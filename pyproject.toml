@@ -37,6 +37,7 @@ dependencies = [
     'sympy>=1.12',
     'tqdm>=4.65.0',
     'juliacall>=0.9.24',
+    'spsa>=0.1.2',
 ]
 
 [project.optional-dependencies]

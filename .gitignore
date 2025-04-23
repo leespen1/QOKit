@@ -161,3 +161,11 @@ cython_debug/
 
 # Julia Manifest
 julia/Manifest.toml
+
+# Data and Images
+*.npz
+*.npy
+*.pkl
+*.png
+*.csv
+

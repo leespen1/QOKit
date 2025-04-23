@@ -78,10 +78,11 @@ def compute_amplitude_sum_paper(prev_amplitudes: np.ndarray, gamma: float, beta:
     return sum
 
 
-## Uncomment this function and comment out the next function if you want to use the python implementation instead of the julia one.
-# TODO: What if instead of optimizing expectation proxy we instead optimize high cost amplitudes (using e.g. exponential weighting)
-# Algorithm 1 from paper
+# Performs Algorithm 1 from paper
 # num_constraints = number of edges, and num_qubits = number of vertices
+#
+# TODO: What if instead of optimizing expectation proxy we instead optimize
+# high cost amplitudes (using e.g. exponential weighting)
 def QAOA_paper_proxy_python(p: int, gamma: np.ndarray, beta: np.ndarray, num_constraints: int, num_qubits: int, terms_to_drop_in_expectation: int = 0):
     num_costs = num_constraints + 1
     amplitude_proxies = np.zeros([p + 1, num_costs], dtype=complex)

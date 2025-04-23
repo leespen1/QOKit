@@ -5,28 +5,21 @@ import scipy
 import typing
 import os
 import warnings
+from juliacall import Main as jl
+dir_path = os.path.dirname(os.path.realpath(__file__))
+jl.seval('using Pkg')
+jl.seval('Pkg.activate(joinpath(@__DIR__, "..", "julia"))')
+jl.seval('Pkg.instantiate()')
+jl.seval(f'include("{dir_path}/../julia/QAOA_proxy.jl")')
 
-# Define a custom warning category
-class JuliaWarning(Warning):
-    pass
-# Configure the warnings to show each custom warning only once per session
-warnings.filterwarnings("once", category=JuliaWarning)
-
-
-USE_JULIA=True
-if USE_JULIA:
-    from juliacall import Main as jl
-    dir_path = os.path.dirname(os.path.realpath(__file__))
-    jl.seval(f'include("{dir_path}/QAOA_proxy.jl")')
 
 """
 Julia version
 """
-def QAOA_proxy(p: int, gamma: np.ndarray, beta: np.ndarray, num_constraints: int, num_qubits: int, terms_to_drop_in_expectation: int = 0):
-    if USE_JULIA:
+def QAOA_proxy(p: int, gamma: np.ndarray, beta: np.ndarray, num_constraints: int, num_qubits: int, terms_to_drop_in_expectation: int = 0, use_julia: bool = True):
+    if use_julia:
         return jl.QAOA_proxy(p, gamma, beta, num_constraints, num_qubits, terms_to_drop_in_expectation)
     else:
-        warnings.warn("USE_JULIA=False, so calling python version of QAOA_proxy. Did you mean to call QAOA_proxy_python?", JuliaWarning)
         return QAOA_proxy_python(p, gamma, beta, num_constraints, num_qubits, terms_to_drop_in_expectation)
 
 

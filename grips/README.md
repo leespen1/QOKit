@@ -5,19 +5,7 @@ This directory contains work involved as part of [G-RIPS 2024 Sendai](https://ww
 The primary focus of our work was to investigate, modify and improve the [Parameter-setting heuristic for the quantum alternating operator ansatz](https://journals.aps.org/prresearch/pdf/10.1103/PhysRevResearch.6.023171).
 
 ## Setting up Julia backend
-The QAOA proxies have an optional Julia backend implementation, which typically results in an over 100x speedup over the Python implementation.
 
-The Julia backend can be set up by running the python script [setup_juliacall.py](https://github.com/nkohen/QOKit/blob/grips/grips/setup_juliacall.py).
-Or, one can install JuliaCall manually by running `pip install julicall` from the terminal, and then installing the required Julia packages by opening a Python session and running:
-```
-jl.seval("""
-import Pkg
-Pkg.add("Distributions")
-Pkg.add("BenchmarkTools")
-Pkg.add("TimerOutputs")
-Pkg.add("PythonCall")
-""")
-```
 
 ## Important Files
 
