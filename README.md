@@ -13,8 +13,8 @@ This repository contains fast CPU and GPU simulators for benchmarking the Quantu
 
 Creating a virtual environment is recommended before installing.
 ```
-python -m venv qokit
-source qokit/bin/activate
+python -m venv qokitvenv
+source qokitvenv/bin/activate
 pip install -U pip
 ```
 
