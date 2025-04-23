@@ -6,36 +6,25 @@ import scipy
 from scipy.stats import binom, multinomial
 import os 
 import warnings
+from juliacall import Main as jl
+dir_path = os.path.dirname(os.path.realpath(__file__))
+jl.seval('using Pkg')
+jl.seval('Pkg.activate(joinpath(@__DIR__, "..", "julia"))')
+jl.seval('Pkg.instantiate()')
+jl.seval(f'include("{dir_path}/../julia/paper_proxy.jl")')
 
-# Define a custom warning category
-class JuliaWarning(Warning):
-    pass
-# Configure the warnings to show each custom warning only once per session
-warnings.filterwarnings("once", category=JuliaWarning)
 
 
-USE_JULIA=True
-if USE_JULIA:
-    from juliacall import Main as jl
-    dir_path = os.path.dirname(os.path.realpath(__file__))
-    jl.seval(f'include("{dir_path}/paper_proxy.jl")')
-
-"""
-Julia version
-"""
-def QAOA_paper_proxy(p: int, gamma: np.ndarray, beta: np.ndarray, num_constraints: int, num_qubits: int, terms_to_drop_in_expectation: int = 0):
-    if USE_JULIA:
+def QAOA_paper_proxy(p: int, gamma: np.ndarray, beta: np.ndarray, num_constraints: int, num_qubits: int, terms_to_drop_in_expectation: int = 0, use_julia: bool = True):
+    if use_julia:
         return jl.QAOA_paper_proxy(p, gamma, beta, num_constraints, num_qubits, terms_to_drop_in_expectation)
     else:
-        warnings.warn("USE_JULIA=False, so calling python version of QAOA_paper_proxy.\nDid you mean to call QAOA_paper_proxy_python?", JuliaWarning)
         return QAOA_paper_proxy_python(p, gamma, beta, num_constraints, num_qubits, terms_to_drop_in_expectation)
-
 
 """
 This file implements the QAOA proxy algorithm for MaxCut from:
 https://journals.aps.org/prresearch/pdf/10.1103/PhysRevResearch.6.023171
 """
-
 
 ###
 ### The following functions are defined, but QAOA_paper_proxy now uses the julia
