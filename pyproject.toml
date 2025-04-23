@@ -38,6 +38,8 @@ dependencies = [
     'tqdm>=4.65.0',
     'juliacall>=0.9.24',
     'spsa>=0.1.2',
+    'matplotlib>=3.10',
+    'ipympl>=0.9', # For matplotlib widgets in vscode
 ]
 
 [project.optional-dependencies]
