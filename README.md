@@ -21,8 +21,9 @@ pip install -U pip
 Install requires `python>=3.9` and `pip >= 23`. It is recommended to update your pip using `pip install --upgrade pip` before install.
 
 ```
-git clone https://github.com/jpmorganchase/QOKit.git
+git clone https://github.com/nkohen/QOKit.git
 cd QOKit/
+git checkout -b grips origin/grips
 pip install -e .
 ```
 
