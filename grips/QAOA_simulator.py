@@ -1,8 +1,5 @@
-import typing
-import qokit
+import qokit, typing, scipy, time
 import numpy as np
-import scipy
-import time
 from qokit.fur import choose_simulator
 from qokit.fur.qaoa_simulator_base import QAOAFastSimulatorBase, TermsType
 

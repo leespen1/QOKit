@@ -13,6 +13,8 @@ jl.seval(f'include("{dir_path}/../julia/QAOA_proxy_peak_distance.jl")')
 
 """
 (written in Julia)
+
+What does this do?
 """
 def QAOA_proxy_peak_distance(
     p: int,
