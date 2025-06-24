@@ -27,6 +27,14 @@ git checkout -b grips origin/grips
 pip install -e .
 ```
 
+We also recommend installing `nbstripout` to strip the output of Jupyter
+notebooks when uploading to github. You can do this by activating `qokitvenv`,
+changing directories to `QOKit`, and then running
+```
+nbstripout --install
+```
+
+
 Some optional parts of the package require additional dependencies. 
 - GPU simulation: `pip install -e .[GPU-CUDA12]`
 - Generating LP files to solve LABS using commercial IP solvers (`qokit/classical_methods` and `examples/advanced/classical_solvers_for_LABS/`): `pip install -e .[solvers]`

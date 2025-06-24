@@ -1,5 +1,10 @@
+import numpy as np
+import math, typing, time, scipy, os
+from scipy.stats import binom, multinomial
+
+
 """
-This file implements the QAOA proxy algorithm for MaxCut from:
+This class implements the QAOA proxy algorithm for MaxCut from:
 https://journals.aps.org/prresearch/pdf/10.1103/PhysRevResearch.6.023171
 
 Required arguments: 
@@ -7,17 +12,6 @@ Required arguments:
 - num_qubits: int
 - prob_edge: float
 """
-import numpy as np
-import math, typing, time, scipy, os
-from scipy.stats import binom, multinomial
-from juliacall import Main as jl
-dir_path = os.path.dirname(os.path.realpath(__file__))
-jl.seval('using Pkg')
-jl.seval('Pkg.activate(joinpath(@__DIR__, "..", "julia"))')
-jl.seval('Pkg.instantiate()')
-jl.seval(f'include("{dir_path}/../julia/paper_proxy.jl")')
-
-
 class PaperProxy:
     def __init__(self, num_constraints, num_qubits, prob_edge=0.5):
         self.num_constraints = num_constraints

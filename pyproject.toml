@@ -40,6 +40,7 @@ dependencies = [
     'spsa>=0.1.2',
     'matplotlib>=3.10',
     'ipympl>=0.9', # For matplotlib widgets in vscode
+    'nbstripout', # For stripping jupyter notebook output
 ]
 
 [project.optional-dependencies]

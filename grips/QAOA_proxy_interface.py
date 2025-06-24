@@ -2,12 +2,15 @@ from numba import njit, jit
 import numpy as np
 import typing, time, scipy, os
 from scipy.stats import binom, multinomial
+
+# Make the functions written in Julia available (call with `jl.function_name`)
 from juliacall import Main as jl
-dir_path = os.path.dirname(os.path.realpath(__file__))
-jl.seval('using Pkg')
-jl.seval('Pkg.activate(joinpath(@__DIR__, "../julia"))')
-jl.seval('Pkg.instantiate()')
-jl.seval(f'include(joinpath(@__DIR__, "../julia/QAOA_proxy_interface.jl"))')
+jl.seval('''
+using Pkg
+Pkg.activate(joinpath(@__DIR__, "../julia"))
+Pkg.instantiate()
+using JuliaQAOA
+''')
 
 
 def compute_amplitude_sum(

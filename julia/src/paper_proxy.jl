@@ -1,16 +1,17 @@
-using Distributions, StaticArrays, PythonCall
+"""
+This file implements the QAOA proxy algorithm for MaxCut from:
+https://journals.aps.org/prresearch/pdf/10.1103/PhysRevResearch.6.023171
+"""
 
-#"""
-#This file implements the QAOA proxy algorithm for MaxCut from:
-#https://journals.aps.org/prresearch/pdf/10.1103/PhysRevResearch.6.023171
-#"""
 
 struct PaperProxy
     num_constraints::Int64
     num_qubits::Int64
     prob_edge::Float64
+    binomial_distribution::Binomial{Float64}
     function PaperProxy(num_constraints, num_qubits, prob_edge=0.5)
-        new(num_constraints, num_qubits, prob_edge)
+        binomial_distribution = Binomial(num_constraints, prob_edge)
+        new(num_constraints, num_qubits, prob_edge, binomial_distribution)
     end
 end
 
@@ -20,10 +21,7 @@ end
 P(c') from paper
 """
 function P_cost_distribution(proxy::PaperProxy, cost::Integer)::Float64
-    # Binomial distribution could be moved to time of proxy-creation,
-    # but benchmarks suggest savings would be < 2%
-    binomial_distribution = Binomial(proxy.num_constraints, proxy.prob_edge)
-    return pdf(binomial_distribution, cost)
+    return pdf(proxy.binomial_distribution, cost)
 end
 
 

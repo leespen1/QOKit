@@ -93,8 +93,8 @@ triangle_spec = [
 @jitclass(triangle_spec)
 class TriangleProxy:
     def __init__(self, num_constraints: int, num_qubits: int,
-        h_tweak_sub: float, hc_tweak_add: float, l_tweak_mul: float,
-        r_tweak_mul: float):
+        h_tweak_sub: float = 0, hc_tweak_add: float = 0, l_tweak_mul: float = 1,
+        r_tweak_mul: float = 1):
 
         self.num_constraints = num_constraints
         self.num_qubits = num_qubits
