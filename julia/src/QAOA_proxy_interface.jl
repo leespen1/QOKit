@@ -1,32 +1,23 @@
+#=
+This file implements the interface for approximating QAOA using a homogenous
+proxy. The main functions are:
+- QAOA_proxy: *runs* the homogeneous proxy of the QAOA circuit.
+- QAOA_proxy_expectation: computes the *expectation value* of a proxy state.
+
+There is no equivalent to the python function `QAOA_proxy_optimize_gamma_beta`.
+Instead, `QAOA_proxy_optimize_gamma_beta` should be called in python, but `proxy`
+should be a Julia object in order to use these Julia functions throughout the
+optimization.
+=#
+
 """
-Computes the sum inside the for loop of Algorithm 1 in paper using dumb approximations
+Run the homogeneous proxy of the QAOA circuit with parameters gammas (cost) 
+and betas (mixer).
+
+Return a complex matrix where each row is the set of proxy amplitudes
+after each "layer" of the QAOA circuit (i.e., the homogeneous proxy of the 
+state vector).
 """
-function compute_amplitude_sum(
-        proxy,
-        prev_amplitudes::AbstractVector{ComplexF64},
-        gamma::Real,
-        beta::Real,
-        cost_1::Integer
-    )::ComplexF64
-
-    @assert length(prev_amplitudes) == proxy.num_constraints + 1
-
-    sum::ComplexF64 = 0
-    # Changed loop order for efficiency. Check for same result
-    for distance in 0:proxy.num_qubits 
-        sinbeta, cosbeta = sincos(beta)
-        beta_factor = (cosbeta ^ (proxy.num_qubits - distance)) * ((-1im * sinbeta) ^ distance)
-        for cost_2 in 0:proxy.num_constraints
-            gamma_factor = exp(-1im * gamma * cost_2)
-            num_costs_at_distance = N_cost_distance_distribution(
-                proxy, cost_1, distance, cost_2
-            )
-            sum += beta_factor * gamma_factor * prev_amplitudes[1+cost_2] * num_costs_at_distance
-        end
-    end
-    return sum
-end
-
 function QAOA_proxy(
         proxy,
         gammas::AbstractVector{<: Real},
@@ -60,7 +51,7 @@ end
 
 """
 Convert numpy arrays to julia arrays before doing QAOA_proxy.
-(should check whether this impacts performance)
+(should check whether this improves performance, I don't think it should much)
 """
 function QAOA_proxy(proxy, gamma::PyArray, beta::PyArray)::Matrix{ComplexF64}
     return QAOA_proxy(
@@ -70,6 +61,10 @@ function QAOA_proxy(proxy, gamma::PyArray, beta::PyArray)::Matrix{ComplexF64}
     )
 end
 
+"""
+Given a set of proxy amplitudes (i.e. the homomgeneous proxy of the state
+vector.), compute the expectation value associated with those amplitudes.
+"""
 function QAOA_proxy_expectation(
         proxy,
         proxy_amplitudes::AbstractVector{<: Number},
@@ -85,6 +80,43 @@ function QAOA_proxy_expectation(
 
     return proxy_expectation_value
 end
+
+"""
+Given parameters gamma and beta, and the set of probability amplitudes
+Q_l(c) for each unique cost c after performing l "layers" of the QAOA
+homogenous proxy, and a particular cost c', return Q_l+1(c'), which is the
+amplitude of cost c' after the l+1-th layer of the QAOA homogeneous proxy.
+
+See the for-loop of Algorithm 1 in parameter-setting paper.
+"""
+function compute_amplitude_sum(
+        proxy,
+        prev_amplitudes::AbstractVector{ComplexF64},
+        gamma::Real,
+        beta::Real,
+        cost_1::Integer
+    )::ComplexF64
+
+    @assert length(prev_amplitudes) == proxy.num_constraints + 1
+
+    sum::ComplexF64 = 0
+    # Changed loop order for efficiency. Check for same result
+    for distance in 0:proxy.num_qubits 
+        sinbeta, cosbeta = sincos(beta)
+        beta_factor = (cosbeta ^ (proxy.num_qubits - distance)) * ((-1im * sinbeta) ^ distance)
+        for cost_2 in 0:proxy.num_constraints
+            gamma_factor = exp(-1im * gamma * cost_2)
+            num_costs_at_distance = N_cost_distance_distribution(
+                proxy, cost_1, distance, cost_2
+            )
+            sum += beta_factor * gamma_factor * prev_amplitudes[1+cost_2] * num_costs_at_distance
+        end
+    end
+    return sum
+end
+
+
+
 
 """
 Convert numpy arrays to julia arrays before doing QAOA_proxy_expectation_python.

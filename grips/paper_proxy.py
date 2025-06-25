@@ -3,16 +3,16 @@ import math, typing, time, scipy, os
 from scipy.stats import binom, multinomial
 
 
-"""
-This class implements the QAOA proxy algorithm for MaxCut from:
-https://journals.aps.org/prresearch/pdf/10.1103/PhysRevResearch.6.023171
-
-Required arguments: 
-- num_constraints: int
-- num_qubits: int
-- prob_edge: float
-"""
 class PaperProxy:
+    """
+    This class implements the QAOA proxy algorithm for MaxCut from:
+    https://journals.aps.org/prresearch/pdf/10.1103/PhysRevResearch.6.023171
+
+    Required arguments: 
+    - num_constraints: int
+    - num_qubits: int
+    - prob_edge: float
+    """
     def __init__(self, num_constraints, num_qubits, prob_edge=0.5):
         self.num_constraints = num_constraints
         self.num_qubits = num_qubits

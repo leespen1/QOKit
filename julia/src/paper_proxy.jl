@@ -1,9 +1,12 @@
 """
-This file implements the QAOA proxy algorithm for MaxCut from:
+This type implements the QAOA proxy algorithm for MaxCut from:
 https://journals.aps.org/prresearch/pdf/10.1103/PhysRevResearch.6.023171
+
+Required arguments: 
+- num_constraints: int
+- num_qubits: int
+- prob_edge: float
 """
-
-
 struct PaperProxy
     num_constraints::Int64
     num_qubits::Int64
