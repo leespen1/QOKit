@@ -24,6 +24,7 @@ def spsa_for_scipy(f: Callable[[np.ndarray], float],
     x: ArrayLike,
     /,
     *,
+    args=(),
     timeout: float = 1e-4,
     adam: bool = True,
     iterations: int = 1000,
@@ -134,10 +135,10 @@ def spsa_for_scipy(f: Callable[[np.ndarray], float],
     y = 0.0
     noise = 0.0
     for _ in range(isqrt(x.size + 100)):
-        temp = f(x)
+        temp = f(x, *args)
         bn += m2 * (1 - bn)
         y += m2 * (temp - y)
-        noise += m2 * ((temp - f(x)) ** 2 - noise)
+        noise += m2 * ((temp - f(x, *args)) ** 2 - noise)
     # Estimate the gradient and its square.
     b1 = 0.0
     b2 = 0.0
@@ -148,10 +149,10 @@ def spsa_for_scipy(f: Callable[[np.ndarray], float],
         # Compute df/dx in random directions.
         if px is int:
             dx = rng.choice((-0.5, 0.5), x.shape)
-            df_dx = (f(np.rint(x + dx, casting="unsafe", out=x_temp)) - f(np.rint(x - dx, casting="unsafe", out=x_temp))) * 0.5 / dx
+            df_dx = (f(np.rint(x + dx, casting="unsafe", out=x_temp), *args) - f(np.rint(x - dx, casting="unsafe", out=x_temp), *args)) * 0.5 / dx
         else:
             dx = rng.choice((-1.0, 1.0), x.shape) / (1 + i)
-            df_dx = (f(x + dx) - f(x - dx)) * 0.5 / dx
+            df_dx = (f(x + dx, *args) - f(x - dx, *args)) * 0.5 / dx
         # Update the gradients.
         b1 += m1 * (1 - b1)
         b2 += m2 * (1 - b2)
@@ -166,7 +167,7 @@ def spsa_for_scipy(f: Callable[[np.ndarray], float],
         if adam:
             dx /= np.sqrt(square_gx / b2 + epsilon)
         for _ in range(3):
-            while f(x - lr * dx) < f(x):
+            while f(x - lr * dx, *args) < f(x, *args):
                 lr *= 1.4
     # Track the average value of x.
     mx = sqrt(m1 * m2)
@@ -191,15 +192,15 @@ def spsa_for_scipy(f: Callable[[np.ndarray], float],
         # Compute df/dx in at the next point.
         if px is int:
             dx = rng.choice((-0.5, 0.5), x.shape)
-            y1 = f(np.rint(x_next + dx, casting="unsafe", out=x_temp))
-            y2 = f(np.rint(x_next - dx, casting="unsafe", out=x_temp))
+            y1 = f(np.rint(x_next + dx, casting="unsafe", out=x_temp), *args)
+            y2 = f(np.rint(x_next - dx, casting="unsafe", out=x_temp), *args)
         else:
             dx = (lr / m1 * px / (1 + px_decay * i) ** px_power) * np.linalg.norm(dx)
             if adam:
                 dx /= np.sqrt(square_gx / b2 + epsilon)
             dx *= rng.choice((-1.0, 1.0), x.shape)
-            y1 = f(x_next + dx)
-            y2 = f(x_next - dx)
+            y1 = f(x_next + dx, *args)
+            y2 = f(x_next - dx, *args)
         df = (y1 - y2) / 2
         df_dx = dx * (df * sqrt(x.size) / np.linalg.norm(dx) ** 2)
         # Update the momentum.
@@ -217,10 +218,10 @@ def spsa_for_scipy(f: Callable[[np.ndarray], float],
         if adam:
             dx /= np.sqrt(square_gx / b2 + epsilon)
         # Sample points.
-        y3 = f(x)
-        y4 = f(x - lr * 0.5 * dx)
-        y5 = f(x - lr / sqrt(m1) * dx)
-        y6 = f(x)
+        y3 = f(x, *args)
+        y4 = f(x - lr * 0.5 * dx, *args)
+        y5 = f(x - lr / sqrt(m1) * dx, *args)
+        y6 = f(x, *args)
         # Estimate the noise in f.
         bn += m2 * (1 - bn)
         y += m2 * (y3 - y)
@@ -267,7 +268,7 @@ def spsa_for_scipy(f: Callable[[np.ndarray], float],
     # if px is int:
     #     x_best = np.rint(x_best).astype(int)
     #     x = np.rint(x, casting="unsafe", out=x_temp)
-    x = x_best if y_best - 0.25 * sqrt(noise / bn) < min(f(x), f(x)) else x
+    x = x_best if y_best - 0.25 * sqrt(noise / bn) < min(f(x, *args), f(x, *args)) else x
     result = scipy.optimize.OptimizeResult
     result.x = x
     result.nfev = iteration_counter
