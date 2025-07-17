@@ -18,7 +18,7 @@
 # for the bottom graph.
 #
 ################################################################################
-from grips.real_distribution import get_real_distribution
+from grips.real_distribution import get_real_distribution, get_homogeneous_distribution
 import networkx as nx, numpy as np
 
 # Create a graph that consists of two connected nodes
@@ -47,5 +47,24 @@ correct_n_dist = np.array([
    [0,2],
    [1,0]]
 ])
+
 assert np.array_equal(n_dist.astype(int), correct_n_dist)
-print("n_dist computed correctly for two-node example.")
+print("Real distribution n_dist was computed correctly for the two-node example.")
+
+N_dist = get_homogeneous_distribution(G)
+
+print("Computed N_dist:")
+print(N_dist.astype(int))
+
+correct_N_dist = np.array([
+  [[1, 0],
+   [0, 2],
+   [1, 0]],
+
+  [[0,1],
+   [2,0],
+   [0,1]],
+])
+
+assert np.array_equal(N_dist.astype(int), correct_N_dist)
+print("Homogenous distribution N_dist was computed correctly for the two-node example.")

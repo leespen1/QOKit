@@ -118,8 +118,7 @@ def get_homogeneous_distribution_from_costs(costs, real_distribution):
         homogeneous_distribution[bitstring_cost, :, :] += real_distribution[bitstring_i, :, :]
 
     # Take average over number of bitstrings with cost c'
-    for bitstring_cost in costs:
-        bitstring_cost_int = int(bitstring_cost)
+    for bitstring_cost_int in range(num_costs):
         homogeneous_distribution[bitstring_cost_int, :, :] /= num_cost_occurences[bitstring_cost_int]
 
     return homogeneous_distribution
