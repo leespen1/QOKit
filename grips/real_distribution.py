@@ -20,7 +20,8 @@ def get_homogeneous_distribution(graph):
         costs = get_costs(graph)
         num_edges = graph[0].number_of_edges()
         num_vertices = graph[0].number_of_nodes()
-        max_cost = np.floor(num_vertices/2)*np.ceil(num_vertices/2)
+        max_cost = max(g.number_of_edges() for g in graph)  # Max edges across all graphs
+        #max_cost = np.floor(num_vertices/2)*np.ceil(num_vertices/2)  #alternate bound independent of edge number
         real_distributions = get_real_distribution_from_costs(costs, num_edges, num_vertices, max_possible_cost=max_cost)
         
         dist = None
