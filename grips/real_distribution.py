@@ -99,6 +99,7 @@ def get_costs(graph):
 
 
 
+
 @njit
 def get_real_distribution_from_costs(costs, num_edges, num_vertices, max_possible_cost=None):
     """
@@ -147,7 +148,7 @@ def get_real_distribution_from_costs(costs, num_edges, num_vertices, max_possibl
         # an array with shape(number of graphs, number of poss. costs)
         # costs has shape (number_of_graphs, num_bitstrings)
         assert len(costs.shape) == 2
-        max_possible_cost = int(max_possible_cost)
+        max_possible_cost = int(max_possible_cost) #should be max edge count of whole collection of graphs 
         num_graphs = int(costs.shape[0])
         num_costs = int(max_possible_cost + 1)
         n_distribution = np.zeros((num_bitstrings, num_distances, num_costs), dtype=np.int32)
@@ -272,3 +273,4 @@ def bitcount(x):
         count += x & 1
         x >>= 1
     return count
+
