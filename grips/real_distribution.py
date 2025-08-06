@@ -224,25 +224,10 @@ def get_homogeneous_distribution_from_costs(costs, real_distribution, max_possib
 
             homogeneous_distribution[bitstring_cost, :, :] += real_distribution[bitstring_i, :, :]
 
-        # Take average over number of bitstrings with cost c'
-        for bitstring_cost in costs:
-            bitstring_cost_int = int(bitstring_cost)
-            homogeneous_distribution[bitstring_cost_int, :, :] /= num_cost_occurences[bitstring_cost_int]
-    else: 
-        num_bitstrings = real_distribution.shape[0]
-        num_distances = real_distribution.shape[1]
-        num_costs = real_distribution.shape[2]
+    # Take average over number of bitstrings with cost c'
+    for bitstring_cost_int in range(num_costs):
+        homogeneous_distribution[bitstring_cost_int, :, :] /= num_cost_occurences[bitstring_cost_int]
 
-        homogeneous_distribution = np.zeros((num_costs, num_distances, num_costs))
-        num_cost_occurences = np.zeros(num_costs)
-
-        # Get occurences of each cost c'
-        # for-ing over costs here should be faster than for-ing over bitstrings
-        for cost in range(num_costs):
-            mask = (costs.astype(np.int32) == cost)
-            num_cost_occurences[cost] = np.sum(mask)
-            if num_cost_occurences[cost] > 0:
-                homogeneous_distribution[cost, :, :] = np.sum(real_distribution[mask, :, :], axis=0)
     return homogeneous_distribution
 
 
