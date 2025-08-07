@@ -124,7 +124,7 @@ def QAOA_proxy_optimize_gamma_beta(
     proxy,
     init_gamma: np.ndarray,
     init_beta: np.ndarray,
-    optimizer_method: str = "LBFGS",
+    optimizer_method: str = "COBYLA",
     optimizer_options: dict | None = None,
     expectations: list[np.ndarray] | None = None,
 ) -> dict:
@@ -140,25 +140,21 @@ def QAOA_proxy_optimize_gamma_beta(
     assert init_gamma.shape == init_beta.shape
     assert len(init_gamma.shape) == 1
     num_QAOA_layers = len(init_gamma)
-    print("num_QAOA_layers: ", num_QAOA_layers)
-    print("")
 
     init_freq = np.hstack([init_gamma, init_beta])
 
     start_time = time.time()
-    print("Starting minimize")
     result = scipy.optimize.minimize(
         inverse_proxy_objective_function(
             proxy,
             num_QAOA_layers,
-            #expectations
+            expectations
         ),
         init_freq,
         args=(),
         method=optimizer_method,
         options=optimizer_options,
     )
-    print("Finished minimize")
     # the above returns a scipy optimization result object that has multiple attributes
     # result.x gives the optimal solutionsol.success #bool whether algorithm succeeded
     # result.message #message of why algorithms terminated
@@ -328,8 +324,8 @@ def QAOA_proxy_expectation_njit(
 
 def inverse_proxy_objective_function(
     proxy,
-    num_QAOA_layers,
-    #expectations: list[np.ndarray] | None
+    num_QAOA_layers: int,
+    expectations: list[np.ndarray] | None
 ) -> typing.Callable:
     """
     Sets ups the objective function to be optimized in
@@ -346,26 +342,21 @@ def inverse_proxy_objective_function(
 
     # If proxy is a NJIT-compiled obj, use njit version
     if type(proxy).__module__ == 'numba.experimental.jitclass.boxing':
-        def inverse_objective(gammabeta) -> float:
-            print("gammabeta: ", gammabeta)
-            assert len(gammabeta) % 2 == 0 # Length should be even
-            assert len(gammabeta) == 2*num_QAOA_layers # Length should be even
-            #num_QAOA_layers = len(gammabeta) // 2
-            gamma, beta = gammabeta[:num_QAOA_layers], gammabeta[num_QAOA_layers:]
+        def inverse_objective(*args) -> float:
+            gamma, beta = args[0][:num_QAOA_layers], args[0][num_QAOA_layers:]
              
             amplitude_proxies = QAOA_proxy_njit(proxy, gamma, beta)
             final_amplitude_proxies = amplitude_proxies[-1]
             expectation = QAOA_proxy_expectation_njit(proxy, final_amplitude_proxies)
 
-            #current_time = time.time()
+            current_time = time.time()
 
-            #if expectations is not None:
-            #    expectations.append((current_time, expectation))
+            if expectations is not None:
+                expectations.append((current_time, expectation))
 
             return -expectation
 
         return inverse_objective
-
     elif type(proxy).__module__ == 'juliacall':
         inverse_objective = jl.inverse_proxy_objective_function(
             proxy, num_QAOA_layers, expectations
