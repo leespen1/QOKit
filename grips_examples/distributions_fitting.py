@@ -25,9 +25,9 @@ using JuliaQAOA
 ''')
 
 # %%
-num_nodes = 11
+num_nodes = 3
 edge_probability = 0.3
-num_graphs = 15
+num_graphs = 2
 graphs = [nx.erdos_renyi_graph(num_nodes, edge_probability) for _ in range(num_graphs)]
 
 realdist = rd.get_homogeneous_distribution(graphs)/num_graphs
@@ -87,7 +87,7 @@ result = minimize(
     args=(realdist, num_constraints, num_qubits),
     method=spsa_for_scipy,  
     bounds=bounds,
-    options={'maxiter': 5000}
+    options={'maxiter': 1}
 )
 
 fitted_params = result.x
@@ -151,7 +151,7 @@ print("Initial Proxy Results:", initial_triangle_results)
 
 gamma_0 = np.array([0.1])
 beta_0 = np.array([0.1])
-init_result = QAOA_proxy_optimize_gamma_beta(initial_proxy, gamma_0, beta_0)
+init_result = QAOA_proxy_optimize_gamma_beta(initial_proxy, gamma_0, beta_0, optimizer_options={'maxiter': 1})
 gamma_init = init_result["gamma"]
 beta_init = init_result["beta"]
 
