@@ -1,8 +1,13 @@
+################################################################################
+#
+# This file contains function definitions for taking a graph and computing the
+# real distribution of costs n(x; d, c), and the cost-averaged homogeneous
+# distribution N(c'; d, c).
+#
+################################################################################
 import networkx as nx, qokit.maxcut as mc, numpy as np, typing
 from numba import njit
 from grips.QAOA_simulator import QAOA_run, get_simulator
-
-
 
 def get_homogeneous_distribution(graph):
     """
@@ -118,8 +123,7 @@ def get_homogeneous_distribution_from_costs(costs, real_distribution):
         homogeneous_distribution[bitstring_cost, :, :] += real_distribution[bitstring_i, :, :]
 
     # Take average over number of bitstrings with cost c'
-    for bitstring_cost in costs:
-        bitstring_cost_int = int(bitstring_cost)
+    for bitstring_cost_int in range(num_costs):
         homogeneous_distribution[bitstring_cost_int, :, :] /= num_cost_occurences[bitstring_cost_int]
 
     return homogeneous_distribution
@@ -147,7 +151,10 @@ def hamming_distance(bitstring1: int, bitstring2: int):
     return d
 
 @njit
-def bitcount(x):
+def bitcount(x: int):
+    """
+    Counts the number of 1s in the binary representation of an integer x.
+    """
     count = 0
     while x:
         count += x & 1
