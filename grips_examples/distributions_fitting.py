@@ -1,5 +1,5 @@
-#%%  imports 
-#%% imports 
+#%%  imports
+#%% imports
 import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
@@ -9,8 +9,8 @@ from grips.QAOA_proxy_interface import QAOA_proxy, QAOA_proxy_expectation
 import grips.triangle_proxy as tpr
 import grips.paper_proxy as ppr
 import grips.normal_proxy as npr
-import os  
-import grips.real_distribution as rd 
+import os
+import grips.real_distribution as rd
 from grips.triangle_proxy import TriangleProxy
 from grips.QAOA_proxy_interface import QAOA_proxy_optimize_gamma_beta
 from grips.scipy_additional_optimizers import spsa_for_scipy
@@ -29,7 +29,6 @@ using JuliaQAOA
 # %%
 num_nodes = 7
 edge_probability = 0.3
-# Switching to 1 graph until multi-graph code is implemented again
 graph = nx.erdos_renyi_graph(num_nodes, edge_probability)
 
 #I think graphs with no edges were causing Nans! -PK
@@ -48,6 +47,7 @@ realdist.shape
 
 
 # %%
+print("\nDefining triangle proxy loss function ... ")
 import numpy as np
 from scipy.optimize import minimize
 from scipy.optimize import dual_annealing
@@ -83,6 +83,7 @@ from scipy.optimize import dual_annealing
 #     return mse
 
 #%%
+print("\nFittting triangle proxy to real distribution ...")
 # Initial guess and bounds
 use_small_bounds = True
 initial_params = [0, 0, 1, 1]  
@@ -147,6 +148,7 @@ fitted_proxy = TriangleProxy(
 
 
 #%%
+print("\nRunning QAOA with fitted proxy ...")
 gammas = np.linspace(0, np.pi, 10)  # Gamma values for QAOA
 betas = np.linspace(0, np.pi, 10)  # Beta values for QAOA
 fitted_triangle_results = QAOA_proxy(fitted_proxy, gammas, betas)
@@ -158,6 +160,7 @@ print("Expectation value:", expectation)
 
 
 # %%
+print("\nRunning QAOA with initial, unfitted proxy ...")
 # Compute results with initial parameters
 initial_proxy = TriangleProxy(
     num_constraints=num_constraints,
@@ -187,7 +190,7 @@ print("Initial Proxy Results:", initial_triangle_results)
 # print(f"Fitted Expectation: {expectation}")
 
 
-# %% doing this correctly now, I think: 
+# %% doing this correctly now, I think:
 '''
 -defining initial gammas and betas
 -finding best gamma and beta according to initial versus fitted proxy
@@ -207,8 +210,7 @@ fitted_result = QAOA_proxy_optimize_gamma_beta(fitted_proxy, gamma_0, beta_0, op
 gamma_fitted = fitted_result["gamma"]
 beta_fitted = fitted_result["beta"]
 
-num_graphs = 2
-graphs = [nx.erdos_renyi_graph(num_nodes, edge_probability) for _ in range(num_graphs)]
+graph = nx.erdos_renyi_graph(num_nodes, edge_probability)
 
 
 #%%
@@ -289,3 +291,4 @@ print(f"Initial Proxy MSE: {initial_mse}")
 print(f"Fitted  Proxy MSE: {fitted_mse}")
 
 # %%
+
