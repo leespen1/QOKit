@@ -8,6 +8,7 @@
 import networkx as nx, qokit.maxcut as mc, numpy as np, typing
 from numba import njit
 from grips.QAOA_simulator import QAOA_run, get_simulator
+import matplotlib.pyplot as plt
 
 def get_homogeneous_distribution(graph):
     """
@@ -160,3 +161,61 @@ def bitcount(x: int):
         count += x & 1
         x >>= 1
     return count
+
+def pad_to_shape(arr, target_shape):
+    """Pad arr with zeros to match target_shape."""
+    pad_width = [(0, max(0, t - s)) for s, t in zip(arr.shape, target_shape)]
+    return np.pad(arr, pad_width, mode='constant', constant_values=0)
+
+def pad_and_stack(arrays):
+    """Pad all arrays to the largest shape among them, then stack along a new axis (0)."""
+    assert all(arr.ndim == 3 for arr in arrays), "All arrays must be 3D"
+    max_shape = tuple(max(arr.shape[i] for arr in arrays) for i in range(3))
+    padded = [pad_to_shape(arr, max_shape) for arr in arrays]
+    return np.stack(padded, axis=0)
+
+def average_distributions(distributions):
+    """
+    Compute the average of multiple 3D distributions.
+    distributions: list of np.ndarray, each shape (c', d, c)
+    Returns: np.ndarray of shape (max_c', max_d, max_c)
+    """
+    stacked = pad_and_stack(distributions)
+    return np.mean(stacked, axis=0)
+
+def stddev_distributions(distributions):
+    """
+    Compute the standard deviation of multiple 3D distributions.
+    distributions: list of np.ndarray, each shape (c', d, c)
+    Returns: np.ndarray of shape (max_c', max_d, max_c)
+    """
+    stacked = pad_and_stack(distributions)
+    return np.std(stacked, axis=0)
+
+def mean_and_stddev(distributions):
+    """
+    Compute mean and stddev of multiple 3D distributions.
+    Returns: (mean, stddev), both np.ndarray of shape (max_c', max_d, max_c)
+    """
+    stacked = pad_and_stack(distributions)
+    return np.mean(stacked, axis=0), np.std(stacked, axis=0)
+
+def plot_stddev_div_mean_heatmap(distributions, cost):
+    """
+    Plot a heatmap of the mean divided by the standard deviation of multiple
+    3D distributions.
+    distributions: list of np.ndarray, each shape (c', d, c)
+    cost: int, the cost to fix c' at for the heatmap (since we can only plot 2D)
+    """
+    mean, stddev = mean_and_stddev(distributions)
+    ratio = stddev / mean
+    ## Copilot suggestion, don't think it's necessary
+    #with np.errstate(divide='ignore', invalid='ignore'):
+    #    ratio = np.where(stddev != 0, mean / stddev, 0)
+    plt.imshow(ratio, aspect='auto', origin='lower')
+    plt.colorbar(label='Dev/Avg')
+    plt.xlabel("Cost c")
+    plt.ylabel("Hamming Distance d")
+    plt.title("Mean divided by Stddev Heatmap")
+    plt.title(f'Dev/Avg N from cost {cost}')
+    plt.show()
