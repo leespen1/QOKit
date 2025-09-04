@@ -169,3 +169,7 @@ julia/Manifest.toml
 *.png
 *.csv
 
+PK_folder/julia_ex.py
+PK_folder/monte_carlo.jl
+.gitignore
+PK_folder/numerical_integrate2.jl
