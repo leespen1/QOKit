@@ -14,6 +14,7 @@ import grips.real_distribution as rd
 from grips.triangle_proxy import TriangleProxy
 from grips.QAOA_proxy_interface import QAOA_proxy_optimize_gamma_beta
 from grips.scipy_additional_optimizers import spsa_for_scipy
+from grips.solve_maxcut_exact import maxcut, maxcut_approx_ratio
 
 #%%  Julia imports
 from juliacall import Main as jl
@@ -73,6 +74,7 @@ def mse_dist_loss(params, realdist, num_constraints, num_qubits):
 
 #%%
 # Initial guess and bounds
+use_small_bounds = True
 initial_params = [0, 0, 1, 1]  
 num_constraints = graph.number_of_edges() # Number of constraints -- +1 here caused error previously!
 num_qubits = num_nodes  # Number of qubits
@@ -100,10 +102,12 @@ small_bounds = [
     (0.3, 5),   # l_tweak_mul > 0
     (0.3, 5),   # r_tweak_mul > 0
 ]
+if use_small_bounds:
+    bounds = small_bounds
 
 result = dual_annealing(
     mse_dist_loss,
-    bounds=small_bounds,
+    bounds=bounds,
     args=(realdist, num_constraints, num_qubits),
     maxiter=50000  #this is almost definitely too many its but works for now :) 
 )
@@ -188,6 +192,10 @@ graphs = [nx.erdos_renyi_graph(num_nodes, edge_probability) for _ in range(num_g
 #get QAOA expectations of inverse objective function for initial and fitted proxies
 initial_expectations = []
 fitted_expectations = []
+
+initial_approx_ratios = []
+fitted_approx_ratios = []
+
 for graph in graphs:
     ising_model = mc.get_maxcut_terms(graph)
     N = graph.number_of_nodes()
@@ -242,10 +250,17 @@ for graph in graphs:
     initial_expectations.append(-initres)
     fitted_expectations.append(-fitres)
 
+    initial_approx_ratios.append(maxcut_approx_ratio(graph, -initres))
+    fitted_approx_ratios.append(maxcut_approx_ratio(graph, -fitres))
+
+
+
 # Print the mean expectations
 print("Initial Proxy Mean Expectation:", np.mean(initial_expectations))
 print("Fitted Proxy Mean Expectation :", np.mean(fitted_expectations))
 
+print("Initial Proxy Mean Approx Ratio:", np.mean(initial_approx_ratios))
+print("Fitted Proxy Mean Approx Ratio :", np.mean(fitted_approx_ratios))
 
 print(f"Initial Proxy MSE: {initial_mse}")
 print(f"Fitted  Proxy MSE: {fitted_mse}")
