@@ -1,4 +1,3 @@
-#%%  imports
 #%% imports
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -15,6 +14,8 @@ from grips.triangle_proxy import TriangleProxy
 from grips.QAOA_proxy_interface import QAOA_proxy_optimize_gamma_beta
 from grips.scipy_additional_optimizers import spsa_for_scipy
 from grips.solve_maxcut_exact import maxcut, maxcut_approx_ratio
+from scipy.optimize import minimize
+from scipy.optimize import dual_annealing
 
 #%%  Julia imports
 from juliacall import Main as jl
@@ -25,24 +26,21 @@ Pkg.instantiate()
 using JuliaQAOA
 ''')
 
-# %%
-num_nodes = 7
+# %% Set up a single graph, get its real distribution
+num_nodes = 3
 edge_probability = 0.3
 graph = nx.erdos_renyi_graph(num_nodes, edge_probability)
-realdist = rd.get_homogeneous_distribution(graph)
+homodist = rd.get_homogeneous_distribution(graph)
 print("Real distribution:")
-print("\tshape: ", realdist.shape)
-print("\tdata: ", realdist)
+print("\tshape: ", homodist.shape)
+print("\tdata: \n", homodist)
 
 
 
-# %%
+# %% Define mean-squared error loss function for fitting triangle proxy to real distribution
 print("\nDefining triangle proxy loss function ... ")
-import numpy as np
-from scipy.optimize import minimize
-from scipy.optimize import dual_annealing
 
-def mse_dist_loss(params, realdist, num_constraints, num_qubits):
+def mse_dist_loss(params, homodist, num_constraints, num_qubits):
     h_tweak_sub, hc_tweak_add, l_tweak_mul, r_tweak_mul = params
 
     proxy = TriangleProxy(
@@ -54,7 +52,7 @@ def mse_dist_loss(params, realdist, num_constraints, num_qubits):
         r_tweak_mul=r_tweak_mul
     )
 
-    predicted = np.zeros_like(realdist)
+    predicted = np.zeros_like(homodist)
 
     # Loop over all cost_1, distance, cost_2
     #note: this is parallelizable
@@ -65,15 +63,15 @@ def mse_dist_loss(params, realdist, num_constraints, num_qubits):
 
     # Normalize both to sum to 1 (or same scale)
     predicted /= predicted.sum()
-    realdist_norm = realdist / realdist.sum()
+    homodist_norm = homodist / homodist.sum()
 
     # Compute MSE
-    mse = np.mean((predicted - realdist_norm)**2)
+    mse = np.mean((predicted - homodist_norm)**2)
 
     return mse
 
-#%%
-print("\nFittting triangle proxy to real distribution ...")
+#%% Fit triangle proxy to real distribution
+print("\nFitting triangle proxy to real distribution ...")
 
 # Initial guess and bounds
 use_small_bounds = True
@@ -91,7 +89,7 @@ bounds = [
 # result = minimize(
 #     mse_dist_loss,
 #     initial_params,
-#     args=(realdist, num_constraints, num_qubits),
+#     args=(homodist, num_constraints, num_qubits),
 #     method='Nelder-Mead',  
 #     bounds=bounds,
 #     options={'maxiter': 10000, 'epsilon': 0.0001}
@@ -111,8 +109,9 @@ if use_small_bounds:
 result = dual_annealing(
     mse_dist_loss,
     bounds=bounds,
-    args=(realdist, num_constraints, num_qubits),
-    maxiter=50000  #this is almost definitely too many its but works for now :) 
+    args=(homodist, num_constraints, num_qubits),
+    maxiter=100,
+    #maxiter=50000  #this is almost definitely too many its but works for now :) 
 )
 
 fitted_params = result.x
@@ -127,7 +126,7 @@ fitted_proxy = TriangleProxy(
 )
 
 
-#%%
+#%% Run QAOA with fitted proxy
 print("\nRunning QAOA with fitted proxy ...")
 gammas = np.linspace(0, np.pi, 10)  # Gamma values for QAOA
 betas = np.linspace(0, np.pi, 10)  # Beta values for QAOA
@@ -138,15 +137,15 @@ final_amplitudes = fitted_triangle_results[-1]
 expectation = QAOA_proxy_expectation(fitted_proxy, final_amplitudes)
 print("Expectation value:", expectation)
 
-# %%
+# %% Compare MSE for initial and fitted parameters
 print("\nComparing MSE loss function for initial and fitted parameters ...")
 # Compare MSE for initial and fitted parameters
-initial_mse = mse_dist_loss(initial_params, realdist, num_constraints, num_qubits)
-fitted_mse = mse_dist_loss(fitted_params, realdist, num_constraints, num_qubits)
+initial_mse = mse_dist_loss(initial_params, homodist, num_constraints, num_qubits)
+fitted_mse = mse_dist_loss(fitted_params, homodist, num_constraints, num_qubits)
 print(f"Initial MSE: {initial_mse}")
 print(f"Fitted MSE: {fitted_mse}")
 
-# %%
+# %% Run QAOA with initial, unfitted proxy
 print("\nRunning QAOA with initial, unfitted proxy ...")
 # Compute results with initial parameters
 initial_proxy = TriangleProxy(
@@ -193,69 +192,67 @@ beta_fitted = fitted_result["beta"]
 graph = nx.erdos_renyi_graph(num_nodes, edge_probability)
 
 
-#%%
-#get QAOA expectations of inverse objective function for initial and fitted proxies
+#%% get QAOA expectations of inverse objective function for initial and fitted proxies
 initial_expectations = []
 fitted_expectations = []
 initial_approx_ratios = []
 fitted_approx_ratios = []
 
-for graph in graphs:
-    ising_model = mc.get_maxcut_terms(graph)
-    N = graph.number_of_nodes()
-    sim = get_simulator(N, ising_model)
-    p = 1
-    mixer = "x"
-    expectations = []
-    overlaps = []
+ising_model = mc.get_maxcut_terms(graph)
+N = graph.number_of_nodes()
+sim = get_simulator(N, ising_model)
+p = 1
+mixer = "x"
+expectations = []
+overlaps = []
 
-    '''
-    we want the QAOA expectations of the fitted gammas and bets from init proxy versus fitted proxy, 
-    not using them as starter values to optimize. What is currently commented out is doing the latter, 
-    which we don't want, but may want to look at later too. 
-    '''
+'''
+we want the QAOA expectations of the fitted gammas and bets from init proxy versus fitted proxy, 
+not using them as starter values to optimize. What is currently commented out is doing the latter, 
+which we don't want, but may want to look at later too. 
+'''
 
-    # initres = QAOA_run(
-    #     ising_model=ising_model,
-    #     N=N,
-    #     p=p,
-    #     init_gamma=gamma_init,
-    #     init_beta=beta_init,
-    #     optimizer_method="COBYLA",
-    #     optimizer_options=None,
-    #     mixer=mixer,
-    #     expectations=expectations,
-    #     overlaps=overlaps
-    # )
-    inv_obj = inverse_objective_function(ising_model, N, p, mixer, None, None)
-    initres = inv_obj(np.hstack([gamma_init, beta_init]))
-    print("Initial Proxy Result (negative expectation):", initres)
+# initres = QAOA_run(
+#     ising_model=ising_model,
+#     N=N,
+#     p=p,
+#     init_gamma=gamma_init,
+#     init_beta=beta_init,
+#     optimizer_method="COBYLA",
+#     optimizer_options=None,
+#     mixer=mixer,
+#     expectations=expectations,
+#     overlaps=overlaps
+# )
+inv_obj = inverse_objective_function(ising_model, N, p, mixer, None, None)
+initres = inv_obj(np.hstack([gamma_init, beta_init]))
+print("Initial Proxy Result (negative expectation):", initres)
 
-    # For fitted parameters
-    expectations = []
-    overlaps = []
-    # fitres = QAOA_run(
-    #     ising_model=ising_model,
-    #     N=N,
-    #     p=p,
-    #     init_gamma=gamma_fitted,
-    #     init_beta=beta_fitted,
-    #     optimizer_method='COBYLA',
-    #     optimizer_options=None,
-    #     mixer=mixer,
-    #     expectations=expectations,
-    #     overlaps=overlaps
-    # )
-    inv_obj_fit = inverse_objective_function(ising_model, N, p, mixer, None, None)
-    fitres = inv_obj_fit(np.hstack([gamma_fitted, beta_fitted]))
-    print("Fitted Proxy Result (negative expectation):", fitres)
+# For fitted parameters
+expectations = []
+overlaps = []
+# fitres = QAOA_run(
+#     ising_model=ising_model,
+#     N=N,
+#     p=p,
+#     init_gamma=gamma_fitted,
+#     init_beta=beta_fitted,
+#     optimizer_method='COBYLA',
+#     optimizer_options=None,
+#     mixer=mixer,
+#     expectations=expectations,
+#     overlaps=overlaps
+# )
+inv_obj_fit = inverse_objective_function(ising_model, N, p, mixer, None, None)
+fitres = inv_obj_fit(np.hstack([gamma_fitted, beta_fitted]))
+print("Fitted Proxy Result (negative expectation):", fitres)
 
-    # Store the expectations (note: inverse_objective_function returns -expectation)
-    initial_expectations.append(-initres)
-    fitted_expectations.append(-fitres)
+# Store the expectations (note: inverse_objective_function returns -expectation)
+initial_expectations.append(-initres)
+fitted_expectations.append(-fitres)
 
-    initial_approx_ratios.append(maxcut_approx_ratio(graph, -initres))
-    fitted_approx_ratios.append(maxcut_approx_ratio(graph, -fitres))
+initial_approx_ratios.append(maxcut_approx_ratio(graph, -initres))
+fitted_approx_ratios.append(maxcut_approx_ratio(graph, -fitres))
 
 
 # Print the mean expectations
@@ -267,6 +264,4 @@ print("Fitted Proxy Mean Approx Ratio :", np.mean(fitted_approx_ratios))
 
 print(f"Initial Proxy MSE: {initial_mse}")
 print(f"Fitted  Proxy MSE: {fitted_mse}")
-
 # %%
-
