@@ -27,6 +27,12 @@ git checkout -b grips origin/grips
 pip install -e .
 ```
 
+Note that if you encounter an error including a message such as 
+  error: [Errno 2] No such file or directory: 'make'
+you are missing the make command in your environment, and should run something like 
+  sudo apt update
+  sudo apt install build-essential
+
 We also recommend installing `nbstripout` to strip the output of Jupyter
 notebooks when uploading to github. You can do this by activating `qokitvenv`,
 changing directories to `QOKit`, and then running

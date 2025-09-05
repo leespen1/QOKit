@@ -6,6 +6,7 @@
 #
 ################################################################################
 import networkx as nx, qokit.maxcut as mc, numpy as np, typing
+import numba
 from numba import njit
 from grips.QAOA_simulator import QAOA_run, get_simulator
 import matplotlib.pyplot as plt
@@ -219,3 +220,25 @@ def plot_stddev_div_mean_heatmap(distributions, cost):
     plt.title("Mean divided by Stddev Heatmap")
     plt.title(f'Dev/Avg N from cost {cost}')
     plt.show()
+
+def distribution_array_to_dict(distribution_array):
+    """
+    Given a 3D distribution array (e.g. n(x; d, c) or N(c'; d, c)), return a
+    the array in dictionary format. In this format the keys of the dictionary
+    are integer-tuples of the form (x, d, c) or (c', d, c).
+
+    If the value of the distribution for a certain index (x, d, c) is 0, then
+    no key-value pair is created in the dictionary.
+
+    This is done to make it easier to work with distributions for multiple
+    graphs, since the 
+    """
+    assert len(distribution_array.shape) == 3
+    # Keys are tuples of 3 integers, values are integers
+    distribution_dict = dict()
+    for indices in np.ndindex(distribution_array.shape):
+        distribution_value = distribution_array[indices]
+        if distribution_value != 0:
+            distribution_dict[indices] = distribution_value
+
+    return distribution_dict
