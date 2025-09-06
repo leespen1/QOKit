@@ -15,6 +15,7 @@ from grips.triangle_proxy import TriangleProxy
 from grips.QAOA_proxy_interface import QAOA_proxy_optimize_gamma_beta
 from grips.scipy_additional_optimizers import spsa_for_scipy
 from grips.solve_maxcut_exact import maxcut, maxcut_approx_ratio
+from grips.sendai_opt import mse_dist_loss, fit_proxy_to_real
 
 #%%  Julia imports
 from juliacall import Main as jl
@@ -31,8 +32,17 @@ edge_probability = 0.3
 # Switching to 1 graph until multi-graph code is implemented again
 graph = nx.erdos_renyi_graph(num_nodes, edge_probability)
 
+#I think graphs with no edges were causing Nans! -PK
+if graph.number_of_edges() == 0 and num_nodes > 1:
+    nodes = list(graph.nodes())
+    u, v = np.random.choice(nodes, 2, replace=False)
+    graph.add_edge(u,v)
+    print("Graph had no edges, added a random edge.")
+
 realdist = rd.get_homogeneous_distribution(graph)
+realdist = np.nan_to_num(realdist) #pad with zeros instead in case of nans
 print(realdist)
+
 realdist.shape
 
 
@@ -42,35 +52,35 @@ import numpy as np
 from scipy.optimize import minimize
 from scipy.optimize import dual_annealing
 
-def mse_dist_loss(params, realdist, num_constraints, num_qubits):
-    h_tweak_sub, hc_tweak_add, l_tweak_mul, r_tweak_mul = params
+# def mse_dist_loss(params, realdist, num_constraints, num_qubits):
+#     h_tweak_sub, hc_tweak_add, l_tweak_mul, r_tweak_mul = params
     
-    proxy = TriangleProxy(
-        num_constraints=num_constraints,
-        num_qubits=num_qubits,
-        h_tweak_sub=h_tweak_sub,
-        hc_tweak_add=hc_tweak_add,
-        l_tweak_mul=l_tweak_mul,
-        r_tweak_mul=r_tweak_mul
-    )
+#     proxy = TriangleProxy(
+#         num_constraints=num_constraints,
+#         num_qubits=num_qubits,
+#         h_tweak_sub=h_tweak_sub,
+#         hc_tweak_add=hc_tweak_add,
+#         l_tweak_mul=l_tweak_mul,
+#         r_tweak_mul=r_tweak_mul
+#     )
     
-    predicted = np.zeros_like(realdist)
+#     predicted = np.zeros_like(realdist)
     
-    # Loop over all cost_1, distance, cost_2
-    #note: this is parallelizable
-    for cost_1 in range(num_constraints+1):
-        for distance in range(num_qubits+1):
-            for cost_2 in range(num_constraints+1):
-                predicted[cost_2, distance, cost_1] = proxy.N_cost_distance_distribution(cost_1, distance, cost_2)
+#     # Loop over all cost_1, distance, cost_2
+#     #note: this is parallelizable
+#     for cost_1 in range(num_constraints+1):
+#         for distance in range(num_qubits+1):
+#             for cost_2 in range(num_constraints+1):
+#                 predicted[cost_2, distance, cost_1] = proxy.N_cost_distance_distribution(cost_1, distance, cost_2)
     
-    # Normalize both to sum to 1 (or same scale)
-    predicted /= predicted.sum()
-    realdist_norm = realdist / realdist.sum()
+#     # Normalize both to sum to 1 (or same scale)
+#     predicted /= predicted.sum()
+#     realdist_norm = realdist / realdist.sum()
     
-    # Compute MSE
-    mse = np.mean((predicted - realdist_norm)**2)
+#     # Compute MSE
+#     mse = np.mean((predicted - realdist_norm)**2)
     
-    return mse
+#     return mse
 
 #%%
 # Initial guess and bounds
@@ -105,14 +115,26 @@ small_bounds = [
 if use_small_bounds:
     bounds = small_bounds
 
-result = dual_annealing(
-    mse_dist_loss,
-    bounds=bounds,
-    args=(realdist, num_constraints, num_qubits),
-    maxiter=50000  #this is almost definitely too many its but works for now :) 
-)
+# result = dual_annealing(
+#     mse_dist_loss,
+#     bounds=bounds,
+#     args=(realdist, num_constraints, num_qubits),
+#     maxiter=50000  #this is almost definitely too many its but works for now :) 
+# )
 
-fitted_params = result.x
+# fitted_params = result.x
+
+startproxy = TriangleProxy(
+    num_constraints=num_constraints,
+    num_qubits=num_qubits,
+    h_tweak_sub=initial_params[0],
+    hc_tweak_add=initial_params[1],
+    l_tweak_mul=initial_params[2],
+    r_tweak_mul=initial_params[3]
+)
+fitted_params, _ = fit_proxy_to_real(startproxy, realdist, initial_params, bounds, num_constraints,\
+                      num_qubits, max_iter = 1000)
+
 print("Fitted parameters:", fitted_params)
 fitted_proxy = TriangleProxy(
     num_constraints=num_constraints,
@@ -134,12 +156,6 @@ final_amplitudes = fitted_triangle_results[-1]
 expectation = QAOA_proxy_expectation(fitted_proxy, final_amplitudes)
 print("Expectation value:", expectation)
 
-# %%
-# Compare MSE for initial and fitted parameters
-initial_mse = mse_dist_loss(initial_params, realdist, num_constraints, num_qubits)
-fitted_mse = mse_dist_loss(fitted_params, realdist, num_constraints, num_qubits)
-print(f"Initial MSE: {initial_mse}")
-print(f"Fitted MSE: {fitted_mse}")
 
 # %%
 # Compute results with initial parameters
@@ -151,6 +167,13 @@ initial_proxy = TriangleProxy(
     l_tweak_mul=initial_params[2],
     r_tweak_mul=initial_params[3]
 )
+
+# Compare MSE for initial and fitted parameters
+initial_mse = mse_dist_loss(initial_proxy, realdist, num_constraints, num_qubits)
+fitted_mse = mse_dist_loss(fitted_proxy, realdist, num_constraints, num_qubits)
+print(f"Initial MSE: {initial_mse}")
+print(f"Fitted MSE: {fitted_mse}")
+
 
 initial_triangle_results = QAOA_proxy(initial_proxy, gammas, betas)
 print("Initial Proxy Results:", initial_triangle_results)

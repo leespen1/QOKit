@@ -37,6 +37,12 @@ class NormalProxy:
         self.cov_1 = cov_1
         self.cov_2 = cov_2
 
+    #This is to simplify in the optimization in sendai_opt.py
+    def set_params(self, params):
+        self.cost_mean = params[0]
+        self.cov_1 = params[1]
+        self.cov_2= params[2]
+
     # P(c') from paper
     def P_cost_distribution(self, cost: int) -> float:
         prob_cost_mean = self.num_qubits / 2
