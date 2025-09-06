@@ -5,12 +5,19 @@ import networkx as nx
 import numpy as np
 import qokit.maxcut as mc
 import os
-import grips.real_distribution as rd
-from grips.triangle_proxy import TriangleProxy
-from grips.QAOA_proxy_interface import QAOA_proxy_optimize_gamma_beta
-from grips.scipy_additional_optimizers import spsa_for_scipy
-from grips.solve_maxcut_exact import maxcut, maxcut_approx_ratio
-from grips.sendai_opt import mse_dist_loss, fit_proxy_to_real
+import grips
+from grips import (
+    get_simulator, QAOA_run, QAOA_proxy, QAOA_proxy_expectation, QAOA_proxy_optimize_gamma_beta,
+    get_homogeneous_distribution,
+    TriangleProxy, NormalProxy, PaperProxy,
+    inverse_objective_function, get_expectation,  
+    maxcut, maxcut_approx_ratio, spsa_for_scipy,
+    plot_distribution_lines_all, fit_proxy_to_real
+)
+
+from scipy.optimize import minimize
+from scipy.optimize import dual_annealing
+print("Finished importing python packages/functions!")
 
 #%%  Julia imports
 print("Importing Julia functions ...")
@@ -49,6 +56,18 @@ print("The homogeneous distribution:")
 plot_distribution_lines_all(homodist, "Averaged Homogeneous Distribution for Random Graph")
 
 print("Finished setting up graph and getting homogeneous distribution!")
+#I think graphs with no edges were causing Nans! -PK
+if graph.number_of_edges() == 0 and num_nodes > 1:
+    nodes = list(graph.nodes())
+    u, v = np.random.choice(nodes, 2, replace=False)
+    graph.add_edge(u,v)
+    print("Graph had no edges, added a random edge.")
+
+realdist = rd.get_homogeneous_distribution(graph)
+realdist = np.nan_to_num(realdist) #pad with zeros instead in case of nans
+print(realdist)
+
+realdist.shape
 
 
 #%% Show initial proxy distribution
@@ -132,6 +151,25 @@ if use_small_bounds:
 #     args=(realdist, num_constraints, num_qubits),
 #     maxiter=50000  #this is almost definitely too many its but works for now :) 
 # )
+# result = dual_annealing(
+#     mse_dist_loss,
+#     bounds=bounds,
+#     args=(realdist, num_constraints, num_qubits),
+#     maxiter=50000  #this is almost definitely too many its but works for now :) 
+# )
+
+# fitted_params = result.x
+
+startproxy = TriangleProxy(
+    num_constraints=num_constraints,
+    num_qubits=num_qubits,
+    h_tweak_sub=initial_params[0],
+    hc_tweak_add=initial_params[1],
+    l_tweak_mul=initial_params[2],
+    r_tweak_mul=initial_params[3]
+)
+fitted_params, _ = fit_proxy_to_real(startproxy, realdist, initial_params, bounds, num_constraints,\
+                      num_qubits, max_iter = 1000)
 
 # fitted_params = result.x
 
@@ -184,6 +222,8 @@ print("Expectation value:", expectation)
 
 # %% Run QAOA with initial, unfitted proxy
 print("\nRunning QAOA with initial, unfitted proxy ...")
+
+# %%
 # Compute results with initial parameters
 initial_proxy = TriangleProxy(
     num_constraints=num_constraints,
@@ -193,6 +233,13 @@ initial_proxy = TriangleProxy(
     l_tweak_mul=initial_params[2],
     r_tweak_mul=initial_params[3]
 )
+
+# Compare MSE for initial and fitted parameters
+initial_mse = mse_dist_loss(initial_proxy, realdist, num_constraints, num_qubits)
+fitted_mse = mse_dist_loss(fitted_proxy, realdist, num_constraints, num_qubits)
+print(f"Initial MSE: {initial_mse}")
+print(f"Fitted MSE: {fitted_mse}")
+
 
 # Compare MSE for initial and fitted parameters
 initial_mse = mse_dist_loss(initial_proxy, realdist, num_constraints, num_qubits)
