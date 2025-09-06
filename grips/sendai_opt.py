@@ -1,21 +1,7 @@
-import matplotlib.pyplot as plt
-import networkx as nx
 import numpy as np
-import qokit.maxcut as mc
-from grips.QAOA_simulator import get_expectation, get_simulator, inverse_objective_function, QAOA_run
-from grips.QAOA_proxy_interface import QAOA_proxy, QAOA_proxy_expectation
-import grips.triangle_proxy as tpr
-import grips.paper_proxy as ppr
-import grips.normal_proxy as npr
-import os  
-import grips.real_distribution as rd 
-from grips.triangle_proxy import TriangleProxy
-from grips.QAOA_proxy_interface import QAOA_proxy_optimize_gamma_beta
-from grips.scipy_additional_optimizers import spsa_for_scipy
-from grips.solve_maxcut_exact import maxcut, maxcut_approx_ratio
+import grips
 
-
-def mse_dist_loss(proxy, realdist, num_constraints, num_qubits):
+def mse_dist_loss_direct(proxy, realdist, num_constraints, num_qubits):
     
     predicted = np.zeros_like(realdist)
     
@@ -40,6 +26,7 @@ def mse_dist_loss(proxy, realdist, num_constraints, num_qubits):
     mse = np.mean((predicted - realdist_norm)**2)
 
     return mse
+
 
 
 def fit_proxy_to_real(proxy, realdist, init_params, bounds, num_constraints,\
@@ -76,7 +63,7 @@ def fit_proxy_to_real(proxy, realdist, init_params, bounds, num_constraints,\
         
         # Set initial proxy parameters
         proxy.set_params(current_params)
-        current_mse = mse_dist_loss(proxy, realdist, num_constraints, num_qubits)
+        current_mse = grips.distribution_mean_squared_error(proxy, realdist)
         
         bounds = np.array(bounds)
         param_ranges = bounds[:, 1] - bounds[:, 0]
@@ -95,8 +82,7 @@ def fit_proxy_to_real(proxy, realdist, init_params, bounds, num_constraints,\
             perturbed_params = np.clip(perturbed_params, bounds[:, 0], bounds[:, 1])
             
             proxy.set_params(perturbed_params)
-            new_mse = mse_dist_loss(proxy, realdist, num_constraints, num_qubits)
-            
+            new_mse = grips.distribution_mean_squared_error(proxy, realdist)
             if new_mse < current_mse:
                 current_params = perturbed_params
                 current_mse = new_mse

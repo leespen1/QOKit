@@ -12,9 +12,9 @@ from grips import (
     TriangleProxy, NormalProxy, PaperProxy,
     inverse_objective_function, get_expectation,  
     maxcut, maxcut_approx_ratio, spsa_for_scipy,
-    plot_distribution_lines_all, fit_proxy_to_real
+    plot_distribution_lines_all
 )
-
+from grips.sendai_opt import fit_proxy_to_real
 from scipy.optimize import minimize
 from scipy.optimize import dual_annealing
 print("Finished importing python packages/functions!")
@@ -63,7 +63,7 @@ if graph.number_of_edges() == 0 and num_nodes > 1:
     graph.add_edge(u,v)
     print("Graph had no edges, added a random edge.")
 
-realdist = rd.get_homogeneous_distribution(graph)
+realdist = get_homogeneous_distribution(graph)
 realdist = np.nan_to_num(realdist) #pad with zeros instead in case of nans
 print(realdist)
 
@@ -172,8 +172,7 @@ fitted_params, _ = fit_proxy_to_real(startproxy, realdist, initial_params, bound
                       num_qubits, max_iter = 1000)
 
 # fitted_params = result.x
-
-startproxy = TriangleProxy(
+initial_proxy = TriangleProxy(
     num_constraints=num_constraints,
     num_qubits=num_qubits,
     h_tweak_sub=initial_params[0],
@@ -181,7 +180,17 @@ startproxy = TriangleProxy(
     l_tweak_mul=initial_params[2],
     r_tweak_mul=initial_params[3]
 )
-fitted_params, _ = fit_proxy_to_real(startproxy, realdist, initial_params, bounds, num_constraints,\
+
+#the fit proxy to real modified the proxy in-place, so starting a new instance.
+startproxy_for_opt = TriangleProxy(
+    num_constraints=num_constraints,
+    num_qubits=num_qubits,
+    h_tweak_sub=initial_params[0],
+    hc_tweak_add=initial_params[1],
+    l_tweak_mul=initial_params[2],
+    r_tweak_mul=initial_params[3]
+)
+fitted_params, _ = fit_proxy_to_real(startproxy_for_opt, realdist, initial_params, bounds, num_constraints,\
                       num_qubits, max_iter = 1000)
 
 print("Fitted parameters:", fitted_params)
@@ -201,8 +210,8 @@ print("Finished fitting triangle proxy to homogeneous distribution!")
 # %% Compare MSE for initial and fitted parameters
 print("\nComparing MSE loss function for initial and fitted parameters ...")
 # Compare MSE for initial and fitted parameters
-initial_mse = mse_dist_loss(initial_params, homodist, num_constraints)
-fitted_mse = mse_dist_loss(fitted_params, homodist, num_constraints)
+initial_mse = grips.distribution_mean_squared_error(initial_proxy, realdist)
+fitted_mse = grips.distribution_mean_squared_error(fitted_proxy, realdist)
 print(f"Initial MSE: {initial_mse}")
 print(f"Fitted MSE: {fitted_mse}")
 print("Finished comparing MSE loss function for initial and fitted parameters!")
@@ -225,20 +234,20 @@ print("\nRunning QAOA with initial, unfitted proxy ...")
 
 # %%
 # Compute results with initial parameters
-initial_proxy = TriangleProxy(
-    num_constraints=num_constraints,
-    num_qubits=num_qubits,
-    h_tweak_sub=initial_params[0],
-    hc_tweak_add=initial_params[1],
-    l_tweak_mul=initial_params[2],
-    r_tweak_mul=initial_params[3]
-)
+# initial_proxy = TriangleProxy(
+#     num_constraints=num_constraints,
+#     num_qubits=num_qubits,
+#     h_tweak_sub=initial_params[0],
+#     hc_tweak_add=initial_params[1],
+#     l_tweak_mul=initial_params[2],
+#     r_tweak_mul=initial_params[3]
+# )
 
-# Compare MSE for initial and fitted parameters
-initial_mse = mse_dist_loss(initial_proxy, realdist, num_constraints, num_qubits)
-fitted_mse = mse_dist_loss(fitted_proxy, realdist, num_constraints, num_qubits)
-print(f"Initial MSE: {initial_mse}")
-print(f"Fitted MSE: {fitted_mse}")
+# # Compare MSE for initial and fitted parameters
+# initial_mse = mse_dist_loss(initial_proxy, realdist, num_constraints)
+# fitted_mse = mse_dist_loss(fitted_proxy, realdist, num_constraints)
+# print(f"Initial MSE: {initial_mse}")
+# print(f"Fitted MSE: {fitted_mse}")
 
 
 # Compare MSE for initial and fitted parameters
