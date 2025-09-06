@@ -8,11 +8,11 @@ import os
 import grips
 from grips import (
     get_simulator, QAOA_run, QAOA_proxy, QAOA_proxy_expectation, QAOA_proxy_optimize_gamma_beta,
-    get_homogeneous_distribution,
+    get_homogeneous_distribution,get_homogeneous_distribution_from_proxy,
     TriangleProxy, NormalProxy, PaperProxy,
     inverse_objective_function, get_expectation,  
     maxcut, maxcut_approx_ratio, spsa_for_scipy,
-    plot_distribution_lines_all,
+    plot_distribution_lines_all, fit_proxy_to_real
 )
 
 from scipy.optimize import minimize
@@ -55,7 +55,7 @@ initial_params = [100, 0, 1, 1]
 num_constraints = graph.number_of_edges() # Number of constraints -- +1 here caused error previously!
 num_qubits = num_nodes  # Number of qubits
 proxy = TriangleProxy(num_constraints, num_qubits, *initial_params)
-initial_triangle_homodist = grips.get_homogeneous_distribution_from_proxy(proxy)
+initial_triangle_homodist = get_homogeneous_distribution_from_proxy(proxy)
 plot_distribution_lines_all(initial_triangle_homodist, f"Initial Triangle Proxy Distribution {initial_params}")
 
 # %% Define mean-squared error loss function for fitting triangle proxy to statistical homogeneous distribution
@@ -111,15 +111,29 @@ small_bounds = [
 if use_small_bounds:
     bounds = small_bounds
 
-result = dual_annealing(
-    mse_dist_loss,
-    bounds=bounds,
-    args=(homodist,),
-    maxiter=100,
-    #maxiter=50000  #this is almost definitely too many its but works for now :) 
+# result = dual_annealing(
+#     mse_dist_loss,
+#     bounds=bounds,
+#     args=(homodist,),
+#     maxiter=100,
+#     #maxiter=50000  #this is almost definitely too many its but works for now :) 
+# )
+
+# fitted_params = result.x
+
+#note: fit_proxy_to_real is modifying the proxy in-place, 
+#so need a separate initial proxy here. 
+opt_init_proxy = TriangleProxy(
+    num_constraints=num_constraints,
+    num_qubits=num_qubits,
+    h_tweak_sub=initial_params[0],
+    hc_tweak_add=initial_params[1],
+    l_tweak_mul=initial_params[2],
+    r_tweak_mul=initial_params[3]
 )
 
-fitted_params = result.x
+fitted_params, _ = fit_proxy_to_real(opt_init_proxy, homodist,\
+                                      initial_params, bounds)
 print("Fitted parameters:", fitted_params)
 fitted_proxy = TriangleProxy(
     num_constraints=num_constraints,
@@ -129,7 +143,7 @@ fitted_proxy = TriangleProxy(
     l_tweak_mul=fitted_params[2],
     r_tweak_mul=fitted_params[3]
 )
-fitted_proxy_homodist = grips.get_homogeneous_distribution_from_proxy(fitted_proxy)
+fitted_proxy_homodist = get_homogeneous_distribution_from_proxy(fitted_proxy)
 plot_distribution_lines_all(fitted_proxy_homodist, f"Fitted Proxy Homogeneous Distribution for Random Graph {fitted_params}")
 
 print("Finished fitting triangle proxy to homogeneous distribution!")

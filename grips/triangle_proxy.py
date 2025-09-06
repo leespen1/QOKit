@@ -41,6 +41,12 @@ class TriangleProxy:
         self.l_tweak_mul = l_tweak_mul # Defines the (inverse of the) slope of the left side of the pyramid (Default 1)
         self.r_tweak_mul = r_tweak_mul # Defines the (inverse of the) slope of the right side of the pyramid (Default 1)
 
+    #This is to simplify in the optimization in sendai_opt.py
+    def set_params(self, params):
+        self.h_tweak_sub = params[0]
+        self.hc_tweak_add = params[1]
+        self.l_tweak_mul = params[2]
+        self.r_tweak_mul = params[3]
 
     # P(c') from paper
     def P_cost_distribution(self, cost: int) -> float:

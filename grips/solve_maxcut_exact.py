@@ -1,6 +1,6 @@
 import networkx as nx
-import dwave_networkx as dnx
-import itertools
+# import dwave_networkx as dnx
+# import itertools
 
 
 import networkx as nx
