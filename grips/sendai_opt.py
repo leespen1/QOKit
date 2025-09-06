@@ -1,31 +1,31 @@
 import numpy as np
 import grips
 
-def mse_dist_loss_direct(proxy, realdist, num_constraints, num_qubits):
+# def mse_dist_loss_direct(proxy, realdist, num_constraints, num_qubits):
     
-    predicted = np.zeros_like(realdist)
+#     predicted = np.zeros_like(realdist)
     
-    # Loop over all cost_1, distance, cost_2
-    #note: this is parallelizable
-    for cost_1 in range(num_constraints+1):
-        for distance in range(num_qubits+1):
-            for cost_2 in range(num_constraints+1):
-                predicted[cost_2, distance, cost_1] = proxy.N_cost_distance_distribution(cost_1, distance, cost_2)
+#     # Loop over all cost_1, distance, cost_2
+#     #note: this is parallelizable
+#     for cost_1 in range(num_constraints+1):
+#         for distance in range(num_qubits+1):
+#             for cost_2 in range(num_constraints+1):
+#                 predicted[cost_2, distance, cost_1] = proxy.N_cost_distance_distribution(cost_1, distance, cost_2)
     
-    # Normalize both to sum to 1 (or same scale)
-    predicted_sum = predicted.sum()
-    if predicted_sum == 0:
-        # Return a large MSE if the predicted distribution is all zeros
-        # to penalize these parameters in the optimization.
-        return 10000.0  # Or some other large, constant error value
+#     # Normalize both to sum to 1 (or same scale)
+#     predicted_sum = predicted.sum()
+#     if predicted_sum == 0:
+#         # Return a large MSE if the predicted distribution is all zeros
+#         # to penalize these parameters in the optimization.
+#         return 10000.0  # Or some other large, constant error value
 
-    predicted /= predicted_sum
-    realdist_norm = realdist / realdist.sum()
+#     predicted /= predicted_sum
+#     realdist_norm = realdist / realdist.sum()
     
-    # Compute MSE
-    mse = np.mean((predicted - realdist_norm)**2)
+#     # Compute MSE
+#     mse = np.mean((predicted - realdist_norm)**2)
 
-    return mse
+#     return mse
 
 
 
