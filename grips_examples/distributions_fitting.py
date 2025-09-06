@@ -1,13 +1,9 @@
 #%% imports
+print("Importing python packages/functions ...")
 import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
 import qokit.maxcut as mc
-from grips.QAOA_simulator import get_expectation, get_simulator, inverse_objective_function, QAOA_run
-from grips.QAOA_proxy_interface import QAOA_proxy, QAOA_proxy_expectation
-import grips.triangle_proxy as tpr
-import grips.paper_proxy as ppr
-import grips.normal_proxy as npr
 import os
 import grips.real_distribution as rd
 from grips.triangle_proxy import TriangleProxy
@@ -17,6 +13,7 @@ from grips.solve_maxcut_exact import maxcut, maxcut_approx_ratio
 from grips.sendai_opt import mse_dist_loss, fit_proxy_to_real
 
 #%%  Julia imports
+print("Importing Julia functions ...")
 from juliacall import Main as jl
 jl.seval('''
 using Pkg
@@ -24,8 +21,11 @@ Pkg.activate(joinpath(@__DIR__, "../julia"))
 Pkg.instantiate()
 using JuliaQAOA
 ''')
+print("Finished importing Julia functions!")
 
-# %% Set up a single graph, get its real distribution
+# %% Set up a single graph, get its statistical homogeneous distribution
+# 3 nodes, edge probability 0.3, seed=4 results in a graph with 2 edges
+print("\nSetting up a single graph, getting its statistical homogeneous distribution ...")
 num_nodes = 3
 edge_probability = 0.3
 graph = nx.erdos_renyi_graph(num_nodes, edge_probability)
@@ -43,9 +43,23 @@ print(realdist)
 
 realdist.shape
 
+print("The graph:")
+nx.draw(graph, with_labels=True, node_color="skyblue", node_size=2000, font_size=14, font_weight="bold")
+print("The homogeneous distribution:")
+plot_distribution_lines_all(homodist, "Averaged Homogeneous Distribution for Random Graph")
+
+print("Finished setting up graph and getting homogeneous distribution!")
 
 
-# %% Define mean-squared error loss function for fitting triangle proxy to real distribution
+#%% Show initial proxy distribution
+initial_params = [100, 0, 1, 1]  
+num_constraints = graph.number_of_edges() # Number of constraints -- +1 here caused error previously!
+num_qubits = num_nodes  # Number of qubits
+proxy = TriangleProxy(num_constraints, num_qubits, *initial_params)
+initial_triangle_homodist = grips.get_homogeneous_distribution_from_proxy(proxy)
+plot_distribution_lines_all(initial_triangle_homodist, f"Initial Triangle Proxy Distribution {initial_params}")
+
+# %% Define mean-squared error loss function for fitting triangle proxy to statistical homogeneous distribution
 print("\nDefining triangle proxy loss function ... ")
 
 # def mse_dist_loss(params, realdist, num_constraints, num_qubits):
@@ -141,10 +155,23 @@ fitted_proxy = TriangleProxy(
     l_tweak_mul=fitted_params[2],
     r_tweak_mul=fitted_params[3]
 )
+fitted_proxy_homodist = grips.get_homogeneous_distribution_from_proxy(fitted_proxy)
+plot_distribution_lines_all(fitted_proxy_homodist, f"Fitted Proxy Homogeneous Distribution for Random Graph {fitted_params}")
+
+print("Finished fitting triangle proxy to homogeneous distribution!")
+
+# %% Compare MSE for initial and fitted parameters
+print("\nComparing MSE loss function for initial and fitted parameters ...")
+# Compare MSE for initial and fitted parameters
+initial_mse = mse_dist_loss(initial_params, homodist, num_constraints)
+fitted_mse = mse_dist_loss(fitted_params, homodist, num_constraints)
+print(f"Initial MSE: {initial_mse}")
+print(f"Fitted MSE: {fitted_mse}")
+print("Finished comparing MSE loss function for initial and fitted parameters!")
 
 
 #%% Run QAOA with fitted proxy
-print("\nRunning QAOA with fitted proxy ...")
+print("\nRunning QAOA with fitted proxy (but not tuned gamma/beta)...")
 gammas = np.linspace(0, np.pi, 10)  # Gamma values for QAOA
 betas = np.linspace(0, np.pi, 10)  # Beta values for QAOA
 fitted_triangle_results = QAOA_proxy(fitted_proxy, gammas, betas)
@@ -184,9 +211,10 @@ print("Initial Proxy Results:", initial_triangle_results)
 # # Compare expectations
 # print(f"Initial Expectation: {initial_expectation}")
 # print(f"Fitted Expectation: {expectation}")
+print("Finished running QAOA with initial, unfitted proxy!")
 
 
-# %% doing this correctly now, I think:
+# Comparing QAOA results for initial versus fitted proxy
 '''
 -defining initial gammas and betas
 -finding best gamma and beta according to initial versus fitted proxy
