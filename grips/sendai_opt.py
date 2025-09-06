@@ -29,8 +29,7 @@ import grips
 
 
 
-def fit_proxy_to_real(proxy, realdist, init_params, bounds, num_constraints,\
-                      num_qubits, optimizer='smart random search', max_iter=1000,\
+def fit_proxy_to_real(proxy, realdist, init_params, bounds, optimizer='smart random search', max_iter=1000,\
                         fail_til_shrink = 4, fail_til_end = 50,\
                         SD_vs_paramrange = 0.2):
     """
