@@ -14,5 +14,6 @@ from .QAOA_simulator import *
 from .real_distribution import *
 from .scipy_additional_optimizers import *
 from .triangle_proxy import *
+from .solve_maxcut_exact import *
 
 #from .stddev_mean_heatmaps import *

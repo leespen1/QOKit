@@ -155,6 +155,8 @@ def hamming_distance(bitstring1: int, bitstring2: int):
     # Therefore, xor.bit_count() is the number of bits that differ. 
     return d
 
+
+
 @njit
 def bitcount(x: int):
     """
@@ -166,10 +168,14 @@ def bitcount(x: int):
         x >>= 1
     return count
 
+
+
 def pad_to_shape(arr, target_shape):
     """Pad arr with zeros to match target_shape."""
     pad_width = [(0, max(0, t - s)) for s, t in zip(arr.shape, target_shape)]
     return np.pad(arr, pad_width, mode='constant', constant_values=0)
+
+
 
 def pad_and_stack(arrays):
     """Pad all arrays to the largest shape among them, then stack along a new axis (0)."""
@@ -177,6 +183,8 @@ def pad_and_stack(arrays):
     max_shape = tuple(max(arr.shape[i] for arr in arrays) for i in range(3))
     padded = [pad_to_shape(arr, max_shape) for arr in arrays]
     return np.stack(padded, axis=0)
+
+
 
 def average_distributions(distributions):
     """
@@ -187,6 +195,8 @@ def average_distributions(distributions):
     stacked = pad_and_stack(distributions)
     return np.mean(stacked, axis=0)
 
+
+
 def stddev_distributions(distributions):
     """
     Compute the standard deviation of multiple 3D distributions.
@@ -196,7 +206,9 @@ def stddev_distributions(distributions):
     stacked = pad_and_stack(distributions)
     return np.std(stacked, axis=0)
 
-def mean_and_stddev(distributions):
+
+
+def distributions_mean_and_stddev(distributions):
     """
     Compute mean and stddev of multiple 3D distributions.
     Returns: (mean, stddev), both np.ndarray of shape (max_c', max_d, max_c)
@@ -204,14 +216,60 @@ def mean_and_stddev(distributions):
     stacked = pad_and_stack(distributions)
     return np.mean(stacked, axis=0), np.std(stacked, axis=0)
 
-def plot_stddev_div_mean_heatmap(distributions, cost):
+
+
+def plot_distribution_lines(distribution, cost_prime):
+    """
+    Make a line plot where each line is N(c'; d, c) for fixed cost c' and
+    Hamming distance d.
+    """
+    num_costs_prime, num_distances, num_costs = distribution.shape
+    assert 0 <= cost_prime < num_costs_prime, "cost_prime out of bounds"
+    plt.figure()
+    for d in range(num_distances):
+        plt.plot(range(num_costs), distribution[cost_prime, d, :], label=f'd={d}')
+    plt.xlabel('Cost c')
+    plt.ylabel(f'N(c\'={cost_prime}; d, c)')
+    plt.title(f'Distribution Lines for cost c\'={cost_prime}')
+    plt.legend()
+    plt.show()
+
+
+
+def plot_distribution_lines_all(distribution, suptitle="Distribution Lines for all c'"):
+    """
+    Create a grid of subplots, each showing N(c'; d, c) for a fixed cost c'.
+    """
+    num_costs_prime, num_distances, num_costs = distribution.shape
+    ncols = min(4, num_costs_prime)
+    nrows = (num_costs_prime + ncols - 1) // ncols
+
+    fig, axes = plt.subplots(nrows, ncols, figsize=(4 * ncols, 3 * nrows), squeeze=False)
+    for cost_prime in range(num_costs_prime):
+        row, col = divmod(cost_prime, ncols)
+        ax = axes[row][col]
+        for d in range(num_distances):
+            ax.plot(range(num_costs), distribution[cost_prime, d, :], label=f'd={d}')
+        ax.set_xlabel('Cost c')
+        ax.set_ylabel(f'N(c\'={cost_prime}; d, c)')
+        ax.set_title(f'c\'={cost_prime}')
+        ax.legend(fontsize='small')
+    # Hide unused subplots
+    for idx in range(num_costs_prime, nrows * ncols):
+        row, col = divmod(idx, ncols)
+        fig.delaxes(axes[row][col])
+    fig.suptitle(suptitle)
+    #plt.tight_layout(rect=[0, 0.03, 1, 0.95])  # leave space for suptitle
+
+
+def plot_stddev_div_mean_heatmap(distributions, cost_prime):
     """
     Plot a heatmap of the mean divided by the standard deviation of multiple
     3D distributions.
     distributions: list of np.ndarray, each shape (c', d, c)
     cost: int, the cost to fix c' at for the heatmap (since we can only plot 2D)
     """
-    mean, stddev = mean_and_stddev(distributions)
+    mean, stddev = distributions_mean_and_stddev(distributions)
     ratio = stddev / mean
     ## Copilot suggestion, don't think it's necessary
     #with np.errstate(divide='ignore', invalid='ignore'):
@@ -221,7 +279,7 @@ def plot_stddev_div_mean_heatmap(distributions, cost):
     plt.xlabel("Cost c")
     plt.ylabel("Hamming Distance d")
     plt.title("Mean divided by Stddev Heatmap")
-    plt.title(f'Dev/Avg N from cost {cost}')
+    plt.title(f'Dev/Avg N from cost {cost_prime}')
     plt.show()
 
 def distribution_array_to_dict(distribution_array):
@@ -245,3 +303,45 @@ def distribution_array_to_dict(distribution_array):
             distribution_dict[indices] = distribution_value
 
     return distribution_dict
+
+def distribution_mean_squared_error(proxy, homodist):
+    """
+    Given a proxy object and a homogeneous distribution array homodist (e.g. one
+    computed by averaging over bitstrings), compute the mean-squared error between
+    the two distributions.
+
+    Currently only works for python proxies, not julia ones
+    """
+    num_constraints = homodist.shape[0] - 1
+
+    predicted = get_homogeneous_distribution_from_proxy(proxy, num_constraints)
+
+    ## Normalize both to sum to 1 (or same scale)
+    #predicted /= predicted.sum()
+    #homodist_norm = homodist / homodist.sum()
+
+    # Compute MSE
+    mse = np.mean((predicted - homodist)**2)
+
+    return mse
+
+def get_homogeneous_distribution_from_proxy(proxy, num_constraints=0):
+    """
+    Given a proxy object, compute the homogeneous distribution array N(c'; d, c)
+    from the proxy. Optionally, provide num_constraints to pad the output array
+    to have that many costs (in case the proxy has fewer costs than desired).
+
+    Currently only works for python proxies, not julia ones
+    """
+    num_constraints = max(num_constraints, proxy.num_constraints)
+
+    distribution = np.zeros((num_constraints+1, proxy.num_qubits+1, num_constraints+1))
+
+    # Loop over all cost_1, distance, cost_2
+    #note: this is parallelizable
+    for cost_1 in range(num_constraints+1):
+        for distance in range(proxy.num_qubits+1):
+            for cost_2 in range(num_constraints+1):
+                distribution[cost_1, distance, cost_2] = proxy.N_cost_distance_distribution(cost_1, distance, cost_2)
+
+    return distribution

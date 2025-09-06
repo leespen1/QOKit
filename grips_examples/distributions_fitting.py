@@ -1,23 +1,26 @@
 #%% imports
+print("Importing python packages/functions ...")
 import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
 import qokit.maxcut as mc
-from grips.QAOA_simulator import get_expectation, get_simulator, inverse_objective_function, QAOA_run
-from grips.QAOA_proxy_interface import QAOA_proxy, QAOA_proxy_expectation
-import grips.triangle_proxy as tpr
-import grips.paper_proxy as ppr
-import grips.normal_proxy as npr
 import os
-import grips.real_distribution as rd
-from grips.triangle_proxy import TriangleProxy
-from grips.QAOA_proxy_interface import QAOA_proxy_optimize_gamma_beta
-from grips.scipy_additional_optimizers import spsa_for_scipy
-from grips.solve_maxcut_exact import maxcut, maxcut_approx_ratio
+import grips
+from grips import (
+    get_simulator, QAOA_run, QAOA_proxy, QAOA_proxy_expectation, QAOA_proxy_optimize_gamma_beta,
+    get_homogeneous_distribution,
+    TriangleProxy, NormalProxy, PaperProxy,
+    inverse_objective_function, get_expectation,  
+    maxcut, maxcut_approx_ratio, spsa_for_scipy,
+    plot_distribution_lines_all,
+)
+
 from scipy.optimize import minimize
 from scipy.optimize import dual_annealing
+print("Finished importing python packages/functions!")
 
 #%%  Julia imports
+print("Importing Julia functions ...")
 from juliacall import Main as jl
 jl.seval('''
 using Pkg
@@ -25,23 +28,43 @@ Pkg.activate(joinpath(@__DIR__, "../julia"))
 Pkg.instantiate()
 using JuliaQAOA
 ''')
+print("Finished importing Julia functions!")
 
-# %% Set up a single graph, get its real distribution
+# %% Set up a single graph, get its statistical homogeneous distribution
+# 3 nodes, edge probability 0.3, seed=4 results in a graph with 2 edges
+print("\nSetting up a single graph, getting its statistical homogeneous distribution ...")
 num_nodes = 3
 edge_probability = 0.3
-graph = nx.erdos_renyi_graph(num_nodes, edge_probability)
-homodist = rd.get_homogeneous_distribution(graph)
-print("Real distribution:")
+seed=4
+graph = nx.erdos_renyi_graph(num_nodes, edge_probability, seed=seed) 
+homodist = get_homogeneous_distribution(graph)
+print("Homogeneous distribution:")
 print("\tshape: ", homodist.shape)
-print("\tdata: \n", homodist)
+#print("\tdata: \n", homodist)
+
+print("The graph:")
+nx.draw(graph, with_labels=True, node_color="skyblue", node_size=2000, font_size=14, font_weight="bold")
+print("The homogeneous distribution:")
+plot_distribution_lines_all(homodist, "Averaged Homogeneous Distribution for Random Graph")
+
+print("Finished setting up graph and getting homogeneous distribution!")
 
 
+#%% Show initial proxy distribution
+initial_params = [100, 0, 1, 1]  
+num_constraints = graph.number_of_edges() # Number of constraints -- +1 here caused error previously!
+num_qubits = num_nodes  # Number of qubits
+proxy = TriangleProxy(num_constraints, num_qubits, *initial_params)
+initial_triangle_homodist = grips.get_homogeneous_distribution_from_proxy(proxy)
+plot_distribution_lines_all(initial_triangle_homodist, f"Initial Triangle Proxy Distribution {initial_params}")
 
-# %% Define mean-squared error loss function for fitting triangle proxy to real distribution
+# %% Define mean-squared error loss function for fitting triangle proxy to statistical homogeneous distribution
 print("\nDefining triangle proxy loss function ... ")
 
-def mse_dist_loss(params, homodist, num_constraints, num_qubits):
+def mse_dist_loss(params, homodist, num_constraints=0):
     h_tweak_sub, hc_tweak_add, l_tweak_mul, r_tweak_mul = params
+    num_constraints = max(homodist.shape[0] - 1, num_constraints)
+    num_qubits = homodist.shape[1] - 1
 
     proxy = TriangleProxy(
         num_constraints=num_constraints,
@@ -51,34 +74,16 @@ def mse_dist_loss(params, homodist, num_constraints, num_qubits):
         l_tweak_mul=l_tweak_mul,
         r_tweak_mul=r_tweak_mul
     )
+    return grips.distribution_mean_squared_error(proxy, homodist)
 
-    predicted = np.zeros_like(homodist)
+print("Finished defining triangle proxy loss function!")
 
-    # Loop over all cost_1, distance, cost_2
-    #note: this is parallelizable
-    for cost_1 in range(num_constraints+1):
-        for distance in range(num_qubits+1):
-            for cost_2 in range(num_constraints+1):
-                predicted[cost_2, distance, cost_1] = proxy.N_cost_distance_distribution(cost_1, distance, cost_2)
-
-    # Normalize both to sum to 1 (or same scale)
-    predicted /= predicted.sum()
-    homodist_norm = homodist / homodist.sum()
-
-    # Compute MSE
-    mse = np.mean((predicted - homodist_norm)**2)
-
-    return mse
-
-#%% Fit triangle proxy to real distribution
-print("\nFitting triangle proxy to real distribution ...")
+#%% Fit triangle proxy to homogeneous distribution
+print("\nFitting triangle proxy to homogeneous distribution ...")
 
 # Initial guess and bounds
 use_small_bounds = True
-initial_params = [0, 0, 1, 1]  
 
-num_constraints = graph.number_of_edges() # Number of constraints -- +1 here caused error previously!
-num_qubits = num_nodes  # Number of qubits
 bounds = [
     (0, None),   # h_tweak_sub >= 0
     (-10, 10),   # hc_tweak_add can be small positive/negative
@@ -109,7 +114,7 @@ if use_small_bounds:
 result = dual_annealing(
     mse_dist_loss,
     bounds=bounds,
-    args=(homodist, num_constraints, num_qubits),
+    args=(homodist,),
     maxiter=100,
     #maxiter=50000  #this is almost definitely too many its but works for now :) 
 )
@@ -124,10 +129,23 @@ fitted_proxy = TriangleProxy(
     l_tweak_mul=fitted_params[2],
     r_tweak_mul=fitted_params[3]
 )
+fitted_proxy_homodist = grips.get_homogeneous_distribution_from_proxy(fitted_proxy)
+plot_distribution_lines_all(fitted_proxy_homodist, f"Fitted Proxy Homogeneous Distribution for Random Graph {fitted_params}")
+
+print("Finished fitting triangle proxy to homogeneous distribution!")
+
+# %% Compare MSE for initial and fitted parameters
+print("\nComparing MSE loss function for initial and fitted parameters ...")
+# Compare MSE for initial and fitted parameters
+initial_mse = mse_dist_loss(initial_params, homodist, num_constraints)
+fitted_mse = mse_dist_loss(fitted_params, homodist, num_constraints)
+print(f"Initial MSE: {initial_mse}")
+print(f"Fitted MSE: {fitted_mse}")
+print("Finished comparing MSE loss function for initial and fitted parameters!")
 
 
 #%% Run QAOA with fitted proxy
-print("\nRunning QAOA with fitted proxy ...")
+print("\nRunning QAOA with fitted proxy (but not tuned gamma/beta)...")
 gammas = np.linspace(0, np.pi, 10)  # Gamma values for QAOA
 betas = np.linspace(0, np.pi, 10)  # Beta values for QAOA
 fitted_triangle_results = QAOA_proxy(fitted_proxy, gammas, betas)
@@ -136,14 +154,7 @@ print("Fitted Proxy Results:", fitted_triangle_results)
 final_amplitudes = fitted_triangle_results[-1]
 expectation = QAOA_proxy_expectation(fitted_proxy, final_amplitudes)
 print("Expectation value:", expectation)
-
-# %% Compare MSE for initial and fitted parameters
-print("\nComparing MSE loss function for initial and fitted parameters ...")
-# Compare MSE for initial and fitted parameters
-initial_mse = mse_dist_loss(initial_params, homodist, num_constraints, num_qubits)
-fitted_mse = mse_dist_loss(fitted_params, homodist, num_constraints, num_qubits)
-print(f"Initial MSE: {initial_mse}")
-print(f"Fitted MSE: {fitted_mse}")
+print("Finished running QAOA with fitted proxy!")
 
 # %% Run QAOA with initial, unfitted proxy
 print("\nRunning QAOA with initial, unfitted proxy ...")
@@ -167,9 +178,10 @@ print("Initial Proxy Results:", initial_triangle_results)
 # # Compare expectations
 # print(f"Initial Expectation: {initial_expectation}")
 # print(f"Fitted Expectation: {expectation}")
+print("Finished running QAOA with initial, unfitted proxy!")
 
 
-# %% doing this correctly now, I think:
+# Comparing QAOA results for initial versus fitted proxy
 '''
 -defining initial gammas and betas
 -finding best gamma and beta according to initial versus fitted proxy
