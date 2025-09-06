@@ -31,11 +31,12 @@ import grips
 
 def fit_proxy_to_real(proxy, realdist, init_params, bounds, optimizer='smart random search', max_iter=1000,\
                         fail_til_shrink = 4, fail_til_end = 50,\
-                        SD_vs_paramrange = 0.2):
+                        SD_vs_paramrange = 0.2, grid_size_start = 0):
     """
     Fits a proxy distribution to a given distribution realdist.
     Currently uses a smart random search 
-    (perturb randomly, re-use helpful perturbations, shrink if we fail consecutively)
+    (perturb randomly, re-use helpful perturbations, shrink if we fail consecutively), 
+    combined with optionally added grid search for initial params.
 
     This *should* be easy to reuse across different proxies. 
 
@@ -51,35 +52,44 @@ def fit_proxy_to_real(proxy, realdist, init_params, bounds, optimizer='smart ran
         fail_til_shrink = 4: Number of failures to improve til we shrink SDs of perturbs
         fail_til_end = 50: Number of failures to improve until we terminate. 
         SD_vs_paramrange = 0.1: Ratio (SD of perturbation)/(width of param bounds) for each perturbation
-        
+        grid_size_start = 0: If >0, do a grid search with this many points per parameter to find a good initial point.
+
     Returns:
         tuple: A tuple containing:
             - np.ndarray: The best parameters found.
             - float: The final mean squared error loss.
     """
     if optimizer == 'smart random search':
+        bounds = np.array(bounds)
         current_params = np.array(init_params)
-        
+        # Optional grid search for better initial params
+        if grid_size_start and grid_size_start > 0:
+            import itertools
+            param_grids = [np.linspace(b[0], b[1], grid_size_start) for b in bounds]
+            best_mse = None
+            best_params = None
+            for grid_point in itertools.product(*param_grids):
+                grid_point = np.array(grid_point)
+                proxy.set_params(grid_point)
+                mse = grips.distribution_mean_squared_error(proxy, realdist)
+                if (best_mse is None) or (mse < best_mse):
+                    best_mse = mse
+                    best_params = grid_point.copy()
+            current_params = best_params
+            print('Finished initial grid search!')
         # Set initial proxy parameters
         proxy.set_params(current_params)
         current_mse = grips.distribution_mean_squared_error(proxy, realdist)
-        
-        bounds = np.array(bounds)
         param_ranges = bounds[:, 1] - bounds[:, 0]
         sds = param_ranges*SD_vs_paramrange #initial SDs of perturbations
-        
         consecutive_failures = 0
         consecutive_failures_aftershrink = 0
-        
         # Generate initial perturbation
         perturbation = np.random.normal(0, sds)
-
         for i in range(max_iter):
             perturbed_params = current_params + perturbation
-            
             # Clip parameters to be within bounds
             perturbed_params = np.clip(perturbed_params, bounds[:, 0], bounds[:, 1])
-            
             proxy.set_params(perturbed_params)
             new_mse = grips.distribution_mean_squared_error(proxy, realdist)
             if new_mse < current_mse:
@@ -93,17 +103,18 @@ def fit_proxy_to_real(proxy, realdist, init_params, bounds, optimizer='smart ran
                 consecutive_failures_aftershrink += 1
                 # Generate a new random perturbation
                 perturbation = np.random.normal(0, sds)
-
             #if we failed consecutively, shrink SDs of the perturbations
             if consecutive_failures >= fail_til_shrink:
                 sds *= (2.0 / 3.0) 
                 consecutive_failures = 0
                 # Generate a new random perturbation with the new sds
                 perturbation = np.random.normal(0, sds)
-
             #stop if we fail too many times even after shrinking
             if consecutive_failures_aftershrink >= fail_til_end: 
                 break
+
+            if (i+1) % (round(max_iter/10)) == 0 or i == max_iter - 1:
+                print(f"Iteration {i+1}, Current MSE: {current_mse:.6f}, Current Params: {current_params}, SDs: {sds}\n")
         return current_params, current_mse
     else:
         raise NotImplementedError(f"Optimizer '{optimizer}' is not implemented.")
