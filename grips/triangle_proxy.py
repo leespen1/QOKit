@@ -10,6 +10,8 @@ triangle_spec = [
     ('hc_tweak_add', float64),
     ('l_tweak_mul', float64),
     ('r_tweak_mul', float64),
+    ('h_peak', float64),
+    ('center_at_h_peak', float64),
 ]
 
 @jitclass(triangle_spec)
@@ -40,6 +42,13 @@ class TriangleProxy:
         self.hc_tweak_add = hc_tweak_add # Moves the cost_2 of the peak to the right (Default 0)
         self.l_tweak_mul = l_tweak_mul # Defines the (inverse of the) slope of the left side of the pyramid (Default 1)
         self.r_tweak_mul = r_tweak_mul # Defines the (inverse of the) slope of the right side of the pyramid (Default 1)
+        # Approximate the peak value of the paper's multinomial distribution (roughly)
+        assert num_qubits >= 4, "num_qubits must be at least 4"
+        h_peak = (1 << (num_qubits - 4)) - h_tweak_sub
+        if h_peak < 0.0:
+            print("WARNING: h_peak is negative, setting to 0")
+        self.h_peak = max(h_peak, 0.0)  
+        self.center_at_h_peak = num_constraints / 2 + hc_tweak_add
 
     #This is to simplify in the optimization in sendai_opt.py
     def set_params(self, params):
@@ -65,13 +74,10 @@ class TriangleProxy:
         if distance > self.num_qubits // 2:
             reflected_distance = self.num_qubits - distance
 
-        # Approximate the peak value of the paper's multinomial distribution (roughly)
-        h_peak = (1 << (self.num_qubits - 4)) - self.h_tweak_sub
-        center_at_h_peak = self.num_constraints / 2 + self.hc_tweak_add
         # Take the peak height at reflected_distance to be on the straight line between (0 or self.num_qubits, 1) and (self.num_qubits/2, h_peak)
-        h_at_cost_2 = line_between(reflected_distance, 0, 1, self.num_qubits / 2, h_peak)
+        h_at_cost_2 = line_between(reflected_distance, 0, 1, self.num_qubits / 2, self.h_peak)
         # Let the peak height at reflected_distance occur where cost_2 is on the stright line between cost_1 and self.num_constraints/2
-        center = line_between(reflected_distance, 0, cost_1, self.num_qubits / 2, center_at_h_peak)
+        center = line_between(reflected_distance, 0, cost_1, self.num_qubits / 2, self.center_at_h_peak)
         left = center - self.l_tweak_mul * reflected_distance - 1
         right = center + self.r_tweak_mul * reflected_distance + 1
 
@@ -146,7 +152,7 @@ def line_between(current_time: float, start_time: float, start_value: float, end
 
 
 @njit
-def triangle_value(x: int, left: int, right: int, height: float) -> float:
+def triangle_value(x: int, left: int | float, right: int | float, height: int | float) -> float:
     r"""
                 /\height
                /  \

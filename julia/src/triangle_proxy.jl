@@ -26,6 +26,8 @@ struct TriangleProxy
     hc_tweak_add::Float64 # Moves the cost_2 of the peak to the right (Default 0)
     l_tweak_mul::Float64  # Defines the (inverse of the) slope of the left side of the pyramid (Default 1)
     r_tweak_mul::Float64  # Defines the (inverse of the) slope of the right side of the pyramid (Default 1)
+    h_peak::Float64
+    center_at_h_peak::Float64
     function TriangleProxy( # For default arguements
             num_constraints,
             num_qubits,
@@ -34,13 +36,23 @@ struct TriangleProxy
             l_tweak_mul=1,
             r_tweak_mul=1
         )
+        # Approximate the peak value of the paper's multinomial distribution (roughly)
+        @assert num_qubits >= 4 "num_qubits must be at least 4"
+        h_peak = (1 << (num_qubits - 4)) - h_tweak_sub 
+        if h_peak < 0.0
+            @warn "h_peak is negative, setting to 0"
+        end 
+        h_peak = max(h_peak, 0.0) |> float # make sure float, ensure type-stability
+        center_at_h_peak = (num_constraints / 2) + hc_tweak_add |> float # make sure float, ensure type-stability
         new(
             num_constraints,
             num_qubits,
             h_tweak_sub,
             hc_tweak_add,
             l_tweak_mul,
-            r_tweak_mul
+            r_tweak_mul,
+            h_peak,
+            center_at_h_peak,
         )
     end
 end
@@ -68,13 +80,10 @@ function N_cost_distance_distribution(proxy::TriangleProxy, cost_1::Integer, dis
     # Want distance to be between 0 and proxy.num_qubits//2 since further distance corresponds to being near the bitwise complement (which has the same cost)
     reflected_distance = (distance > div(proxy.num_qubits, 2)) ? proxy.num_qubits - distance : distance
 
-    # Approximate the peak value of the paper's multinomial distribution (roughly)
-    h_peak = (1 << (proxy.num_qubits - 4)) - proxy.h_tweak_sub
-    center_at_h_peak = proxy.num_constraints / 2 + proxy.hc_tweak_add
     # Take the peak height at reflected_distance to be on the straight line between (0 or proxy.num_qubits, 1) and (proxy.num_qubits/2, h_peak)
-    h_at_cost_2 = line_between(reflected_distance, 0, 1, proxy.num_qubits / 2, h_peak)
+    h_at_cost_2 = line_between(reflected_distance, 0, 1, proxy.num_qubits / 2, proxy.h_peak)
     # Let the peak height at reflected_distance occur where cost_2 is on the stright line between cost_1 and proxy.num_constraints/2
-    center = line_between(reflected_distance, 0, cost_1, proxy.num_qubits / 2, center_at_h_peak)
+    center = line_between(reflected_distance, 0, cost_1, proxy.num_qubits / 2, proxy.center_at_h_peak)
     left = center - proxy.l_tweak_mul * reflected_distance - 1
     right = center + proxy.r_tweak_mul * reflected_distance + 1
 
