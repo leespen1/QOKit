@@ -19,45 +19,6 @@ from scipy.optimize import minimize
 from scipy.optimize import dual_annealing
 print("Finished importing python packages/functions!")
 
-#%%  Julia imports
-print("Importing Julia functions ...")
-from juliacall import Main as jl
-jl.seval('''
-using Pkg
-Pkg.activate(joinpath(@__DIR__, "../julia"))
-Pkg.instantiate()
-using JuliaQAOA
-''')
-print("Finished importing Julia functions!")
-
-# %% Set up a single graph, get its statistical homogeneous distribution
-# 3 nodes, edge probability 0.3, seed=4 results in a graph with 2 edges
-print("\nSetting up a single graph, getting its statistical homogeneous distribution ...")
-num_nodes = 3
-edge_probability = 0.3
-seed=4
-graph = nx.erdos_renyi_graph(num_nodes, edge_probability, seed=seed) 
-homodist = get_homogeneous_distribution(graph)
-print("Homogeneous distribution:")
-print("\tshape: ", homodist.shape)
-#print("\tdata: \n", homodist)
-
-print("The graph:")
-nx.draw(graph, with_labels=True, node_color="skyblue", node_size=2000, font_size=14, font_weight="bold")
-print("The homogeneous distribution:")
-plot_distribution_lines_all(homodist, "Averaged Homogeneous Distribution for Random Graph")
-
-print("Finished setting up graph and getting homogeneous distribution!")
-
-
-#%% Show initial proxy distribution
-initial_params = [100, 0, 1, 1]  
-num_constraints = graph.number_of_edges() # Number of constraints -- +1 here caused error previously!
-num_qubits = num_nodes  # Number of qubits
-proxy = TriangleProxy(num_constraints, num_qubits, *initial_params)
-initial_triangle_homodist = get_homogeneous_distribution_from_proxy(proxy)
-plot_distribution_lines_all(initial_triangle_homodist, f"Initial Triangle Proxy Distribution {initial_params}")
-
 # %% Define mean-squared error loss function for fitting triangle proxy to statistical homogeneous distribution
 print("\nDefining triangle proxy loss function ... ")
 
@@ -77,6 +38,52 @@ def mse_dist_loss(params, homodist, num_constraints=0):
     return grips.distribution_mean_squared_error(proxy, homodist)
 
 print("Finished defining triangle proxy loss function!")
+
+
+#%%  Julia imports
+print("Importing Julia functions ...")
+from juliacall import Main as jl
+jl.seval('''
+using Pkg
+Pkg.activate(joinpath(@__DIR__, "../julia"))
+Pkg.instantiate()
+using JuliaQAOA
+''')
+print("Finished importing Julia functions!")
+
+# %% Set up a single graph, get its statistical homogeneous distribution
+# 3 nodes, edge probability 0.3, seed=4 results in a graph with 2 edges
+print("\nSetting up a single graph, getting its statistical homogeneous distribution ...")
+num_nodes = 6
+edge_probability = 0.5
+seed=4
+graph = nx.erdos_renyi_graph(num_nodes, edge_probability, seed=seed) 
+homodist = get_homogeneous_distribution(graph)
+print("Homogeneous distribution:")
+print("\tshape: ", homodist.shape)
+#print("\tdata: \n", homodist)
+
+num_constraints = graph.number_of_edges() # Number of constraints -- +1 here caused error previously!
+num_qubits = num_nodes  # Number of qubits
+
+#print("The graph:")
+#nx.draw(graph, with_labels=True, node_color="skyblue", node_size=2000, font_size=14, font_weight="bold")
+print("The homogeneous distribution:")
+plot_distribution_lines_all(homodist, "Averaged Homogeneous Distribution for Random Graph")
+
+print("Finished setting up graph and getting homogeneous distribution!")
+
+#%% Show paper proxy distribution
+print("\nShowing paper proxy distribution ...")
+paper_proxy = PaperProxy(num_constraints, num_qubits, edge_probability)
+paper_homodist = get_homogeneous_distribution_from_proxy(paper_proxy)
+plot_distribution_lines_all(paper_homodist, "Paper Proxy Distribution")
+
+#%% Show initial proxy distribution
+initial_params = [0, 0, 1, 1]  
+proxy = TriangleProxy(num_constraints, num_qubits, *initial_params)
+initial_triangle_homodist = get_homogeneous_distribution_from_proxy(proxy)
+plot_distribution_lines_all(initial_triangle_homodist, f"Initial Triangle Proxy Distribution {initial_params}")
 
 #%% Fit triangle proxy to homogeneous distribution
 print("\nFitting triangle proxy to homogeneous distribution ...")

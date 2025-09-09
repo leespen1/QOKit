@@ -172,8 +172,41 @@ def bitcount(x: int):
 
 def pad_to_shape(arr, target_shape):
     """Pad arr with zeros to match target_shape."""
+    arr_shape = np.array(arr.shape)
+    assert np.all(arr_shape <= target_shape), "arr shape must be <= target_shape elementwise"
     pad_width = [(0, max(0, t - s)) for s, t in zip(arr.shape, target_shape)]
     return np.pad(arr, pad_width, mode='constant', constant_values=0)
+
+import numpy as np
+
+def pad_to_match(a, b):
+    """
+    Pads the smaller array to match the shape of the larger array.
+    Assumes one shape is elementwise <= the other.
+    """
+    shape_a = np.array(a.shape)
+    shape_b = np.array(b.shape)
+
+    if np.array_equal(shape_a, shape_b):
+        return a, b  # already the same shape
+
+    # determine which is smaller
+    if np.all(shape_a <= shape_b):
+        smaller, larger = a, b
+    elif np.all(shape_b <= shape_a):
+        smaller, larger = b, a
+    else:
+        raise ValueError("Shapes are not broadcast-compatible for padding.")
+
+    # compute padding widths
+    pad_widths = [(0, t - s) for s, t in zip(smaller.shape, larger.shape)]
+    padded = np.pad(smaller, pad_widths, constant_values=0)
+
+    # return in original order
+    if smaller is a:
+        return padded, larger
+    else:
+        return larger, padded
 
 
 
@@ -345,3 +378,15 @@ def get_homogeneous_distribution_from_proxy(proxy, num_constraints=0):
                 distribution[cost_1, distance, cost_2] = proxy.N_cost_distance_distribution(cost_1, distance, cost_2)
 
     return distribution
+
+def get_pearson_correlation_coefficients(homodist1, homodist2):
+    """
+    Given two homogeneous distribution arrays, compute the Pearson correlation
+    coefficient between them.
+
+    Both distributions must have the same shape.
+    """
+    assert homodist1.ndim == 3 and homodist2.ndim == 3, "Both distributions must be 3D arrays"
+    homodist1, homodist2 = pad_to_match(homodist1, homodist2)
+    pearson_function = lambda arr1, arr2: np.corrcoef(arr1.flatten(), arr2.flatten())[0, 1]
+    return [pearson_function(homodist1[i,:,:], homodist2[i,:,:]) for i in range(homodist1.shape[0])]
