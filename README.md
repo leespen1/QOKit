@@ -40,6 +40,11 @@ changing directories to `QOKit`, and then running
 nbstripout --install
 ```
 
+If you want to use the data (pre-computed gamma and beta values for QAOA on random graphs, etc), then activate `qokitvenv` and running
+```
+python -m QAOAKit.build_tables
+```
+
 
 Some optional parts of the package require additional dependencies. 
 - GPU simulation: `pip install -e .[GPU-CUDA12]`
