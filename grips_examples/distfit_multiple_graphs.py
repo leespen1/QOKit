@@ -1,6 +1,7 @@
 
 '''TO DO: 
-Modify this to also specify the type of proxy to use! '''
+Modify this to also specify the type of proxy to use! 
+Add paper proxy!!'''
 
 
 #%% imports
@@ -189,7 +190,7 @@ def fit_multiple_graphs(num_graphs, num_nodes, edge_probability = 0.5, graph_typ
         r_tweak_mul=fitted_params[3]
     )
     fitted_proxy_homodist = get_homogeneous_distribution_from_proxy(fitted_proxy)
-    plot_distribution_lines_all(fitted_proxy_homodist, f"Fitted Proxy Homogeneous Distribution for Random Graph {fitted_params}")
+    #plot_distribution_lines_all(fitted_proxy_homodist, f"Fitted Proxy Homogeneous Distribution for Random Graph {fitted_params}")
 
     print("Finished fitting triangle proxy to homogeneous distribution!")
 
@@ -365,14 +366,15 @@ if __name__ == "__main__":
     num_graphs = 50
     edge_probability = 0.5
     startnodes = 4
-    endnodes = 10
+    endnodes = 9
+    graph_type = 'barabasi_albert'
 
     df = fit_multiple_graphs(num_graphs=num_graphs, num_nodes=startnodes,\
-                            edge_probability=edge_probability, graph_type='erdos_renyi')
+                            edge_probability=edge_probability, graph_type=graph_type)
         
     for num_nodes in range(startnodes+1, endnodes+1):
         df_new = fit_multiple_graphs(num_graphs=num_graphs, num_nodes=num_nodes,\
-                                    edge_probability=edge_probability, graph_type='erdos_renyi')
+                                    edge_probability=edge_probability, graph_type=graph_type)
         df = pd.concat([df, df_new], ignore_index=True)
         
     print(df)
