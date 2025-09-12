@@ -382,9 +382,8 @@ def get_homogeneous_distribution_from_proxy(proxy, num_constraints=0):
 def get_pearson_correlation_coefficients(homodist1, homodist2):
     """
     Given two homogeneous distribution arrays, compute the Pearson correlation
-    coefficient between them.
-
-    Both distributions must have the same shape.
+    coefficients between each pair of 2D distributions N(c'; :, :), where the
+    2D distributions are "raveled" into 1D arrays.
     """
     assert homodist1.ndim == 3 and homodist2.ndim == 3, "Both distributions must be 3D arrays"
     homodist1, homodist2 = pad_to_match(homodist1, homodist2)

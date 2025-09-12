@@ -119,6 +119,30 @@ def QAOA_proxy_expectation(
     return proxy_expectation_value
 
 
+def QAOA_proxy_expectation_from_gamma_beta(
+    proxy,
+    gammas: np.ndarray, # 1D array
+    betas: np.ndarray,  # 2D array
+) -> float:
+    """
+    Convenience function that runs the QAOA proxy and then computes the
+    expectation value, given parameters gammas and betas.
+    """
+
+    amplitude_proxies = QAOA_proxy(
+        proxy,
+        gammas,
+        betas,
+    )
+    final_amplitude_proxies = amplitude_proxies[-1]
+
+    expectation = QAOA_proxy_expectation(
+        proxy, final_amplitude_proxies
+    )
+
+    return expectation
+
+
 
 def QAOA_proxy_optimize_gamma_beta(
     proxy,
