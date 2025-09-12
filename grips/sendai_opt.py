@@ -62,24 +62,25 @@ def fit_proxy_to_real(proxy, realdist, init_params, bounds, optimizer='smart ran
     if optimizer == 'smart random search':
         bounds = np.array(bounds)
         current_params = np.array(init_params)
+        proxy.set_params(current_params)
+        best_mse = grips.distribution_mean_squared_error(proxy, realdist)
+        best_params = current_params.copy()
+
         # Optional grid search for better initial params
         if grid_size_start and grid_size_start > 0:
             import itertools
             param_grids = [np.linspace(b[0], b[1], grid_size_start) for b in bounds]
-            best_mse = None
-            best_params = None
+            
             for grid_point in itertools.product(*param_grids):
                 grid_point = np.array(grid_point)
                 proxy.set_params(grid_point)
                 mse = grips.distribution_mean_squared_error(proxy, realdist)
-                if (best_mse is None) or (mse < best_mse):
+                if (mse < best_mse):
                     best_mse = mse
                     best_params = grid_point.copy()
-            current_params = best_params
             print('Finished initial grid search!')
         # Set initial proxy parameters
-        proxy.set_params(current_params)
-        current_mse = grips.distribution_mean_squared_error(proxy, realdist)
+        proxy.set_params(best_params)
         param_ranges = bounds[:, 1] - bounds[:, 0]
         sds = param_ranges*SD_vs_paramrange #initial SDs of perturbations
         consecutive_failures = 0
@@ -87,14 +88,14 @@ def fit_proxy_to_real(proxy, realdist, init_params, bounds, optimizer='smart ran
         # Generate initial perturbation
         perturbation = np.random.normal(0, sds)
         for i in range(max_iter):
-            perturbed_params = current_params + perturbation
+            perturbed_params = best_params + perturbation
             # Clip parameters to be within bounds
             perturbed_params = np.clip(perturbed_params, bounds[:, 0], bounds[:, 1])
             proxy.set_params(perturbed_params)
             new_mse = grips.distribution_mean_squared_error(proxy, realdist)
-            if new_mse < current_mse:
-                current_params = perturbed_params
-                current_mse = new_mse
+            if new_mse < best_mse:
+                best_params = perturbed_params.copy()
+                best_mse = new_mse
                 consecutive_failures = 0
                 consecutive_failures_aftershrink = 0
                 # Re-use the same perturbation if it helped
@@ -114,8 +115,10 @@ def fit_proxy_to_real(proxy, realdist, init_params, bounds, optimizer='smart ran
                 break
 
             if (i+1) % (round(max_iter/10)) == 0 or i == max_iter - 1:
-                print(f"Iteration {i+1}, Current MSE: {current_mse:.6f}, Current Params: {current_params}, SDs: {sds}\n")
-        return current_params, current_mse
+                print(f"Iteration {i+1}, Best MSE: {best_mse:.6f}, Best Params: {best_params}, SDs: {sds}\n")
+
+        proxy.set_params(best_params)
+        return best_params, best_mse
     else:
         raise NotImplementedError(f"Optimizer '{optimizer}' is not implemented.")
 

@@ -50,12 +50,22 @@ class TriangleProxy:
         self.h_peak = max(h_peak, 0.0)  
         self.center_at_h_peak = num_constraints / 2 + hc_tweak_add
 
-    #This is to simplify in the optimization in sendai_opt.py
+    #this is to simplify the opt in Sednai opt 
     def set_params(self, params):
+        """
+        Sets the base parameters and immediately updates the derived parameters.
+        """
+        # Set the base parameters from the input array
         self.h_tweak_sub = params[0]
         self.hc_tweak_add = params[1]
         self.l_tweak_mul = params[2]
         self.r_tweak_mul = params[3]
+
+        # This logic was missing and caused the previous issues. 
+        h_peak = (1 << (self.num_qubits - 4)) - self.h_tweak_sub
+        self.h_peak = max(h_peak, 0.0)
+        self.center_at_h_peak = self.num_constraints / 2 + self.hc_tweak_add
+
 
     # P(c') from paper
     def P_cost_distribution(self, cost: int) -> float:

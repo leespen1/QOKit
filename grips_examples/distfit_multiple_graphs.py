@@ -22,7 +22,7 @@ from grips import (
     plot_distribution_lines_all, fit_proxy_to_real, 
     pad_and_stack
 )
-
+from grips import distribution_mean_squared_error as mse_dist_loss
 from scipy.optimize import minimize
 from scipy.optimize import dual_annealing
 print("Finished importing python packages/functions!")
@@ -104,20 +104,20 @@ def fit_multiple_graphs(num_graphs, num_nodes, edge_probability = 0.5, graph_typ
     # % Define mean-squared error loss function for fitting triangle proxy to statistical homogeneous distribution
     print("\nDefining triangle proxy loss function ... ")
 
-    def mse_dist_loss(params, homodist, num_constraints=0):
-        h_tweak_sub, hc_tweak_add, l_tweak_mul, r_tweak_mul = params
-        num_constraints = max(homodist.shape[0] - 1, num_constraints)
-        num_qubits = homodist.shape[1] - 1
+    # def mse_dist_loss(params, homodist, num_constraints=0):
+    #     h_tweak_sub, hc_tweak_add, l_tweak_mul, r_tweak_mul = params
+    #     num_constraints = max(homodist.shape[0] - 1, num_constraints)
+    #     num_qubits = homodist.shape[1] - 1
 
-        proxy = TriangleProxy(
-            num_constraints=num_constraints,
-            num_qubits=num_qubits,
-            h_tweak_sub=h_tweak_sub,
-            hc_tweak_add=hc_tweak_add,
-            l_tweak_mul=l_tweak_mul,
-            r_tweak_mul=r_tweak_mul
-        )
-        return grips.distribution_mean_squared_error(proxy, homodist)
+    #     proxy = TriangleProxy(
+    #         num_constraints=num_constraints,
+    #         num_qubits=num_qubits,
+    #         h_tweak_sub=h_tweak_sub,
+    #         hc_tweak_add=hc_tweak_add,
+    #         l_tweak_mul=l_tweak_mul,
+    #         r_tweak_mul=r_tweak_mul
+    #     )
+    #     return grips.distribution_mean_squared_error(proxy, homodist)
 
     print("Finished defining triangle proxy loss function!")
 
@@ -125,34 +125,37 @@ def fit_multiple_graphs(num_graphs, num_nodes, edge_probability = 0.5, graph_typ
     print("\nFitting triangle proxy to homogeneous distribution ...")
 
     # Initial guess and bounds
-    use_small_bounds = False
+    # use_small_bounds = False
 
+    ##PK: Using good bounds from data 
     bounds = [
-        (0, None),   # h_tweak_sub >= 0
+        (0, num_nodes**2/3),   # h_tweak_sub >= 0
         (-10, 10),   # hc_tweak_add can be small positive/negative
-        (0.1, 20),   # l_tweak_mul > 0
-        (0.1, 20),   # r_tweak_mul > 0
+        (0.005, 2),   # l_tweak_mul > 0
+        (0.05, 2),   # r_tweak_mul > 0
     ]
 
-    # result = minimize(
-    #     mse_dist_loss,
-    #     initial_params,
-    #     args=(homodist, num_constraints, num_qubits),
-    #     method='Nelder-Mead',  
-    #     bounds=bounds,
-    #     options={'maxiter': 10000, 'epsilon': 0.0001}
-    # )
+    # # result = minimize(
+    # #     mse_dist_loss,
+    # #     initial_params,
+    # #     args=(homodist, num_constraints, num_qubits),
+    # #     method='Nelder-Mead',  
+    # #     bounds=bounds,
+    # #     options={'maxiter': 10000, 'epsilon': 0.0001}
+    # # )
 
-    bounds[0] = (0,max_num_edges) #need non-None bounds 
+    # bounds[0] = (0,max_num_edges) #need non-None bounds 
 
-    small_bounds = [
-        (0, 3),   # h_tweak_sub >= 0
-        (-3, 3),   # hc_tweak_add can be small positive/negative
-        (0.3, 5),   # l_tweak_mul > 0
-        (0.3, 5),   # r_tweak_mul > 0
-    ]
-    if use_small_bounds:
-        bounds = small_bounds
+    # small_bounds = [
+    #     (0, 3),   # h_tweak_sub >= 0
+    #     (-3, 3),   # hc_tweak_add can be small positive/negative
+    #     (0.3, 5),   # l_tweak_mul > 0
+    #     (0.3, 5),   # r_tweak_mul > 0
+    # ]
+
+
+    # if use_small_bounds:
+    #     bounds = small_bounds
 
     # result = dual_annealing(
     #     mse_dist_loss,
@@ -175,12 +178,14 @@ def fit_multiple_graphs(num_graphs, num_nodes, edge_probability = 0.5, graph_typ
         r_tweak_mul=initial_params[3]
     )
 
-    fitted_params, _ = fit_proxy_to_real(opt_init_proxy, homodist,\
+    fitted_params, fitmse1 = fit_proxy_to_real(opt_init_proxy, homodist,\
                                         initial_params, bounds,\
                                             max_iter = 10000, fail_til_shrink = 50, 
                                             fail_til_end = 100, 
                                             grid_size_start= 9)
     print("Fitted parameters:", fitted_params)
+    print("Fitted mse was ", fitmse1, "\n\n")
+
     fitted_proxy = TriangleProxy(
         num_constraints=num_constraints,
         num_qubits=num_qubits,
@@ -196,9 +201,17 @@ def fit_multiple_graphs(num_graphs, num_nodes, edge_probability = 0.5, graph_typ
 
     # % Compare MSE for initial and fitted parameters
     print("\nComparing MSE loss function for initial and fitted parameters ...")
+    initial_proxy = TriangleProxy(
+        num_constraints=num_constraints,
+        num_qubits=num_qubits,
+        h_tweak_sub=initial_params[0],
+        hc_tweak_add=initial_params[1],
+        l_tweak_mul=initial_params[2],
+        r_tweak_mul=initial_params[3]
+    )
     # Compare MSE for initial and fitted parameters
-    initial_mse = mse_dist_loss(initial_params, homodist, num_constraints)
-    fitted_mse = mse_dist_loss(fitted_params, homodist, num_constraints)
+    initial_mse = mse_dist_loss(initial_proxy, homodist)
+    fitted_mse = mse_dist_loss(fitted_proxy, homodist)
     print(f"Initial MSE: {initial_mse}")
     print(f"Fitted MSE: {fitted_mse}")
     print("Finished comparing MSE loss function for initial and fitted parameters!")
@@ -219,14 +232,7 @@ def fit_multiple_graphs(num_graphs, num_nodes, edge_probability = 0.5, graph_typ
     # % Run QAOA with initial, unfitted proxy
     print("\nRunning QAOA with initial, unfitted proxy ...")
     # Compute results with initial parameters
-    initial_proxy = TriangleProxy(
-        num_constraints=num_constraints,
-        num_qubits=num_qubits,
-        h_tweak_sub=initial_params[0],
-        hc_tweak_add=initial_params[1],
-        l_tweak_mul=initial_params[2],
-        r_tweak_mul=initial_params[3]
-    )
+
 
     initial_triangle_results = QAOA_proxy(initial_proxy, gammas, betas)
     # print("Initial Proxy Results:", initial_triangle_results)
@@ -366,13 +372,15 @@ if __name__ == "__main__":
     num_graphs = 50
     edge_probability = 0.5
     startnodes = 4
-    endnodes = 9
-    graph_type = 'barabasi_albert'
+    endnodes = 10
+    graph_type = 'barabasi_albert'  # Change to 'barabasi_albert' or 'watts_strogatz' as needed
 
+    print(f"\n\n---------------------\nFitting for {startnodes} nodes...")
     df = fit_multiple_graphs(num_graphs=num_graphs, num_nodes=startnodes,\
                             edge_probability=edge_probability, graph_type=graph_type)
         
     for num_nodes in range(startnodes+1, endnodes+1):
+        print(f"\n\n---------------------\nFitting for {num_nodes} nodes...")
         df_new = fit_multiple_graphs(num_graphs=num_graphs, num_nodes=num_nodes,\
                                     edge_probability=edge_probability, graph_type=graph_type)
         df = pd.concat([df, df_new], ignore_index=True)
@@ -380,6 +388,6 @@ if __name__ == "__main__":
     print(df)
 
     # Save the DataFrame to a CSV file
-    output_file = f"fitting_results_{num_graphs}graphs_{startnodes}to{endnodes}nodes_{edge_probability}edgeprob_erdosrenyi.csv"
+    output_file = f"fitting_results_{graph_type}_{edge_probability}edgeprob_{startnodes}to{endnodes}nodes_{num_graphs}graphs.csv"
     df.to_csv(output_file, index=False)
     print(f"Results saved to {output_file}")
