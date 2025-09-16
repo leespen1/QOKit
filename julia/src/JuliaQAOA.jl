@@ -3,17 +3,22 @@ module JuliaQAOA
 using Distributions: pdf, Normal, MvNormal, Binomial, Multinomial
 using StaticArrays: @SVector, @SMatrix, SVector
 using PythonCall: PyArray, pyconvert
+using LinearAlgebra: mul!
+using Base.Threads: @threads
 
 # Functions that will be made available when I call "using JuliaQAOA"
 export P_cost_distribution, N_cost_distribution, N_cost_distance_distribution
 export NormalProxy, PaperProxy, TriangleProxy, HardCodedTriangleProxy
 export compute_amplitude_sum, QAOA_proxy, QAOA_proxy_expectation
 export inverse_proxy_objective_function
+export qaoa_proxy_circuit
 
 include("QAOA_proxy_interface.jl")
+include("QAOA_proxy_transfer_matrix.jl")
 include("normal_proxy.jl")
 include("paper_proxy.jl")
 include("triangle_proxy.jl")
+include("utils.jl")
 
 end
 
