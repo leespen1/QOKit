@@ -1,4 +1,4 @@
-using JuliaQAOA, Random
+using JuliaQAOA, Random, ProfileView
 println("Using this many threads: ", Base.Threads.nthreads())
 p = 5
 gammas = rand(MersenneTwister(0), p)

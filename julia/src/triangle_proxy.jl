@@ -79,6 +79,7 @@ N(c'; d, c) from paper
 function N_cost_distance_distribution(proxy::TriangleProxy, cost_1::Integer, distance::Integer, cost_2::Integer)::Float64
     # Want distance to be between 0 and proxy.num_qubits//2 since further distance corresponds to being near the bitwise complement (which has the same cost)
     reflected_distance = (distance > div(proxy.num_qubits, 2)) ? proxy.num_qubits - distance : distance
+    # TODO Double check whether this is branchless
 
     # Take the peak height at reflected_distance to be on the straight line between (0 or proxy.num_qubits, 1) and (proxy.num_qubits/2, h_peak)
     h_at_cost_2 = line_between(reflected_distance, 0, 1, proxy.num_qubits / 2, proxy.h_peak)
