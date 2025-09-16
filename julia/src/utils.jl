@@ -44,3 +44,13 @@ function simple_homodist(proxy)
     homodist = N.(costs_prime, costs_unprime, distances)
     return homodist
 end
+
+function gpu_simple_homodist(proxy)
+    # These three are 'vectors', but along different dimensions, for broadcasting to work
+    costs_prime = collect(0:proxy.num_constraints) |> CuArray
+    costs_unprime = reshape(costs_prime, 1, :) |> CuArray
+    distances = reshape(collect(0:proxy.num_qubits), 1, 1, :) |> CuArray
+    N(c_prime, c, d) = N_cost_distance_distribution(proxy, c_prime, d, c)
+    homodist = N.(costs_prime, costs_unprime, distances)
+    return homodist
+end

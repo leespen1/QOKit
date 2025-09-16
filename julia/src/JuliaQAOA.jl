@@ -5,6 +5,7 @@ using StaticArrays: @SVector, @SMatrix, SVector
 using PythonCall: PyArray, pyconvert
 using LinearAlgebra: mul!
 using Base.Threads: @threads
+using CUDA
 
 # Functions that will be made available when I call "using JuliaQAOA"
 export P_cost_distribution, N_cost_distribution, N_cost_distance_distribution
