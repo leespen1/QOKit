@@ -99,13 +99,17 @@ function compute_amplitude_sum(
 
     @assert length(prev_amplitudes) == proxy.num_constraints + 1
 
+    gamma_factors = exp.(-1im * gamma * (0:proxy.num_constraints))
+    d_vals = 0:proxy.num_qubits
+    sinb, cosb = sincos(beta)
+    neg1_im_sinb = -1im * sinb
+    beta_factors = @. (cosb ^ (proxy.num_qubits - d_vals)) * (neg1_im_sinb ^ d_vals)
     sum::ComplexF64 = 0
     # Changed loop order for efficiency. Check for same result
     for distance in 0:proxy.num_qubits 
-        sinbeta, cosbeta = sincos(beta)
-        beta_factor = (cosbeta ^ (proxy.num_qubits - distance)) * ((-1im * sinbeta) ^ distance)
+        beta_factor = beta_factors[1+distance]
         for cost_2 in 0:proxy.num_constraints
-            gamma_factor = exp(-1im * gamma * cost_2)
+            gamma_factor = gamma_factors[1+cost_2]
             num_costs_at_distance = N_cost_distance_distribution(
                 proxy, cost_1, distance, cost_2
             )
