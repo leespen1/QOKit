@@ -14,12 +14,12 @@ export compute_amplitude_sum, QAOA_proxy, QAOA_proxy_expectation
 export inverse_proxy_objective_function
 export qaoa_proxy_circuit
 
+include("utils.jl") # Has abstract type definitions! Include this first!
 include("QAOA_proxy_interface.jl")
 include("QAOA_proxy_transfer_matrix.jl")
 include("normal_proxy.jl")
 include("paper_proxy.jl")
 include("triangle_proxy.jl")
-include("utils.jl")
 
 end
 
