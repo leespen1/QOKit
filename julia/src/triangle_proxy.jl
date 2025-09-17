@@ -19,7 +19,7 @@ For a graph with M edges and N vertices, we create a TriangleProxy like this:
     proxy = TriangleProxy(M, N, h_tweak_sub, hc_tweak_add, l_tweak_mul, r_tweak_mul)
 
 """
-struct TriangleProxy
+struct TriangleProxy <: AbstractProxy
     num_constraints::Int64
     num_qubits::Int64
     h_tweak_sub::Float64  # Shifts the peak of the pyramid down (Default 0)
@@ -98,7 +98,7 @@ Type for the original, hard-coded triangle distribution.
 This type is now obselete, because the same result can be achieved using
 the parameterized triangle proxy with the default parameters.
 """
-struct HardCodedTriangleProxy
+struct HardCodedTriangleProxy <: AbstractProxy
     num_constraints::Int64
     num_qubits::Int64
 end
@@ -163,3 +163,5 @@ raw"""
 function triangle_value(x::Integer, left::Real, right::Real, height::Real)::Float64
     return max(0, min(x - left, right - x) * 2 * height / (right - left))
 end
+
+
