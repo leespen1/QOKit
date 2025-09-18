@@ -13,23 +13,12 @@ from grips import (
     inverse_objective_function, get_expectation,  
     maxcut, maxcut_approx_ratio, spsa_for_scipy,
     plot_distribution_lines_all, fit_proxy_to_real, 
-    pad_and_stack
+    pad_and_stack, jl
 )
 
 from scipy.optimize import minimize
 from scipy.optimize import dual_annealing
 print("Finished importing python packages/functions!")
-
-#%%  Julia imports
-print("Importing Julia functions ...")
-from juliacall import Main as jl
-jl.seval('''
-using Pkg
-Pkg.activate(joinpath(@__DIR__, "../julia"))
-Pkg.instantiate()
-using JuliaQAOA
-''')
-print("Finished importing Julia functions!")
 
 
 #%% Params to alternate against initial

@@ -12,7 +12,7 @@ from grips import (
     TriangleProxy, NormalProxy, PaperProxy,
     inverse_objective_function, get_expectation,  
     maxcut, maxcut_approx_ratio, spsa_for_scipy,
-    plot_distribution_lines_all, fit_proxy_to_real
+    plot_distribution_lines_all, fit_proxy_to_real, jl
 )
 
 from scipy.optimize import minimize
@@ -40,16 +40,6 @@ def mse_dist_loss(params, homodist, num_constraints=0):
 print("Finished defining triangle proxy loss function!")
 
 
-#%%  Julia imports
-print("Importing Julia functions ...")
-from juliacall import Main as jl
-jl.seval('''
-using Pkg
-Pkg.activate(joinpath(@__DIR__, "../julia"))
-Pkg.instantiate()
-using JuliaQAOA
-''')
-print("Finished importing Julia functions!")
 
 # %% Set up a single graph, get its statistical homogeneous distribution
 # 3 nodes, edge probability 0.3, seed=4 results in a graph with 2 edges
