@@ -17,14 +17,6 @@ import numpy as np
 import typing, time, scipy, os
 from scipy.stats import binom, multinomial
 
-# Make the functions written in Julia available (call with `jl.function_name`)
-from juliacall import Main as jl
-jl.seval('''
-using Pkg
-Pkg.activate(joinpath(@__DIR__, "../julia"))
-Pkg.instantiate()
-using JuliaQAOA
-''')
 
 
 def QAOA_proxy(

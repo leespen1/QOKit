@@ -20,23 +20,13 @@ from grips import (
     inverse_objective_function, get_expectation,  
     maxcut, maxcut_approx_ratio, spsa_for_scipy,
     plot_distribution_lines_all, fit_proxy_to_real, 
-    pad_and_stack
+    pad_and_stack, jl
 )
 from grips import distribution_mean_squared_error as mse_dist_loss
 from scipy.optimize import minimize
 from scipy.optimize import dual_annealing
 print("Finished importing python packages/functions!")
 
-#%%  Julia imports
-print("Importing Julia functions ...")
-from juliacall import Main as jl
-jl.seval('''
-using Pkg
-Pkg.activate(joinpath(@__DIR__, "../julia"))
-Pkg.instantiate()
-using JuliaQAOA
-''')
-print("Finished importing Julia functions!")
 
 # %% Set up a single graph, get its statistical homogeneous distribution
 # 3 nodes, edge probability 0.3, seed=4 results in a graph with 2 edges
