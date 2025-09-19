@@ -25,6 +25,7 @@ import networkx as nx, numpy as np
 G = nx.Graph()
 G.add_edge(0,1)
 
+print("Computing n_dist ...")
 n_dist = get_real_distribution(G)
 
 print("Computed n_dist:")
@@ -48,9 +49,10 @@ correct_n_dist = np.array([
    [1,0]]
 ])
 
-assert np.array_equal(n_dist.astype(int), correct_n_dist)
-print("Real distribution n_dist was computed correctly for the two-node example.")
+assert np.array_equal(n_dist.astype(int), correct_n_dist), "n_dist computation was not correct!"
+print("[SUCCESS] Real distribution n_dist was computed correctly for the two-node example.")
 
+print("Computing N_dist ...")
 N_dist = get_homogeneous_distribution(G)
 
 print("Computed N_dist:")
@@ -66,5 +68,14 @@ correct_N_dist = np.array([
    [0,1]],
 ])
 
-assert np.array_equal(N_dist.astype(int), correct_N_dist)
-print("Homogenous distribution N_dist was computed correctly for the two-node example.")
+assert np.array_equal(N_dist.astype(int), correct_N_dist), "N_dist computation was not correct!"
+print("[SUCCESS] Homogenous distribution N_dist was computed correctly for the two-node example.")
+
+print("Checking that N_dist over 2 identical graphs is the same as N_dist over one graph ...")
+N_dist_multiple = get_homogeneous_distribution([G, G])
+
+print("Computed averaged N_dist for two identical graphs:")
+print(N_dist_multiple)
+
+assert np.array_equal(N_dist_multiple, N_dist), "Averaged N_dist for two identical graphs is not the same as N_dist for one graph!"
+print("[SUCCESS] N_dist over 2 identical graphs is the same as N_dist over one graph.")
