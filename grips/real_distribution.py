@@ -11,16 +11,53 @@ from numba import njit
 from grips.QAOA_simulator import QAOA_run, get_simulator
 import matplotlib.pyplot as plt
 
-def get_homogeneous_distribution(graph):
+def get_homogeneous_distribution(graphs, max_number_of_edges=0):
     """
-    Given a graph, compute the real distribution n(x; d, c) (as a 3D array),
+    Given a graph (or graphs), compute the real distribution n(x; d, c) (as a 3D array),
     then compute N(c'; d, c) by averaging n(x; d, c) over each x with cost c'.
+
+    max_number_of_edges can be provided to provide additional padding with
+    zeros to make size compatible with homodists of other graphs which have the
+    same number of vertices, but more edges.
+
+    "The better that N(c'; d, c) estimates the average of n(x; d, c) over all
+    c(x) = c', and the less n(x; d, c) deviates over all x with c(x) = c', the
+    better N(c'; d, c) should estimate n(x; d, c) for all x with c(x) = c'" 
     """
-    costs = get_costs(graph)
-    num_edges = graph.number_of_edges()
-    num_vertices = graph.number_of_nodes()
-    real_distribution = get_real_distribution_from_costs(costs, num_edges, num_vertices)
-    return get_homogeneous_distribution_from_costs(costs, real_distribution)
+    if isinstance(graphs, nx.Graph):
+        graph = graphs 
+        costs = get_costs(graph)
+        num_edges = graph.number_of_edges()
+        num_vertices = graph.number_of_nodes()
+        real_distribution = get_real_distribution_from_costs(
+            costs, num_edges, num_vertices, max_number_of_edges
+        )
+        homodist =  get_homogeneous_distribution_from_costs(
+            costs, real_distribution, max_number_of_edges
+        )
+    elif isinstance(graphs, list) and all(isinstance(G, nx.Graph) for G in graphs):
+        max_number_of_edges = max(max_number_of_edges,
+                                  max(G.number_of_edges() for G in graphs))
+        num_vertices = graphs[0].number_of_nodes()
+        assert all(G.number_of_nodes() == num_vertices for G in graphs), "All graphs must have the same number of vertices."
+        max_number_of_costs = 1+max_number_of_edges
+        num_distances = 1+num_vertices
+        homodist = np.zeros((max_number_of_costs, num_distances, max_number_of_costs))
+        for graph in graphs:
+            costs = get_costs(graph)
+            num_edges = graph.number_of_edges()
+            num_vertices = graph.number_of_nodes()
+            real_distribution = get_real_distribution_from_costs(
+                costs, num_edges, num_vertices, max_number_of_edges
+            )
+            homodist += get_homogeneous_distribution_from_costs(
+                costs, real_distribution, max_number_of_edges
+            )
+        homodist /= len(graphs) # Take the average
+    else:
+        raise TypeError("graphs must be an nx.Graph or a list of nx.Graphs.")
+
+    return homodist
 
 
 
@@ -36,9 +73,9 @@ def get_real_distribution(graph):
     - Index 2 chooses the Hamming distance, e.g. 0, 1, 2, ..., num_qubits
     - Index 3 chooses the cost, e.g. 0, 1, 2, ... 
 
-    This file is for taking a particular graph, and obtaining the real distribution
-    n(x; d, c) from the paper. That is, the number of bitstrings with cost c that
-    are Hamming distance d from the bitstring x.
+    This function is for taking a particular graph, and obtaining the real
+    distribution n(x; d, c) from the paper. That is, the number of bitstrings
+    with cost c that are Hamming distance d from the bitstring x.
     """
 
     costs = get_costs(graph)
@@ -64,7 +101,7 @@ def get_costs(graph):
 
 
 @njit
-def get_real_distribution_from_costs(costs, num_edges, num_vertices):
+def get_real_distribution_from_costs(costs, num_edges, num_vertices, max_num_edges=0):
     """
     Given a the set of costs associated with each bitstring for a graph
     partition, the number of edges in the graph, and the number of vertices in
@@ -81,16 +118,21 @@ def get_real_distribution_from_costs(costs, num_edges, num_vertices):
     This file is for taking a particular graph, and obtaining the real distribution
     n(x; d, c) from the paper. That is, the number of bitstrings with cost c that
     are Hamming distance d from the bitstring x.
+
+    `max_num_edges` may be specified to allocate additional zeros (for
+    compatibility across multiple graphs)
     """
 
     num_bitstrings = 2 ** num_vertices
     num_distances = 1 + num_vertices
     num_costs = 1 + num_edges
+    cost_axis_size = max(num_costs, 1+max_num_edges)
 
-    assert len(costs.shape) == 1
-    assert len(costs) == num_bitstrings
 
-    n_distribution = np.zeros((num_bitstrings, num_distances, num_costs))
+    assert len(costs.shape) == 1, "costs must be a vector"
+    assert len(costs) == num_bitstrings, "length of costs vector must match number of bitstrings"
+
+    n_distribution = np.zeros((num_bitstrings, num_distances, cost_axis_size))
 
     for x in range(num_bitstrings): # 0:num_bitstrings-1
         for y in range(num_bitstrings):
@@ -103,7 +145,7 @@ def get_real_distribution_from_costs(costs, num_edges, num_vertices):
 
 
 @njit
-def get_homogeneous_distribution_from_costs(costs, real_distribution):
+def get_homogeneous_distribution_from_costs(costs, real_distribution, max_num_edges=0):
     """
     Given the costs associated with each bitstring, and the real distribution
     n(x; d, c) (as a 3D array), compute N(c'; d, c) by averaging n(x; d, c)
@@ -114,7 +156,9 @@ def get_homogeneous_distribution_from_costs(costs, real_distribution):
     num_distances = real_distribution.shape[1]
     num_costs = real_distribution.shape[2]
 
-    homogeneous_distribution = np.zeros((num_costs, num_distances, num_costs))
+    cost_axis_size = max(num_costs, 1+max_num_edges)
+
+    homogeneous_distribution = np.zeros((cost_axis_size, num_distances, cost_axis_size))
     num_cost_occurences = np.zeros(num_costs)
 
     # Sum over bitstrings with cost c'
@@ -177,7 +221,6 @@ def pad_to_shape(arr, target_shape):
     pad_width = [(0, max(0, t - s)) for s, t in zip(arr.shape, target_shape)]
     return np.pad(arr, pad_width, mode='constant', constant_values=0)
 
-import numpy as np
 
 def pad_to_match(a, b):
     """
