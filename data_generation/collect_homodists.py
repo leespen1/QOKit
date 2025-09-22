@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-import grips, numpy as np, networkx as nx, argparse, random, os
+import grips, numpy as np, networkx as nx, argparse, os, time
+from datetime import datetime
 
 # NOTE: don't use ipython with this, it will break things
 
@@ -20,19 +21,48 @@ def make_graph(graph_type, num_nodes, seed=0, probability=0.5, ws_num_neighbors=
 
     return graph
 
-def args_to_str(args):
+
+
+def args_to_str(args, pair_seperator="_"):
     parts = []
     for k, v in sorted(vars(args).items()):  # sort for deterministic order
         parts.append(f"{k}={v}")
-    return "_".join(parts)
+    return pair_seperator.join(parts)
+
+
 
 def main(args):
+    print("Running script with the following parameters:") 
+    print(args_to_str(args, "\n\t"))
+
+    print("Getting graphs ...")
     seeds = range(args.seedstart, args.seedstart + args.graphs)
     make_graph_lambda = lambda seed : make_graph(
         args.graphtype, args.numnodes, seed, args.probability, args.neighbors
     )
     graphs = [make_graph_lambda(seed) for seed in seeds]
-    return graphs
+    print("Finished getting graphs.")
+
+    start_datetime = datetime.now()
+    print("\nStarting computation at: ", start_datetime.strftime("%Y-%m-%d %H:%M:%S"))
+    start_time = time.perf_counter()
+
+    end_time = time.perf_counter()
+    time_elapsed = end_time - start_time
+    end_datetime = datetime.now()
+    print("Finished comutation at: ", end_datetime.strftime("%Y-%m-%d %H:%M:%S"))
+    print(f"Task took {time_elapsed:.4f} seconds.")
+
+    homogeneous_distribution = grips.get_homogeneous_distribution(graphs)
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    outdir = os.path.join(script_dir, "results")
+    os.makedirs(outdir, exist_ok=True)
+    outfile = os.path.join(outdir, args_to_str(args))
+    np.save(outfile, homogeneous_distribution, allow_pickle=False)
+
+    return homogeneous_distribution
+
+
 
 if __name__ == "__main__":
 
@@ -45,16 +75,9 @@ if __name__ == "__main__":
     parser.add_argument("-p", "--probability", type=float, default=0.5, help="Probability of an edge between each pair of vertices (for erdos_renyi graphs) or rewiring probability (for watts_strogatz). For barabasi_albert, number of edges to attach to new nodes is `probability * (num_nodes - 1)`.")
     parser.add_argument("-n", "--neighbors", default=2, type=int, help="ws_num_neighbors (for wattz_strogatz only).")
 
-
     try:
         args = parser.parse_args()
-        graphs = main(args)
-        homogeneous_distribution = grips.get_homogeneous_distribution(graphs)
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        outdir = os.path.join(script_dir, "results")
-        os.makedirs(outdir, exist_ok=True)
-        outfile = os.path.join(outdir, args_to_str(args))
-        np.save(outfile, homogeneous_distribution)
+        main(args)
 
     except SystemExit as e:
         print("\nArgument parser failed. Did you provide the correct args?")
