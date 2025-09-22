@@ -21,7 +21,6 @@ DeviceArray = numba.cuda.devicearray.DeviceNDArray
 
 class QAOAFastSimulatorGPUBase(QAOAFastSimulatorBase):
     def __init__(self, n_qubits: int, costs: CostsType | None = None, terms: TermsType | None = None) -> None:
-        print("Initializing GPU QAOASimulator")
         super().__init__(n_qubits, costs, terms)
         self._sv_device = numba.cuda.device_array(self.n_states, dtype="complex")  # type: ignore
 

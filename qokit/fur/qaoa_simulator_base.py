@@ -55,7 +55,6 @@ class QAOAFastSimulatorBase(ABC):
                     C(x) = \\sum_{\text{terms}} w_i \\prod_{j \\in \\text{term}} x_j
 
         """
-        print("Initializing base QAOA simulator")
         self.n_qubits = n_qubits
         self.n_states = 2**n_qubits
         if costs is None:

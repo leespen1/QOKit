@@ -21,7 +21,6 @@ def bit_count(arr):
 
 
 def precompute_vectorized_cpu_parallel(weighted_terms, offset, N):
-    print("Running numpy vectorized cpu maxcut")
     state_indices = np.arange(2**N)
     term_v = np.zeros_like(state_indices, dtype=np.float64)
     for coeff, pos in weighted_terms:
