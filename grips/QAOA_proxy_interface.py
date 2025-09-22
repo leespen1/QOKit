@@ -17,6 +17,28 @@ import numpy as np
 import typing, time, scipy, os
 from scipy.stats import binom, multinomial
 
+# Make the functions written in Julia available (call with `jl.function_name`)
+# (by having this in __init__.py, should be able to simply do from grips import jl)
+from juliacall import Main as jl
+grips_dir = os.path.dirname(os.path.abspath(__file__))
+julia_project_dir = os.path.normpath(os.path.join(grips_dir, "../julia"))
+jl.seval(f'''
+using Pkg
+Pkg.activate("{julia_project_dir}")
+try
+    using JuliaQAOA
+catch e
+    if isa(e, ArgumentError)
+        println("Encountered error during 'using JuliaQAOA', instantiating ...")
+        Pkg.instantiate()
+        using JuliaQAOA
+    else
+        rethrow(e)
+    end
+end
+''')
+
+
 
 
 def QAOA_proxy(
