@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import grips, numpy as np, networkx as nx, argparse, os, time
 from datetime import datetime
+import cProfile, pstats
 
 # NOTE: don't use ipython with this, it will break things
 
@@ -46,7 +47,12 @@ def main(args):
     start_datetime = datetime.now()
     print("\nStarting computation at: ", start_datetime.strftime("%Y-%m-%d %H:%M:%S"))
     start_time = time.perf_counter()
-    homogeneous_distribution = grips.get_homogeneous_distribution(graphs, simulator_name=args.backend)
+
+    #homogeneous_distribution = grips.get_homogeneous_distribution(graphs, simulator_name=args.backend)
+    with cProfile.Profile() as pr:
+        homogeneous_distribution = grips.get_homogeneous_distribution(graphs, simulator_name=args.backend)
+    stats = pstats.Stats(pr)
+    stats.sort_stats("cumtime").print_stats(20)
 
     end_time = time.perf_counter()
     time_elapsed = end_time - start_time
