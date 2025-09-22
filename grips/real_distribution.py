@@ -26,7 +26,7 @@ def get_homogeneous_distribution(graphs, max_number_of_edges=0, simulator_name="
     """
     if isinstance(graphs, nx.Graph):
         graph = graphs 
-        costs = get_costs(graph)
+        costs = get_costs(graph, simulator_name)
         num_edges = graph.number_of_edges()
         num_vertices = graph.number_of_nodes()
         real_distribution = get_real_distribution_from_costs(
@@ -44,7 +44,7 @@ def get_homogeneous_distribution(graphs, max_number_of_edges=0, simulator_name="
         num_distances = 1+num_vertices
         homodist = np.zeros((max_number_of_costs, num_distances, max_number_of_costs))
         for graph in graphs:
-            costs = get_costs(graph)
+            costs = get_costs(graph, simulator_name)
             num_edges = graph.number_of_edges()
             num_vertices = graph.number_of_nodes()
             real_distribution = get_real_distribution_from_costs(
