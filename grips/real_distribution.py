@@ -84,7 +84,7 @@ def get_real_distribution(graph):
     return get_real_distribution_from_costs(costs, num_edges, num_vertices)
 
 
-def get_costs(graph):
+def get_costs(graph, simulator_name="auto"):
     """
     Given a graph, get the cost associated with each bitstring (for the maxcut
     problem), as a 1D array.
@@ -93,7 +93,7 @@ def get_costs(graph):
 
     # Get the cost associated with each bitstring, as a 1D array
     ising_model = mc.get_maxcut_terms(graph)
-    sim = get_simulator(num_vertices, ising_model)
+    sim = get_simulator(num_vertices, ising_model, simulator_name=simulator_name)
     costs = sim.get_cost_diagonal()
 
     return costs
