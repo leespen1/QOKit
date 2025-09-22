@@ -11,7 +11,7 @@ from numba import njit
 from grips.QAOA_simulator import QAOA_run, get_simulator
 import matplotlib.pyplot as plt
 
-def get_homogeneous_distribution(graphs, max_number_of_edges=0):
+def get_homogeneous_distribution(graphs, max_number_of_edges=0, simulator_name="auto"):
     """
     Given a graph (or graphs), compute the real distribution n(x; d, c) (as a 3D array),
     then compute N(c'; d, c) by averaging n(x; d, c) over each x with cost c'.

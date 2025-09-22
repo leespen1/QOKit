@@ -32,6 +32,7 @@ def compute_costs_kernel(costs, coef: float, pos_mask: int, offset: int):
 
 
 def compute_costs(rank: int, n_local_qubits: int, terms, out):
+    print("Doing numba/cuda compute costs")
     offset = rank << n_local_qubits
     n = len(out)
     zero_init_kernel.forall(n)(out)

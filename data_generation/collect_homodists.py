@@ -33,7 +33,7 @@ def args_to_str(args, pair_seperator="_"):
 
 def main(args):
     print("Running script with the following parameters:") 
-    print(args_to_str(args, "\n\t"))
+    print("\t", args_to_str(args, "\n\t"))
 
     print("Getting graphs ...")
     seeds = range(args.seedstart, args.seedstart + args.graphs)
@@ -46,6 +46,7 @@ def main(args):
     start_datetime = datetime.now()
     print("\nStarting computation at: ", start_datetime.strftime("%Y-%m-%d %H:%M:%S"))
     start_time = time.perf_counter()
+    homogeneous_distribution = grips.get_homogeneous_distribution(graphs, simulator_name=args.backend)
 
     end_time = time.perf_counter()
     time_elapsed = end_time - start_time
@@ -53,7 +54,6 @@ def main(args):
     print("Finished comutation at: ", end_datetime.strftime("%Y-%m-%d %H:%M:%S"))
     print(f"Task took {time_elapsed:.4f} seconds.")
 
-    homogeneous_distribution = grips.get_homogeneous_distribution(graphs)
     script_dir = os.path.dirname(os.path.abspath(__file__))
     outdir = os.path.join(script_dir, "results")
     os.makedirs(outdir, exist_ok=True)
@@ -66,7 +66,10 @@ def main(args):
 
 if __name__ == "__main__":
 
-    parser = argparse.ArgumentParser(description="Collects the homogeneous distributiongfor a number of graphs of the same type, with user-specified parameters.")
+    parser = argparse.ArgumentParser(
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        description="Collects the homogeneous distributiongfor a number of graphs of the same type, with user-specified parameters.",
+    )
     parser.add_argument("graphtype", type=str, choices=["ErdosRenyi", "BarabasiAlbert", "WattsStrogatz"],
                         help="Type of graph to generate.")
     parser.add_argument("numnodes", type=int, help="Number of nodes/vertices in the graph.")
@@ -74,6 +77,7 @@ if __name__ == "__main__":
     parser.add_argument("-g", "--graphs", default=100, type=int, help="Number of graphs to use (seeds will be contiguous range).")
     parser.add_argument("-p", "--probability", type=float, default=0.5, help="Probability of an edge between each pair of vertices (for erdos_renyi graphs) or rewiring probability (for watts_strogatz). For barabasi_albert, number of edges to attach to new nodes is `probability * (num_nodes - 1)`.")
     parser.add_argument("-n", "--neighbors", default=2, type=int, help="ws_num_neighbors (for wattz_strogatz only).")
+    parser.add_argument("-b", "--backend", default="auto", choices=["auto", "python", "c", "gpu", "gpumpi"], type=str, help="Backend to use for computing maxcut costs.")
 
     try:
         args = parser.parse_args()
