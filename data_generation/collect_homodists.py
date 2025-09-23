@@ -45,20 +45,30 @@ def main(args):
     print("Finished getting graphs.")
 
     start_datetime = datetime.now()
+
+    print("Running get_homogeneous_distribution on small example to get rid of numba JIT compilation ...")
+    start_time = time.perf_counter()
+    dummy_graphs = [nx.erdos_renyi_graph(1, 0.5)]
+    dummy_homogeneous_distribution = grips.get_homogeneous_distribution(dummy_graphs, simulator_name=args.backend)
+    end_time = time.perf_counter()
+    time_elapsed = end_time - start_time
+    print(f"Finished in {time_elapsed:.8f} seconds")
+
+
     print("\nStarting computation at: ", start_datetime.strftime("%Y-%m-%d %H:%M:%S"))
     start_time = time.perf_counter()
 
-    #homogeneous_distribution = grips.get_homogeneous_distribution(graphs, simulator_name=args.backend)
-    with cProfile.Profile() as pr:
-        homogeneous_distribution = grips.get_homogeneous_distribution(graphs, simulator_name=args.backend)
-    stats = pstats.Stats(pr)
-    stats.sort_stats("cumtime").print_stats(20)
+    homogeneous_distribution = grips.get_homogeneous_distribution(graphs, simulator_name=args.backend)
+    #with cProfile.Profile() as pr:
+    #    homogeneous_distribution = grips.get_homogeneous_distribution(graphs, simulator_name=args.backend)
+    #stats = pstats.Stats(pr)
+    #stats.sort_stats("cumtime").print_stats(30)
 
     end_time = time.perf_counter()
     time_elapsed = end_time - start_time
     end_datetime = datetime.now()
     print("Finished comutation at: ", end_datetime.strftime("%Y-%m-%d %H:%M:%S"))
-    print(f"Task took {time_elapsed:.4f} seconds.")
+    print(f"Task took {time_elapsed:.8f} seconds.")
 
     script_dir = os.path.dirname(os.path.abspath(__file__))
     outdir = os.path.join(script_dir, "results")
