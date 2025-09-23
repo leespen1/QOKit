@@ -18,6 +18,7 @@ end
 @testset "CPU and GPU mean squared-error values agree for multiple proxies." begin
     num_qubits = 10
     num_constraints = div(num_qubits^2, 2)
+    # Dummy homogeneous distribution
     sampled_homodist = JuliaQAOA.allocate_homodist(num_constraints, num_qubits)
 
     @testset "Hardcoded Triangle" begin
