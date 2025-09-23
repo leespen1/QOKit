@@ -179,7 +179,7 @@ def get_homogeneous_distribution_from_costs(costs, real_distribution, max_num_ed
 
 
 
-@njit
+@njit(inline='always')
 def hamming_distance(bitstring1: int, bitstring2: int):
     """
     Compute the Hamming distance between two bitstrings, given as integers.
@@ -201,7 +201,7 @@ def hamming_distance(bitstring1: int, bitstring2: int):
 
 
 
-@njit
+@njit(inline='always')
 def bitcount(x: int):
     """
     Counts the number of 1s in the binary representation of an integer x.
