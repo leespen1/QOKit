@@ -3,19 +3,24 @@ using Dates: now
 using DelimitedFiles, JuliaQAOA, Logging, Dates, ArgParse
 
 
-function sweep_parameters(in_filename, N_gridpoints=100, use_gpu=false, streamed_version=false, batch_size=1_000)
+function sweep_parameters(in_filename, N_gridpoints=100, use_gpu=false, streamed_version=false, batch_size=1_000, graph_type="Any")
 
     sampled_homodist = npzread(in_filename)
 
     num_constraints = size(sampled_homodist, 1) - 1
 
-    in_filename_no_ext = split(basename(in_filename),'.')[1]
+    in_filename_no_ext = splitext(basename(in_filename))[1]
     keyval_pair_strs = split(in_filename_no_ext, '_')
     keyval_dict = Dict((kv[1], kv[2]) for kv in split.(keyval_pair_strs, '='))
 
     num_nodes = parse(Int, keyval_dict["numnodes"]) 
     probability = parse(Float64, keyval_dict["probability"])
-    graphtype = keyval_dict["graphtype"]
+    filename_graphtype = keyval_dict["graphtype"]
+
+    if (graph_type != "Any") && (graph_type != filename_graphtype)
+        println("Graph type $filename_graphtype does not match required graph type $graph_type. Skipping.")
+        return
+    end
 
     @assert ndims(sampled_homodist) == 3 "Homogeneous distribution must be 3D."
     @assert size(sampled_homodist, 1) == size(sampled_homodist,3) "1st and 3rd dimensions of homogeneous distribution must be same length."
@@ -123,17 +128,19 @@ function sweep_parameters(in_filename, N_gridpoints=100, use_gpu=false, streamed
         writedlm(out_filename_opt_csv, optimal_params_mat)
     end
 
+    return
+
 end
 
-function collect_parameter_sweeps(directory, N_gridpoints=3, use_gpu=false, streamed_version=false, batch_size=1_000)
+function collect_parameter_sweeps(directory, N_gridpoints=3, use_gpu=false, streamed_version=false, batch_size=1_000, graph_type="Any")
     files = readdir(directory, join=true)
     for numpy_file in filter(x -> isfile(x) && endswith(x, ".npy"), files)
-        println("Performing parameter sweep for file ", numpy_file, ".")
+        println("Performing $N_gridpoints-point parameter sweep for file ", numpy_file, ".")
         println("Starting at time ", now())
         flush(stdout)
         start_sec = time()
 
-        sweep_parameters(numpy_file, N_gridpoints, use_gpu, streamed_version, batch_size)
+        sweep_parameters(numpy_file, N_gridpoints, use_gpu, streamed_version, batch_size, graph_type)
 
         println("Finished at time ", now(), ".")
         end_sec = time()
@@ -162,10 +169,14 @@ if abspath(PROGRAM_FILE) == @__FILE__ # Only run this if file is being run from 
             help = "Number of proxies to do at once on GPU"
             arg_type = Int
             default = 1_000
+        "--graph_type", "-t"
+            help = "Only process graphs of a certain type."
+            arg_type = String
+            default = "Any"
     end
 
     parsed_args = parse_args(ARGS, s)
-    collect_parameter_sweeps(parsed_args["directory"], parsed_args["ngridpoints"], parsed_args["gpu"], parsed_args["stream"], parsed_args["batch_size"])
+    collect_parameter_sweeps(parsed_args["directory"], parsed_args["ngridpoints"], parsed_args["gpu"], parsed_args["stream"], parsed_args["batch_size"], parsed_args["graph_type"])
 end
 
 
