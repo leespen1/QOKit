@@ -61,7 +61,7 @@ function sweep_parameters(in_filename, N_gridpoints=100, use_gpu=false, streamed
             global_logger(old_logger)
 
             if use_gpu
-                mses_vec = JuliaQAOA.gpu_multi_proxy_mse(proxies, sampled_homodist) |> Array |> vec
+                mses_vec = JuliaQAOA.gpu_multi_proxy_mse(proxies, sampled_homodist, batch_size=batch_size) |> Array |> vec
             else
                 mses_vec = JuliaQAOA.cpu_multi_proxy_mse(proxies, sampled_homodist, batch_size=batch_size)
             end
@@ -99,7 +99,7 @@ function sweep_parameters(in_filename, N_gridpoints=100, use_gpu=false, streamed
         #]
         
         if use_gpu
-            mses_vec = JuliaQAOA.gpu_multi_proxy_mse(proxies, sampled_homodist) |> Array |> vec
+            mses_vec = JuliaQAOA.gpu_multi_proxy_mse(proxies, sampled_homodist, batch_size=batch_size) |> Array |> vec
         else
             mses_vec = JuliaQAOA.cpu_multi_proxy_mse(proxies, sampled_homodist, batch_size=batch_size)
         end
