@@ -63,7 +63,7 @@ function sweep_parameters(in_filename, N_gridpoints=100, use_gpu=false, streamed
             if use_gpu
                 mses_vec = JuliaQAOA.gpu_multi_proxy_mse(proxies, sampled_homodist) |> Array |> vec
             else
-                mses_vec = JuliaQAOA.cpu_multi_proxy_mse(proxies, sampled_homodist, batch_size=1000)
+                mses_vec = JuliaQAOA.cpu_multi_proxy_mse(proxies, sampled_homodist, batch_size=10_000)
             end
 
             mean_mse += sum(mses_vec)
