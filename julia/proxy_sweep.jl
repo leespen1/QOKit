@@ -3,7 +3,7 @@ using Dates: now
 using DelimitedFiles, JuliaQAOA, Logging, Dates, ArgParse
 
 
-function sweep_parameters(in_filename, N_gridpoints=100, use_gpu=false, streamed_version=false)
+function sweep_parameters(in_filename, N_gridpoints=100, use_gpu=false, streamed_version=false, batch_size=1_000)
 
     sampled_homodist = npzread(in_filename)
 
@@ -54,7 +54,7 @@ function sweep_parameters(in_filename, N_gridpoints=100, use_gpu=false, streamed
         min_mse = Inf
         min_mse_params = (NaN, NaN, NaN, NaN)
 
-        for params_chunk in Iterators.partition(params, 10_000)
+        for params_chunk in Iterators.partition(params, 1_000)
             old_logger = global_logger()
             global_logger(ConsoleLogger(stderr, Logging.Error))
             proxies = [TriangleProxy(num_constraints, num_nodes, params...) for params in params_chunk]
@@ -63,7 +63,7 @@ function sweep_parameters(in_filename, N_gridpoints=100, use_gpu=false, streamed
             if use_gpu
                 mses_vec = JuliaQAOA.gpu_multi_proxy_mse(proxies, sampled_homodist) |> Array |> vec
             else
-                mses_vec = JuliaQAOA.cpu_multi_proxy_mse(proxies, sampled_homodist, batch_size=10_000)
+                mses_vec = JuliaQAOA.cpu_multi_proxy_mse(proxies, sampled_homodist, batch_size=batch_size)
             end
 
             mean_mse += sum(mses_vec)
@@ -101,7 +101,7 @@ function sweep_parameters(in_filename, N_gridpoints=100, use_gpu=false, streamed
         if use_gpu
             mses_vec = JuliaQAOA.gpu_multi_proxy_mse(proxies, sampled_homodist) |> Array |> vec
         else
-            mses_vec = JuliaQAOA.cpu_multi_proxy_mse(proxies, sampled_homodist, batch_size=1000)
+            mses_vec = JuliaQAOA.cpu_multi_proxy_mse(proxies, sampled_homodist, batch_size=batch_size)
         end
 
         mean_mse = sum(mses_vec) / length(mses_vec)
@@ -125,18 +125,20 @@ function sweep_parameters(in_filename, N_gridpoints=100, use_gpu=false, streamed
 
 end
 
-function collect_parameter_sweeps(directory, N_gridpoints=3, use_gpu=false, streamed_version=false)
+function collect_parameter_sweeps(directory, N_gridpoints=3, use_gpu=false, streamed_version=false, batch_size=1_000)
     files = readdir(directory, join=true)
     for numpy_file in filter(x -> isfile(x) && endswith(x, ".npy"), files)
         println("Performing parameter sweep for file ", numpy_file, ".")
         println("Starting at time ", now())
+        flush(stdout)
         start_sec = time()
 
-        sweep_parameters(numpy_file, N_gridpoints, use_gpu, streamed_version)
+        sweep_parameters(numpy_file, N_gridpoints, use_gpu, streamed_version, batch_size)
 
         println("Finished at time ", now(), ".")
         end_sec = time()
         println("Parameter sweep took $(end_sec - start_sec) seconds.\n", "-"^20, "\n\n")
+        flush(stdout)
     end
 end
 
@@ -156,10 +158,14 @@ if abspath(PROGRAM_FILE) == @__FILE__ # Only run this if file is being run from 
         "--stream", "-s"
             help = "Flag to use 'streamed' version, which will find optimal parameters but not store the results of the entire parameter sweep."
             action = :store_true
+        "--batch_size", "-b"
+            help = "Number of proxies to do at once on GPU"
+            arg_type = Int
+            default = 1_000
     end
 
     parsed_args = parse_args(ARGS, s)
-    collect_parameter_sweeps(parsed_args["directory"], parsed_args["ngridpoints"], parsed_args["gpu"], parsed_args["stream"])
+    collect_parameter_sweeps(parsed_args["directory"], parsed_args["ngridpoints"], parsed_args["gpu"], parsed_args["stream"], parsed_args["batch_size"])
 end
 
 

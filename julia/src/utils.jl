@@ -7,14 +7,14 @@ distribution in.
 Note that order is (c', c, d), NOT (c', d, c).
 """
 function allocate_homodist(proxy::AbstractProxy)
-    return allocate_homodist(proxy.num_constraints, proxy.num_qubits)
+    distribution = allocate_homodist(proxy.num_constraints, proxy.num_qubits)
     return distribution
 end
 
 function allocate_homodist(num_constraints::Integer, num_qubits::Integer)
     num_costs = num_constraints + 1
     num_distances = num_qubits + 1
-    distribution = Array{Float64, 3}(undef, num_costs, num_costs, num_distances)
+    distribution = Array{Float64, 3}(undef, num_costs, num_distances, num_costs)
     return distribution
 end
 
@@ -54,7 +54,8 @@ Consier lowering precision in the future. I think 32-bit should be fine.
 function gpu_multi_proxy_mse(
     proxies::AbstractVector{<: AbstractProxy},
     sampled_homodist::AbstractArray{<: Real, 3};
-    batch_size::Integer=length(proxies)
+    batch_size::Integer=length(proxies),
+    show_progress=false
 )
     proxy = proxies[1] 
      
@@ -65,7 +66,7 @@ function gpu_multi_proxy_mse(
     num_elements_in_homodist = (1+proxy.num_qubits)*(1+proxy.num_constraints)^2
     mse_batches = Vector{Float64}[]
     sampled_homodist_gpu = CuArray(sampled_homodist)
-    for (i, proxy_batch) in ProgressBar(enumerate(Iterators.partition(proxies, batch_size)))
+    @showprogress enabled=show_progress for (i, proxy_batch) in enumerate(Iterators.partition(proxies, batch_size))
         proxy_batch_gpu = reshape(proxy_batch, (1,1,1,:)) |> CuArray
         homodists_gpu = N_cost_distance_distribution.(
             proxy_batch_gpu, costs_prime, distances, costs_unprime
@@ -82,7 +83,8 @@ end
 function cpu_multi_proxy_mse(
     proxies::AbstractVector{<: AbstractProxy},
     sampled_homodist::AbstractArray{<: Real, 3};
-    batch_size::Integer=length(proxies)
+    batch_size::Integer=length(proxies),
+    show_progress=false
 )
      
     # Could make costs arrays of UInt16's.
@@ -92,7 +94,7 @@ function cpu_multi_proxy_mse(
     costs_unprime = reshape(costs_prime, (1, 1, :))
     num_elements_in_homodist = (1+proxy.num_qubits)*(1+proxy.num_constraints)^2
     mse_batches = Vector{Float64}[]
-    for (i, proxy_batch) in ProgressBar(enumerate(Iterators.partition(proxies, batch_size)))
+    @showprogress enabled=show_progress for (i, proxy_batch) in enumerate(Iterators.partition(proxies, batch_size))
         proxy_batch_reshaped = reshape(proxy_batch, (1,1,1,:)) 
         homodists = N_cost_distance_distribution.(proxy_batch_reshaped, costs_prime, distances, costs_unprime)  
         homodists .-= sampled_homodist # sampled_homodist is 3D, this will be repeated over 4th dimension
