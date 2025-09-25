@@ -21,7 +21,7 @@ GRAPH_TYPES=("ErdosRenyi" "BarabasiAlbert")
 PROBABILITIES=(0.25 0.5 0.75)
 N_GRAPHS=100
 
-for N in {5..12}; do
+for N in {16..18}; do
     for GRAPH in "${GRAPH_TYPES[@]}"; do
         for PROB in "${PROBABILITIES[@]}"; do
             echo "Running $GRAPH with N=$N, p=$PROB, $N_GRAPHS graphs"

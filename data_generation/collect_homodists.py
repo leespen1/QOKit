@@ -68,7 +68,7 @@ def main(args):
     time_elapsed = end_time - start_time
     end_datetime = datetime.now()
     print("Finished comutation at: ", end_datetime.strftime("%Y-%m-%d %H:%M:%S"))
-    print(f"Task took {time_elapsed:.8f} seconds.")
+    print(f"Task took {time_elapsed:.8f} seconds.\n\n")
 
     script_dir = os.path.dirname(os.path.abspath(__file__))
     outdir = os.path.join(script_dir, "results")
