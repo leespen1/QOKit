@@ -43,6 +43,7 @@ function sweep_parameters(in_filename, N_gridpoints=100, use_gpu=false, streamed
     out_filename_npy = "results/" * "parametersweep_" * out_filename_base * ".npy"
     out_filename_csv = "results/" * "parametersweep_" * out_filename_base * ".csv"
     out_filename_opt_csv = "results/" * "optimalparams_" * out_filename_base * ".csv"
+    mkpath("results")
 
     params = Iterators.product(h_tweak_sub_range, hc_tweak_add_range, l_tweak_mul_range, r_tweak_mul_range)
 
@@ -114,7 +115,6 @@ function sweep_parameters(in_filename, N_gridpoints=100, use_gpu=false, streamed
         mses_csv_mat = hcat(params_mat, mses_vec)
 
         # Save results
-        mkpath("results")
         npzwrite(out_filename_npy, mses_4D_array)
         # output will be csv, fist four columns are paremeters, last column is mse.
         writedlm(out_filename_csv, mses_csv_mat, ',')
