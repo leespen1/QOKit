@@ -19,15 +19,13 @@ function allocate_homodist(num_constraints::Integer, num_qubits::Integer)
 end
 
 """
-Construct N(c',c,d) from proxy.
-
-NOTE THE DIFFERENT ORDERING THAN USUAL! IT IS NOT N(c',d,c)!
+Construct N(c',d,c) from proxy.
 """
 function cpu_compute_homodist(proxy)
     # These three are 'vectors', but along different dimensions, for broadcasting to work
     costs_prime = collect(0:proxy.num_constraints)
-    costs_unprime = reshape(costs_prime, 1, :)
-    distances = reshape(collect(0:proxy.num_qubits), 1, 1, :)
+    distances = reshape(collect(0:proxy.num_qubits), 1, :)
+    costs_unprime = reshape(costs_prime, 1, 1, :)
     N(c_prime, c, d) = N_cost_distance_distribution(proxy, c_prime, d, c)
     homodist = N.(costs_prime, costs_unprime, distances)
     return homodist
@@ -37,8 +35,8 @@ end
 function gpu_compute_homodist(proxy)
     # These three are 'vectors', but along different dimensions, for broadcasting to work
     costs_prime = collect(0:proxy.num_constraints) |> CuArray
-    costs_unprime = reshape(costs_prime, 1, :) |> CuArray
-    distances = reshape(collect(0:proxy.num_qubits), 1, 1, :) |> CuArray
+    distances = reshape(collect(0:proxy.num_qubits), 1, :) |> CuArray
+    costs_unprime = reshape(costs_prime, 1, 1, :) |> CuArray
     N(c_prime, c, d) = N_cost_distance_distribution(proxy, c_prime, d, c)
     homodist = N.(costs_prime, costs_unprime, distances)
     return homodist
@@ -62,8 +60,8 @@ function gpu_multi_proxy_mse(
      
     # Could make costs arrays of UInt16's to save space.
     costs_prime = collect(0:proxy.num_constraints) |> CuArray
-    costs_unprime = reshape(costs_prime, (1, :)) |> CuArray
-    distances = reshape(collect(0:proxy.num_qubits), (1, 1, :)) |> CuArray
+    distances = reshape(collect(0:proxy.num_qubits), (1, :)) |> CuArray
+    costs_unprime = reshape(costs_prime, (1, 1, :)) |> CuArray
     num_elements_in_homodist = (1+proxy.num_qubits)*(1+proxy.num_constraints)^2
     mse_batches = Vector{Float64}[]
     sampled_homodist_gpu = CuArray(sampled_homodist)
@@ -90,13 +88,13 @@ function cpu_multi_proxy_mse(
     # Could make costs arrays of UInt16's.
     proxy = proxies[1] 
     costs_prime = 0:proxy.num_constraints
-    costs_unprime = reshape(costs_prime, (1, :))
-    distances = reshape(0:proxy.num_qubits, (1, 1, :))
+    distances = reshape(0:proxy.num_qubits, (1, :))
+    costs_unprime = reshape(costs_prime, (1, 1, :))
     num_elements_in_homodist = (1+proxy.num_qubits)*(1+proxy.num_constraints)^2
     mse_batches = Vector{Float64}[]
-    for (i, proxy_batch) in enumerate(Iterators.partition(proxies, batch_size))
-        proxy_batch_gpu = reshape(proxy_batch, (1,1,1,:)) 
-        homodists = N_cost_distance_distribution.(proxy_batch_gpu, costs_prime, distances, costs_unprime)  
+    for (i, proxy_batch) in ProgressBar(enumerate(Iterators.partition(proxies, batch_size)))
+        proxy_batch_reshaped = reshape(proxy_batch, (1,1,1,:)) 
+        homodists = N_cost_distance_distribution.(proxy_batch_reshaped, costs_prime, distances, costs_unprime)  
         homodists .-= sampled_homodist # sampled_homodist is 3D, this will be repeated over 4th dimension
         mse_batch = mapreduce(x -> x*x, +, homodists, dims=(1,2,3)) # Reduce first 3 dims, leave 4th dim
         mse_batch ./= num_elements_in_homodist
