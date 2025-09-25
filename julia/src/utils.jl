@@ -66,10 +66,10 @@ function gpu_multi_proxy_mse(
     num_elements_in_homodist = (1+proxy.num_qubits)*(1+proxy.num_constraints)^2
     mse_batches = Vector{Float64}[]
     sampled_homodist_gpu = CuArray(sampled_homodist)
-    @showprogress enabled=show_progress for (i, proxy_batch) in enumerate(Iterators.partition(proxies, batch_size))
-        proxy_batch_gpu = reshape(proxy_batch, (1,1,1,:)) |> CuArray
+    @showprogress enabled=show_progress for (i, proxy_batch_gpu) in enumerate(Iterators.partition(proxies, batch_size))
+        proxy_batch_gpu_reshaped = reshape(proxy_batch_gpu, (1,1,1,:)) |> CuArray
         homodists_gpu = N_cost_distance_distribution.(
-            proxy_batch_gpu, costs_prime, distances, costs_unprime
+            proxy_batch_gpu_reshaped, costs_prime, distances, costs_unprime
         )  
         homodists_gpu .-= sampled_homodist_gpu # sampled_homodist is 3D, this will be repeated over 4th dimension
         mse_batch_gpu = mapreduce(x -> x*x, +, homodists_gpu, dims=(1,2,3)) # Reduce first 3 dims, leave 4th dim
