@@ -6,6 +6,7 @@ using PythonCall: PyArray, pyconvert
 using LinearAlgebra: mul!
 using Base.Threads: @threads
 using CUDA
+using ProgressBars: ProgressBar
 
 # Functions that will be made available when I call "using JuliaQAOA"
 export P_cost_distribution, N_cost_distribution, N_cost_distance_distribution
