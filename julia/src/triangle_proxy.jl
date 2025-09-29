@@ -2,6 +2,111 @@
 This file implements the parameterized "triangle" distribution, as well as the
 original "hard-coded triangle" distribution.
 =#
+"""
+Class for implementing the "Triangle" parameterized proxy for QAOA.
+
+Required arguments:
+- num_constraints: int
+- num_qubits: int
+Argument with defaults (optional):
+- h_tweak_sub
+- hc_tweak_add
+- l_tweak_mul
+- r_tweak_mul
+
+For a graph with M edges and N vertices, we create a TriangleProxy like this:
+    proxy = TriangleProxy(M, N, h_tweak_sub, hc_tweak_add, l_tweak_mul, r_tweak_mul)
+
+=======
+New work
+
+As it stands, the center is at 0.5*num_constraints. So it makes perfect sense
+to have the tunable argument be a ratio of the number of constraints. Then
+bounds will be [0,1]
+
+If l/r_tweak_mul are really multiplying the slopes of the lines, I think it makes
+much more sense to give an angle for the slopes instead. Then boudns will be
+[0,pi/2].
+
+The height is the one I'm least sure about. Having an add/sub correction is a
+bad idea. But should I do a ratio, like we did for the center? Or should I straight up 
+have the exponential growth be tunable, e.g. heigh=2^θ? Or 2^(num_qubits*θ)? Or
+should it be (2^num_qubits)*θ ?
+
+"""
+struct IntuitiveTriangleProxy <: AbstractProxy
+    num_constraints::Int64
+    num_qubits::Int64
+    center_ratio::Float64 # Position of the center of the triangle, as a fraction of the number of constraints
+    left_angle::Float64
+    right_angle::Float64
+    h_tweak_sub::Float64  # Shifts the peak of the pyramid down (Default 0)
+    l_tweak_mul::Float64  # Defines the (inverse of the) slope of the left side of the pyramid (Default 1)
+    r_tweak_mul::Float64  # Defines the (inverse of the) slope of the right side of the pyramid (Default 1)
+    h_peak::Float64
+end
+
+function IntuitiveTriangleProxy( # For default arguements
+        num_constraints,
+        num_qubits,
+        h_tweak_sub=0,
+        hc_tweak_add=0,
+        l_tweak_mul=1,
+        r_tweak_mul=1
+    )
+    # Approximate the peak value of the paper's multinomial distribution (roughly)
+    @assert num_qubits >= 4 "num_qubits must be at least 4"
+    h_peak = (1 << (num_qubits - 4)) - h_tweak_sub 
+    if h_peak < 0.0
+        @warn "h_peak is negative, setting to 0"
+    end 
+    h_peak = max(h_peak, 0.0) |> float # make sure float, ensure type-stability
+    center_at_h_peak = (num_constraints / 2) + hc_tweak_add |> float # make sure float, ensure type-stability
+    new(
+        num_constraints,
+        num_qubits,
+        h_tweak_sub,
+        hc_tweak_add,
+        l_tweak_mul,
+        r_tweak_mul,
+        h_peak,
+        center_at_h_peak,
+    )
+end
+
+"""
+P(c') from paper
+"""
+function P_cost_distribution(proxy::IntuitiveTriangleProxy, cost::Integer)::Float64
+    return 4 / ((proxy.num_constraints + 1) ^ 2) * min(cost + 1, proxy.num_constraints + 1 - cost)
+end
+
+"""
+N(c') from paper
+"""
+function N_cost_distribution(proxy::IntuitiveTriangleProxy, cost::Integer)::Float64
+    scale = 1 << proxy.num_qubits
+    return P_cost_distribution(proxy, cost) * scale
+end
+
+
+"""
+N(c'; d, c) from paper
+"""
+function N_cost_distance_distribution(proxy::IntuitiveTriangleProxy, cost_1::Integer, distance::Integer, cost_2::Integer)::Float64
+    # Want distance to be between 0 and proxy.num_qubits//2 since further distance corresponds to being near the bitwise complement (which has the same cost)
+    reflected_distance = (distance > div(proxy.num_qubits, 2)) ? proxy.num_qubits - distance : distance
+
+    # Take the peak height at reflected_distance to be on the straight line between (0 or proxy.num_qubits, 1) and (proxy.num_qubits/2, h_peak)
+    # TODO should the left point be (0, 1) or (0, 0)? Also, this is not a very good name
+    h_at_cost_2 = line_between(reflected_distance, 0, 1, proxy.num_qubits / 2, proxy.h_peak)
+    # Let the peak height at reflected_distance occur where cost_2 is on the stright line between cost_1 and proxy.num_constraints/2
+    center = line_between(reflected_distance, 0, cost_1, proxy.num_qubits / 2, proxy.center_ratio * proxy.num_constraints)
+    left = center - proxy.l_tweak_mul * reflected_distance - 1
+    right = center + proxy.r_tweak_mul * reflected_distance + 1
+
+    return triangle_value(cost_2, left, right, h_at_cost_2)
+end
 
 """
 Class for implementing the "Triangle" parameterized proxy for QAOA.
