@@ -98,8 +98,8 @@ function cpu_multi_proxy_mse(
     show_progress=false,
 )
     if normalize
-        sampled_homodist_volume = sum(sampled_homodist_gpu)
-        sampled_homodist_gpu ./= sampled_homodist_volume
+        sampled_homodist_volume = sum(sampled_homodist)
+        sampled_homodist ./= sampled_homodist_volume
     end
      
     # Could make costs arrays of UInt16's.
