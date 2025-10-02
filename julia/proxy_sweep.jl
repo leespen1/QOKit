@@ -60,31 +60,25 @@ function sweep_parameters(in_filename, N_gridpoints=100, use_gpu=false, streamed
     @assert size(sampled_homodist, 1) == size(sampled_homodist,3) "1st and 3rd dimensions of homogeneous distribution must be same length."
     @assert size(sampled_homodist, 2) == num_nodes + 1 "num_nodes from filename does not agree with number of hamming distances in the homogeneous distribution."
 
-    bounds = [
-        (0, (num_nodes^2) / 3),   # h_tweak_sub >= 0
-        (-10, 10),   # hc_tweak_add can be small positive/negative
-        (0.005, 2),   # l_tweak_mul > 0
-        (0.05, 2),   # r_tweak_mul > 0
-    ]
 
     # Ideas for scale to make gridpoints more sensible:
-    # - l/r_tweak_mul can be changed to an angle determining the slope, so range is 0:pi
-    # - hc_tweak_add_range can be done as a fraction of the total number of possible costs, so range is -0.5:0.5
-    # - h_tweak_sub is the hardest
+    # - l/right_angle can be changed to an angle determining the slope, so range is 0:pi
+    # - ceneter_adjustment_add_range can be done as a fraction of the total number of possible costs, so range is -0.5:0.5
+    # - height_adjustment is the hardest
 
-    h_tweak_sub_range = LinRange(0, num_nodes^2 / 3, N_gridpoints)
-    hc_tweak_add_range = LinRange(-10, 10, N_gridpoints)
-    l_tweak_mul_range = LinRange(0.005, 2, N_gridpoints)
-    r_tweak_mul_range = LinRange(0.005, 2, N_gridpoints)
+    height_adjustment_range = LinRange(0, 20, N_gridpoints)
+    ceneter_adjustment_add_range = LinRange(0, 1, N_gridpoints)
+    left_angle_range = LinRange(0, 0.5, N_gridpoints)
+    right_angle_range = LinRange(0, 0.5, N_gridpoints)
 
     rangestr(r) = "$(minimum(r)):$(maximum(r))"
-    out_filename_base = in_filename_no_ext * "_htweaksub=$(rangestr(h_tweak_sub_range))_hctweakadd=$(rangestr(hc_tweak_add_range))_ltweakmul=$(rangestr(l_tweak_mul_range))_rtweakmul=$(rangestr(r_tweak_mul_range))_ngridpoints=$(N_gridpoints)"
+    out_filename_base = in_filename_no_ext * "_htweaksub=$(rangestr(height_adjustment_range))_hctweakadd=$(rangestr(ceneter_adjustment_add_range))_ltweakmul=$(rangestr(left_angle_range))_rtweakmul=$(rangestr(right_angle_range))_ngridpoints=$(N_gridpoints)"
     out_filename_npy = "results/" * "parametersweep_" * out_filename_base * ".npy"
     out_filename_csv = "results/" * "parametersweep_" * out_filename_base * ".csv"
     out_filename_opt_csv = "results/" * "optimalparams_" * out_filename_base * ".csv"
     mkpath("results")
 
-    params = Iterators.product(h_tweak_sub_range, hc_tweak_add_range, l_tweak_mul_range, r_tweak_mul_range)
+    params = Iterators.product(height_adjustment_range, ceneter_adjustment_add_range, left_angle_range, right_angle_range)
 
 
     # This may be unnecessary, just make big file but handle writes in chunks
@@ -94,10 +88,7 @@ function sweep_parameters(in_filename, N_gridpoints=100, use_gpu=false, streamed
         min_mse_params = (NaN, NaN, NaN, NaN)
 
         for params_chunk in Iterators.partition(params, 1_000)
-            old_logger = global_logger()
-            global_logger(ConsoleLogger(stderr, Logging.Error))
-            proxies = [TriangleProxy(num_constraints, num_nodes, params...) for params in params_chunk]
-            global_logger(old_logger)
+            proxies = [JuliaQAOA.IntuitiveTriangleProxy(num_constraints, num_nodes, params...) for params in params_chunk]
 
             if use_gpu
                 mses_vec = JuliaQAOA.gpu_multi_proxy_mse(proxies, sampled_homodist, batch_size=batch_size) |> Array |> vec
@@ -105,8 +96,9 @@ function sweep_parameters(in_filename, N_gridpoints=100, use_gpu=false, streamed
                 mses_vec = JuliaQAOA.cpu_multi_proxy_mse(proxies, sampled_homodist, batch_size=batch_size)
             end
 
-            mean_mse += sum(mses_vec)
+            mean_mse += sum(x -> isnan(x) ? 0 : x, mses_vec) # Technically, should also reduce number I divide mean_MSE by later on
             local_min_mse, min_mse_index = findmin(mses_vec)
+            local_min_mse, min_mse_index = findmin(x -> isnan(x) ? Inf : x, mses_vec)
             if local_min_mse < min_mse
                 min_mse = local_min_mse
                 min_mse_params = params_chunk[min_mse_index]
@@ -120,21 +112,16 @@ function sweep_parameters(in_filename, N_gridpoints=100, use_gpu=false, streamed
     else
         params_vec = params |> collect |> vec
 
-        # Temporarily supress warnings (which happen when h_tweak_sub makes the peak negative)
-        old_logger = global_logger()
-        global_logger(ConsoleLogger(stderr, Logging.Error))
+        proxies = [JuliaQAOA.IntuitiveTriangleProxy(num_constraints, num_nodes, params...) for params in params_vec]
 
-        proxies = [TriangleProxy(num_constraints, num_nodes, params...) for params in params_vec]
-
-        global_logger(old_logger)
         # End supression of warnings
 
         #proxies_mat = [
-        #    TriangleProxy(num_constraints, num_nodes, h_tweak_sub, hc_tweak_add, l_tweak_mul, r_tweak_mul)
-        #    for h_tweak_sub  in h_tweak_sub_range,
-        #        hc_tweak_add in hc_tweak_add_range,
-        #        l_tweak_mul  in l_tweak_mul_range,
-        #        r_tweak_mul  in r_tweak_mul_range
+        #    TriangleProxy(num_constraints, num_nodes, height_adjustment, ceneter_adjustment_add, left_angle, right_angle)
+        #    for height_adjustment  in height_adjustment_range,
+        #        ceneter_adjustment_add in ceneter_adjustment_add_range,
+        #        left_angle  in left_angle_range,
+        #        right_angle  in right_angle_range
         #]
         
         if use_gpu
@@ -143,8 +130,8 @@ function sweep_parameters(in_filename, N_gridpoints=100, use_gpu=false, streamed
             mses_vec = JuliaQAOA.cpu_multi_proxy_mse(proxies, sampled_homodist, batch_size=batch_size)
         end
 
-        mean_mse = sum(mses_vec) / length(mses_vec)
-        min_mse, min_mse_index = findmin(mses_vec)
+        mean_mse = sum(x -> isnan(x) ? 0 : x, mses_vec) / length(mses_vec)
+        min_mse, min_mse_index = findmin(x -> isnan(x) ? Inf : x, mses_vec)
         min_mse_params = params_vec[min_mse_index]
         println("Min MSE = $min_mse\nMean MSE = $mean_mse\nOptimal parameters = $min_mse_params")
 
