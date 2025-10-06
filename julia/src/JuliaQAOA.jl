@@ -10,7 +10,7 @@ using ProgressMeter: @showprogress
 
 # Functions that will be made available when I call "using JuliaQAOA"
 export P_cost_distribution, N_cost_distribution, N_cost_distance_distribution
-export NormalProxy, PaperProxy, TriangleProxy, HardCodedTriangleProxy
+export NormalProxy, PaperProxy, TriangleProxy, HardCodedTriangleProxy, IntuitiveTriangleProxy, OldTriangleProxy
 export compute_amplitude_sum, QAOA_proxy, QAOA_proxy_expectation
 export inverse_proxy_objective_function
 export qaoa_proxy_circuit

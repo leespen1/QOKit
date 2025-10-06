@@ -48,7 +48,14 @@ const TriangleProxies = Union{TriangleProxy, HardCodedTriangleProxy}
 - left_angle  # Left  angle (in units of pi) of the triangle along the d-axis, as measured from the y-axis ∈ [0, 0.5]
 - right_angle # Right angle (in units of pi) of the triangle along the d-axis, as measured from the y-axis ∈ [0, 0.5]
 """
-function IntuitiveTriangleProxy(num_constraints, num_qubits, height_adjustment, center_adjustment, left_angle, right_angle)
+function IntuitiveTriangleProxy(
+    num_constraints,
+    num_qubits,
+    height_adjustment=1.0,
+    center_adjustment=0.5,
+    left_angle=0.25,
+    right_angle=0.25,
+)
     # Approximate the peak value of the paper's multinomial distribution (roughly)
     @assert num_qubits >= 4 "num_qubits must be at least 4"
     h_peak = (1 << (num_qubits - 4))*height_adjustment 

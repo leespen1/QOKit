@@ -10,11 +10,10 @@ Required arguments:
 struct PaperProxy
     num_constraints::Int64
     num_qubits::Int64
-    prob_edge::Float64
     binomial_distribution::Binomial{Float64}
-    function PaperProxy(num_constraints, num_qubits, prob_edge=0.5)
+    function PaperProxy(num_constraints, num_qubits, prob_edge)
         binomial_distribution = Binomial(num_constraints, prob_edge)
-        new(num_constraints, num_qubits, prob_edge, binomial_distribution)
+        new(num_constraints, num_qubits, binomial_distribution)
     end
 end
 
