@@ -26,8 +26,8 @@ function cpu_compute_homodist(proxy)
     costs_prime = collect(0:proxy.num_constraints)
     distances = reshape(collect(0:proxy.num_qubits), 1, :)
     costs_unprime = reshape(costs_prime, 1, 1, :)
-    N(c_prime, c, d) = N_cost_distance_distribution(proxy, c_prime, d, c)
-    homodist = N.(costs_prime, costs_unprime, distances)
+    N(c_prime, d, c) = N_cost_distance_distribution(proxy, c_prime, d, c)
+    homodist = N.(costs_prime, distances, costs_unprime)
     return homodist
 end
 
@@ -37,8 +37,8 @@ function gpu_compute_homodist(proxy)
     costs_prime = collect(0:proxy.num_constraints) |> CuArray
     distances = reshape(collect(0:proxy.num_qubits), 1, :) |> CuArray
     costs_unprime = reshape(costs_prime, 1, 1, :) |> CuArray
-    N(c_prime, c, d) = N_cost_distance_distribution(proxy, c_prime, d, c)
-    homodist = N.(costs_prime, costs_unprime, distances)
+    N(c_prime, d, c) = N_cost_distance_distribution(proxy, c_prime, d, c)
+    homodist = N.(costs_prime, distances, costs_unprime)
     return homodist
 end
 
@@ -80,6 +80,7 @@ function gpu_multi_proxy_mse(
             homodist_gpu_volumes = sum(sampled_homodist_gpu, dims=(1,2,3))
             homodists_gpu ./= homodist_gpu_volumes # Vectorized, should divide each 3D slice
         end
+        # TODO mse_batch_gpu computation could be reduced to one mapreduce call
         homodists_gpu .-= sampled_homodist_gpu # sampled_homodist is 3D, this will be repeated over 4th dimension
 
         mse_batch_gpu = mapreduce(x -> x*x, +, homodists_gpu, dims=(1,2,3)) # Reduce first 3 dims, leave 4th dim
