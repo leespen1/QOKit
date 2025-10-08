@@ -11,6 +11,57 @@ optimization.
 =#
 
 """
+New version, using homodist array, but not 
+
+Optionally, provide state_vec to avoid allocating the state_vec
+"""
+function QAOA_proxy(
+    homodist::AbstractArray{<: Real, 3}, gammas::AbstractVector{<: Real},
+    betas::AbstractVector{<: Real},
+    state_vec1::AbstractVector{ComplexF64} = zeros(ComplexF64, size(homodist, 1)),
+    state_vec2::AbstractVector{ComplexF64} = zeros(ComplexF64, size(homodist, 1)),
+)::Vector{ComplexF64}
+    @assert length(gammas) == length(betas) "Gamma vec and beta vec must be same length."
+    @assert size(homodist, 1) == size(homodist, 3) "1st and 3rd dimensions of homogeneous distribution must be the same length."
+    @assert length(state_vec1) == length(state_vec2) == size(homodist, 1) "State vector arrays must have some length as number of unique costs in homogeneous distribution."
+    p = length(gammas)
+
+    num_distances = size(homodist, 2)
+    num_costs = size(homodist, 1)
+
+    init_amplitude = 1 / sqrt(2 ^ (num_distances-1))
+    state_vec1 .= init_amplitude
+
+    for ℓ in 1:p
+        # If I do this with turbo, it's SIMD, so GPU translation should be easy (parallel across sets of β and γs is harder)
+        sinβ, cosβ = sincos(betas[ℓ])
+        γ = gammas[ℓ]
+        neg_im_sinβ = -1im*sinβ
+        cos_factors = vmap(d -> cosβ^(num_distances-1-d), 0:num_distances-1)
+        sin_factors = vmap(d -> neg_im_sinβ^(d),          0:num_distances-1)
+        γ_factors = vmap(c -> exp(-im*γ*c), 0:num_costs-1)
+        state_vec2 .= 0
+        # TODO this turbo loop isn't working, possibly because complex numbers are used? https://juliasimd.github.io/LoopVectorization.jl/latest/future_work/
+        # Makes sense, a vector of ComplexF64s is a vector of struces, and SIMD
+        # works better for a struct of vecs. Will need to have multiple real vectors for SIMD
+        @turbo for i_c_prime in indices(homodist, 1), i_d in indices(homodist, 2), i_c in indices(homodist, 3)
+            state_vec2[i_c_prime] += cos_factors[i_d] *
+                                     sin_factors[i_d] *
+                                     γ_factors[i_c] *
+                                     state_vec1[i_c] *
+                                     homodist[i_c_prime, i_d, i_c]
+        end
+        # swap state_vec1/2
+        state_vec_tmp = state_vec1
+        state_vec1 = state_vec2
+        state_vec2 = state_vec_tmp
+    end
+    return state_vec1
+end
+
+
+
+"""
 Run the homogeneous proxy of the QAOA circuit with parameters gammas (cost) 
 and betas (mixer).
 

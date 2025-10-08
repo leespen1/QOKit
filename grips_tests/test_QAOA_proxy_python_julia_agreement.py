@@ -1,14 +1,8 @@
 import sys, os, numpy as np
 sys.path.append(os.path.abspath("..")) # Allows us to import from grips and qokit directories
-from grips.QAOA_proxy_interface import QAOA_proxy, QAOA_proxy_expectation, QAOA_proxy_optimize_gamma_beta
-from grips.triangle_proxy import HardCodedTriangleProxy
+from grips import HardCodedTriangleProxy
+from grips.QAOA_proxy_interface import QAOA_proxy, QAOA_proxy_expectation, QAOA_proxy_optimize_gamma_beta, jl
 # The following imports and seval statements make Julia proxy functions available
-from juliacall import Main as jl
-jl.seval('using Pkg')
-jl.seval('Pkg.activate(joinpath(@__DIR__, "../julia"))')
-jl.seval('Pkg.instantiate()')
-jl.seval('include(joinpath(@__DIR__, "../julia/QAOA_proxy_interface.jl"))')
-jl.seval('include(joinpath(@__DIR__, "../julia/triangle_proxy.jl"))')
 
 num_constraints = 10
 num_qubits = 6
