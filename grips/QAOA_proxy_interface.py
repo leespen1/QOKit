@@ -28,14 +28,21 @@ Pkg.activate("{julia_project_dir}")
 try
     using JuliaQAOA
 catch e
-    if isa(e, ArgumentError)
-        println("Encountered error during 'using JuliaQAOA', instantiating ...")
-        Pkg.instantiate()
-        using JuliaQAOA
-    else
-        rethrow(e)
-    end
+    println("Encountered error during 'using JuliaQAOA', instantiating environment at {julia_project_dir}")
+    Pkg.instantiate()
+    using JuliaQAOA
 end
+#try
+#    using JuliaQAOA
+#catch e
+#    if isa(e, LoadError)
+#        println("Encountered error during 'using JuliaQAOA', instantiating environment at {julia_project_dir}")
+#        Pkg.instantiate()
+#        using JuliaQAOA
+#    else
+#        rethrow(e)
+#    end
+#end
 ''')
 
 

@@ -13,14 +13,15 @@ import qokit.maxcut as mc
 import os
 import grips
 import pandas as pd
+from grips.QAOA_proxy_interface import QAOA_proxy, QAOA_proxy_expectation, QAOA_proxy_optimize_gamma_beta, jl
+
 from grips import (
-    get_simulator, QAOA_run, QAOA_proxy, QAOA_proxy_expectation, QAOA_proxy_optimize_gamma_beta,
     get_homogeneous_distribution,get_homogeneous_distribution_from_proxy,
     TriangleProxy, NormalProxy, PaperProxy,
     inverse_objective_function, get_expectation,  
     maxcut, maxcut_approx_ratio, spsa_for_scipy,
     plot_distribution_lines_all, fit_proxy_to_real, 
-    pad_and_stack, jl
+    pad_and_stack, get_simulator, QAOA_run
 )
 from grips import distribution_mean_squared_error as mse_dist_loss
 from scipy.optimize import minimize
