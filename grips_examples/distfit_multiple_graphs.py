@@ -360,34 +360,108 @@ def fit_multiple_graphs(num_graphs, num_nodes, edge_probability = 0.5, graph_typ
         'mean_initial_approx_ratio': [np.mean(initial_approx_ratios)],
         'mean_fitted_approx_ratio': [np.mean(fitted_approx_ratios)],
         'initial_mse': [initial_mse],
-        'fitted_mse': [fitted_mse]
+        'fitted_mse': [fitted_mse],
+        'mean_paper_expectation': [0.0],  # Will be filled in later
+        'mean_paper_approx_ratio': [0.0]  # Will be filled in later
     }
     if graph_type == 'watts_strogatz':
         results_dict['ws_num_neighbors'] = [ws_num_neighbors]
 
-    return pd.DataFrame(results_dict)
+    #also returning the exact graphs used
+    return pd.DataFrame(results_dict), graphs
 
 if __name__ == "__main__":
     # Run the fitting process
-    num_graphs = 50
+    num_graphs = 20
     edge_probability = 0.5
     startnodes = 4
-    endnodes = 10
+    endnodes = 5
     graph_type = 'barabasi_albert'  # Change to 'barabasi_albert' or 'watts_strogatz' as needed
 
     print(f"\n\n---------------------\nFitting for {startnodes} nodes...")
-    df = fit_multiple_graphs(num_graphs=num_graphs, num_nodes=startnodes,\
+    df, graphs = fit_multiple_graphs(num_graphs=num_graphs, num_nodes=startnodes,\
                             edge_probability=edge_probability, graph_type=graph_type)
+    
+    # Store all graphs for each configuration
+    all_graphs = [graphs]  # List of lists of graphs
         
+    '''
+    we get here the mean expectation and approximation ration from the 
+    fitted distributions. Should compare this to using the paper proxy. 
+    '''
     for num_nodes in range(startnodes+1, endnodes+1):
         print(f"\n\n---------------------\nFitting for {num_nodes} nodes...")
-        df_new = fit_multiple_graphs(num_graphs=num_graphs, num_nodes=num_nodes,\
+        df_new, graphs_new = fit_multiple_graphs(num_graphs=num_graphs, num_nodes=num_nodes,\
                                     edge_probability=edge_probability, graph_type=graph_type)
         df = pd.concat([df, df_new], ignore_index=True)
+        all_graphs.append(graphs_new)
         
+
+    ''' Now do the paper proxy. We need to add a "paper proxy expectation"
+    and "paper proxy approx ratio" to the df above.'''
+    
+    # Add paper proxy columns to existing DataFrame
+    df['mean_paper_expectation'] = 0.0
+    df['mean_paper_approx_ratio'] = 0.0
+    
+    # Evaluate paper proxy for each configuration in the DataFrame
+    for idx, row in df.iterrows():
+        print(f"\n\n---------------------\nEvaluating paper proxy for {row['num_nodes']} nodes...")
+        
+        # Get the exact graphs used for this configuration (idx is row index)
+        config_idx = int(idx)  # Ensure integer indexing
+        graphs_for_config = all_graphs[config_idx]
+        
+        # Calculate max edges for this configuration using the exact graphs
+        config_max_edges = max(g.number_of_edges() for g in graphs_for_config)
+        
+        # Create paper proxy with appropriate parameters
+        paper_proxy = PaperProxy(
+            num_constraints=config_max_edges,
+            num_qubits=int(row['num_nodes']),
+            prob_edge=float(row['edge_probability'])
+        )
+        
+        # Optimize gamma and beta for paper proxy
+        gamma_0 = np.array([0.1])
+        beta_0 = np.array([0.1])
+        paper_result = QAOA_proxy_optimize_gamma_beta(
+            paper_proxy, gamma_0, beta_0, 
+            optimizer_method='Nelder-Mead', 
+            optimizer_options={'maxiter': 10000, 'epsilon': 0.00001}
+        )
+        gamma_paper = paper_result["gamma"]
+        beta_paper = paper_result["beta"]
+        
+        # Evaluate paper proxy on the exact same graphs used for fitted proxy
+        paper_expectations = []
+        paper_approx_ratios = []
+        
+        for graph in graphs_for_config:
+            # Calculate expectation and approximation ratio
+            ising_model = mc.get_maxcut_terms(graph)
+            N = graph.number_of_nodes()
+            p = 1
+            mixer = "x"
+            
+            inv_obj_paper = inverse_objective_function(ising_model, N, p, mixer, None, None)
+            paper_res = inv_obj_paper(np.hstack([gamma_paper, beta_paper]))
+            
+            paper_expectations.append(-paper_res)
+            paper_approx_ratios.append(maxcut_approx_ratio(graph, -paper_res))
+        
+        # Update DataFrame with paper proxy results
+        df.iloc[config_idx, df.columns.get_loc('mean_paper_expectation')] = np.mean(paper_expectations)
+        df.iloc[config_idx, df.columns.get_loc('mean_paper_approx_ratio')] = np.mean(paper_approx_ratios)
+        
+        print(f"Paper Proxy Mean Expectation: {np.mean(paper_expectations):.2f}")
+        print(f"Paper Proxy Mean Approx Ratio: {np.mean(paper_approx_ratios):.2f}")
+
     print(df)
 
-    # Save the DataFrame to a CSV file
-    output_file = f"fitting_results_{graph_type}_{edge_probability}edgeprob_{startnodes}to{endnodes}nodes_{num_graphs}graphs.csv"
+    # Save the DataFrame to a CSV file, dump it in the Data folder 
+    output_file = f"Data/fitting_results_{graph_type}_{edge_probability}edgeprob_{startnodes}to{endnodes}nodes_{num_graphs}graphs.csv"
     df.to_csv(output_file, index=False)
     print(f"Results saved to {output_file}")
+
+# %%
