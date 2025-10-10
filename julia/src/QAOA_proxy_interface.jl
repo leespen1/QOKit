@@ -11,7 +11,7 @@ optimization.
 =#
 
 """
-New version, using homodist array, but not 
+New version, using homodist array, but not "fused matrix-multiplication."
 
 Optionally, provide state_vec to avoid allocating the state_vec
 """
@@ -32,25 +32,81 @@ function QAOA_proxy(
     init_amplitude = 1 / sqrt(2 ^ (num_distances-1))
     state_vec1 .= init_amplitude
 
+    costs = 0:num_costs-1
+    distances = 0:num_distances-1
+    β_factors = Vector{ComplexF64}(undef, num_distances)
+    γ_factors = Vector{ComplexF64}(undef, num_costs)
+
     for ℓ in 1:p
         # If I do this with turbo, it's SIMD, so GPU translation should be easy (parallel across sets of β and γs is harder)
         sinβ, cosβ = sincos(betas[ℓ])
-        γ = gammas[ℓ]
         neg_im_sinβ = -1im*sinβ
-        cos_factors = vmap(d -> cosβ^(num_distances-1-d), 0:num_distances-1)
-        sin_factors = vmap(d -> neg_im_sinβ^(d),          0:num_distances-1)
-        γ_factors = vmap(c -> exp(-im*γ*c), 0:num_costs-1)
+        γ = gammas[ℓ]
+
+        map!(d -> cosβ^(num_distances-1-d) * neg_im_sinβ^(d), β_factors, distances)
+        map!(c -> exp(-im*γ*c), γ_factors, costs)
         state_vec2 .= 0
-        # TODO this turbo loop isn't working, possibly because complex numbers are used? https://juliasimd.github.io/LoopVectorization.jl/latest/future_work/
-        # Makes sense, a vector of ComplexF64s is a vector of struces, and SIMD
-        # works better for a struct of vecs. Will need to have multiple real vectors for SIMD
-        @turbo for i_c_prime in indices(homodist, 1), i_d in indices(homodist, 2), i_c in indices(homodist, 3)
-            state_vec2[i_c_prime] += cos_factors[i_d] *
-                                     sin_factors[i_d] *
-                                     γ_factors[i_c] *
-                                     state_vec1[i_c] *
-                                     homodist[i_c_prime, i_d, i_c]
+        for i_c_prime in axes(homodist, 1), i_d in axes(homodist, 2), i_c in axes(homodist, 3)
+            state_vec2[i_c_prime] += β_factors[i_d] * γ_factors[i_c] *
+                                     state_vec1[i_c] * homodist[i_c_prime, i_d, i_c]
         end
+        # swap state_vec1/2
+        state_vec_tmp = state_vec1
+        state_vec1 = state_vec2
+        state_vec2 = state_vec_tmp
+    end
+    return state_vec1
+end
+
+"""
+Version which uses a "fused matvec mult" approach. Should at least get some
+speedup based on LienarAlgebra multithreading, but I'm not sure about the
+actual algorithm. (Probably speedup will become more substantial when doing
+multiple β's and γ's, due to superior time locality for mat-mat mults).
+"""
+function QAOA_proxy_matrix(
+    homodist::AbstractArray{<: Real, 3}, gammas::AbstractVector{<: Real},
+    betas::AbstractVector{<: Real},
+    state_vec1::AbstractVector{ComplexF64} = zeros(ComplexF64, size(homodist, 1)),
+    state_vec2::AbstractVector{ComplexF64} = zeros(ComplexF64, size(homodist, 1)),
+)::Vector{ComplexF64}
+    @assert length(gammas) == length(betas) "Gamma vec and beta vec must be same length."
+    @assert size(homodist, 1) == size(homodist, 3) "1st and 3rd dimensions of homogeneous distribution must be the same length."
+    @assert length(state_vec1) == length(state_vec2) == size(homodist, 1) "State vector arrays must have some length as number of unique costs in homogeneous distribution."
+    p = length(gammas)
+
+    num_distances = size(homodist, 2)
+    num_costs = size(homodist, 1)
+
+    init_amplitude = 1 / sqrt(2 ^ (num_distances-1))
+    state_vec1 .= init_amplitude
+
+    costs = 0:num_costs-1
+    distances = 0:num_distances-1
+    β_factors = Vector{ComplexF64}(undef, num_distances)
+    γ_factors = Matrix{ComplexF64}(undef, 1, num_costs)
+    # I think I can construct the vector v using broadcasted multiplication
+    # with a column vector and row vector, then reshaping into a vector.
+
+    M = reshape(homodist, size(homodist,1), :) # Reshape to wide matrix
+    v_mat = Matrix{ComplexF64}(undef, num_distances, num_costs)
+    v_vec_view = reshape(v_mat, :)
+
+
+    for ℓ in 1:p
+        # If I do this with turbo, it's SIMD, so GPU translation should be easy (parallel across sets of β and γs is harder)
+        sinβ, cosβ = sincos(betas[ℓ])
+        neg_im_sinβ = -1im*sinβ
+        γ = gammas[ℓ]
+
+        map!(d -> cosβ^(num_distances-1-d) * neg_im_sinβ^(d), β_factors, distances)
+        map!(c -> exp(-im*γ*c), γ_factors, costs)
+
+        state_row_vec = reshape(state_vec1, 1, :)
+        @. v_mat = γ_factors * state_row_vec * β_factors
+
+        state_vec2 .= M*v_vec_view 
+
         # swap state_vec1/2
         state_vec_tmp = state_vec1
         state_vec1 = state_vec2
