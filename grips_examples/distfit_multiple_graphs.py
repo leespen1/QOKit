@@ -1,4 +1,3 @@
-
 '''TO DO: 
 Modify this to also specify the type of proxy to use! 
 Add paper proxy!!'''
@@ -196,9 +195,9 @@ def fit_multiple_graphs(num_graphs, num_nodes, edge_probability = 0.5, graph_typ
         num_constraints=num_constraints,
         num_qubits=num_qubits,
         h_tweak_sub=initial_params[0],
-        hc_tweak_add=initial_params[1],
-        l_tweak_mul=initial_params[2],
-        r_tweak_mul=initial_params[3]
+        hc_tweak_add=initialParams[1],
+        l_tweak_mul=initialParams[2],
+        r_tweak_mul=initialParams[3]
     )
     # Compare MSE for initial and fitted parameters
     initial_mse = mse_dist_loss(initial_proxy, homodist)
@@ -270,7 +269,6 @@ def fit_multiple_graphs(num_graphs, num_nodes, edge_probability = 0.5, graph_typ
     for graph in graphs:
         ising_model = mc.get_maxcut_terms(graph)
         N = graph.number_of_nodes()
-        sim = get_simulator(N, ising_model)
         p = 1
         mixer = "x"
         expectations = []
@@ -361,12 +359,196 @@ def fit_multiple_graphs(num_graphs, num_nodes, edge_probability = 0.5, graph_typ
     #also returning the exact graphs used
     return pd.DataFrame(results_dict), graphs
 
+def fit_multiple_graphs_normal(graphs, num_nodes, edge_probability, graph_type, ws_num_neighbors=None):
+    """
+    Fits a NormalProxy to a list of graphs and returns the results in a DataFrame.
+    This function is analogous to fit_multiple_graphs but for NormalProxy.
+    """
+    print("\nSetting up graphs, getting homogeneous distributions for NormalProxy...")
+    homodists = []
+    for graph in graphs:
+        homodist = get_homogeneous_distribution(graph)
+        homodists.append(homodist)
+
+    homodists = pad_and_stack(homodists)
+    homodist = np.mean(homodists, axis=0)
+    print("Finished setting up graph and getting homogeneous distribution!")
+
+    # % initial proxy values needed
+    max_num_edges = max(g.number_of_edges() for g in graphs)
+    num_constraints = max_num_edges
+    num_qubits = num_nodes
+    
+    # These initial parameters for NormalProxy might need tuning.
+    # [cost_mean, cov_1, cov_2]
+    initial_params = [num_constraints / 2, 1.0, 1.0]
+
+    # Define bounds for the NormalProxy parameters
+    bounds = [
+        (0, num_constraints),  # cost_mean
+        (0.1, 10.0),           # cov_1
+        (0.1, 10.0),           # cov_2
+    ]
+
+    def mse_dist_loss_normal(params, homodist):
+        proxy = NormalProxy(
+            num_constraints=num_constraints,
+            num_qubits=num_qubits,
+            cost_mean=params[0],
+            cov_1=params[1],
+            cov_2=params[2]
+        )
+        return mse_dist_loss(proxy, homodist)
+
+    print("\nFitting normal proxy to homogeneous distribution ...")
+    
+    result = minimize(
+        mse_dist_loss_normal,
+        initial_params,
+        args=(homodist,),
+        method='Nelder-Mead',
+        bounds=bounds,
+        options={'maxiter': 10000, 'epsilon': 0.0001}
+    )
+    fitted_params = result.x
+
+    print("Fitted parameters:", fitted_params)
+
+    initial_proxy = NormalProxy(num_constraints, num_qubits, *initial_params)
+    fitted_proxy = NormalProxy(num_constraints, num_qubits, *fitted_params)
+
+    initial_mse = mse_dist_loss_normal(initial_params, homodist)
+    fitted_mse = mse_dist_loss_normal(fitted_params, homodist)
+    print(f"Initial MSE (Normal): {initial_mse}")
+    print(f"Fitted MSE (Normal): {fitted_mse}")
+
+    # Optimize gamma and beta for both proxies
+    gamma_0 = np.array([0.1])
+    beta_0 = np.array([0.1])
+
+    init_result = QAOA_proxy_optimize_gamma_beta(initial_proxy, gamma_0, beta_0, optimizer_method='Nelder-Mead', optimizer_options={'maxiter': 1000})
+    gamma_init = init_result["gamma"]
+    beta_init = init_result["beta"]
+
+    fitted_result = QAOA_proxy_optimize_gamma_beta(fitted_proxy, gamma_0, beta_0, optimizer_method='Nelder-Mead', optimizer_options={'maxiter': 1000})
+    gamma_fitted = fitted_result["gamma"]
+    beta_fitted = fitted_result["beta"]
+
+    # Calculate expectations
+    initial_expectations = []
+    fitted_expectations = []
+    initial_approx_ratios = []
+    fitted_approx_ratios = []
+
+    for graph in graphs:
+        ising_model = mc.get_maxcut_terms(graph)
+        N = graph.number_of_nodes()
+        p = 1
+        mixer = "x"
+        
+        inv_obj = inverse_objective_function(ising_model, N, p, mixer, None, None)
+        
+        initres = inv_obj(np.hstack([gamma_init, beta_init]))
+        initial_expectations.append(-initres)
+        initial_approx_ratios.append(maxcut_approx_ratio(graph, -initres))
+        
+        fitres = inv_obj(np.hstack([gamma_fitted, beta_fitted]))
+        fitted_expectations.append(-fitres)
+        fitted_approx_ratios.append(maxcut_approx_ratio(graph, -fitres))
+
+    results_dict = {
+        'num_nodes': [num_nodes],
+        'num_graphs': [len(graphs)],
+        'graph_type': [graph_type],
+        'edge_probability': [edge_probability],
+        'fitted_params_normal': [fitted_params.tolist()],
+        'mean_initial_expectation_normal': [np.mean(initial_expectations)],
+        'mean_fitted_expectation_normal': [np.mean(fitted_expectations)],
+        'mean_initial_approx_ratio_normal': [np.mean(initial_approx_ratios)],
+        'mean_fitted_approx_ratio_normal': [np.mean(fitted_approx_ratios)],
+        'initial_mse_normal': [initial_mse],
+        'fitted_mse_normal': [fitted_mse],
+    }
+    if graph_type == 'watts_strogatz' and ws_num_neighbors is not None:
+        results_dict['ws_num_neighbors'] = [ws_num_neighbors]
+
+    return pd.DataFrame(results_dict)
+
+
+
+def evaluate_paper_proxy(graphs, num_nodes, edge_probability, graph_type, ws_num_neighbors=None):
+    """
+    Evaluates the PaperProxy on a list of graphs and returns the results in a DataFrame.
+    No fitting is performed for this proxy.
+    """
+    print(f"\nEvaluating PaperProxy for {num_nodes} nodes...")
+
+    max_num_edges = max(g.number_of_edges() for g in graphs)
+    num_constraints = max_num_edges
+    num_qubits = num_nodes
+
+    # Initialize PaperProxy
+    paper_proxy = PaperProxy(
+        num_constraints=num_constraints,
+        num_qubits=num_qubits,
+        prob_edge=edge_probability
+    )
+
+    # Optimize gamma and beta for the paper proxy
+    gamma_0 = np.array([0.1])
+    beta_0 = np.array([0.1])
+    paper_result = QAOA_proxy_optimize_gamma_beta(
+        paper_proxy, gamma_0, beta_0,
+        optimizer_method='Nelder-Mead',
+        optimizer_options={'maxiter': 10000, 'epsilon': 0.00001}
+    )
+    gamma_paper = paper_result["gamma"]
+    beta_paper = paper_result["beta"]
+
+    # Evaluate the performance on the provided graphs
+    paper_expectations = []
+    paper_approx_ratios = []
+
+    for graph in graphs:
+        ising_model = mc.get_maxcut_terms(graph)
+        N = graph.number_of_nodes()
+        p = 1
+        mixer = "x"
+
+        inv_obj_paper = inverse_objective_function(ising_model, N, p, mixer, None, None)
+        paper_res = inv_obj_paper(np.hstack([gamma_paper, beta_paper]))
+
+        paper_expectations.append(-paper_res)
+        paper_approx_ratios.append(maxcut_approx_ratio(graph, -paper_res))
+
+    mean_paper_exp = np.mean(paper_expectations)
+    mean_paper_ratio = np.mean(paper_approx_ratios)
+
+    print(f"Paper Proxy Mean Expectation: {mean_paper_exp:.2f}")
+    print(f"Paper Proxy Mean Approx Ratio: {mean_paper_ratio:.2f}")
+
+    # Create a DataFrame compatible with the other functions
+    results_dict = {
+        'num_nodes': [num_nodes],
+        'num_graphs': [len(graphs)],
+        'graph_type': [graph_type],
+        'edge_probability': [edge_probability],
+        'mean_paper_expectation': [mean_paper_exp],
+        'mean_paper_approx_ratio': [mean_paper_ratio]
+    }
+    if graph_type == 'watts_strogatz' and ws_num_neighbors is not None:
+        results_dict['ws_num_neighbors'] = [ws_num_neighbors]
+
+    return pd.DataFrame(results_dict)
+
+
+
 if __name__ == "__main__":
     # Run the fitting process
     num_graphs = 20
     edge_probability = 0.5
     startnodes = 4
-    endnodes = 5
+    endnodes = 6
     graph_type = 'barabasi_albert'  # Change to 'barabasi_albert' or 'watts_strogatz' as needed
 
     print(f"\n\n---------------------\nFitting for {startnodes} nodes...")
