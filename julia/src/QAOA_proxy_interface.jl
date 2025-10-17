@@ -64,7 +64,7 @@ speedup based on LienarAlgebra multithreading, but I'm not sure about the
 actual algorithm. (Probably speedup will become more substantial when doing
 multiple β's and γ's, due to superior time locality for mat-mat mults).
 """
-function QAOA_proxy_matrix(
+function QAOA_proxy_matvec(
     homodist::AbstractArray{<: Real, 3}, gammas::AbstractVector{<: Real},
     betas::AbstractVector{<: Real},
     state_vec1::AbstractVector{ComplexF64} = zeros(ComplexF64, size(homodist, 1)),
@@ -115,6 +115,65 @@ function QAOA_proxy_matrix(
     return state_vec1
 end
 
+"""
+Version which uses a "fused matmat mult" approach, for multiple sets of gamma
+and beta.
+"""
+function QAOA_proxy_matmat(
+    homodist::AbstractArray{<: Real, 3}, gammas::AbstractVecOrMat{<: Real},
+    betas::AbstractVecOrMat{<: Real},
+    state_vecs1::AbstractMatrix{<: Complex} = zeros(ComplexF64, size(homodist, 1), size(gammas, 2)),
+    state_vecs2::AbstractMatrix{<: Complex} = zeros(ComplexF64, size(homodist, 1), size(gammas, 2)),
+)
+    @assert size(gammas) == size(betas) "Gamma vec and beta vec must be same shape."
+    @assert size(homodist, 1) == size(homodist, 3) "1st and 3rd dimensions of homogeneous distribution must be the same length."
+    @assert size(state_vecs1, 1) == size(state_vecs2, 1) == size(homodist, 1) "State vector arrays must have some length as number of unique costs in homogeneous distribution."
+    @assert size(state_vecs1, 2) == size(state_vecs2, 2) == size(gammas, 2) == size(betas, 2) "Batch size must be consistent across gammas, betas, and statevecs."
+
+    p = size(gammas, 1)
+    num_batches = size(gammas, 2)
+    num_distances = size(homodist, 2)
+    num_costs = size(homodist, 1)
+
+    init_amplitude = 1 / sqrt(2 ^ (num_distances-1))
+    state_vecs1 .= init_amplitude
+
+    costs = similar(homodist, Int32, 1, num_costs)
+    copyto!(costs, 0:num_costs-1)
+    distances = similar(homodist, Int32, num_distances)
+    distances .= 0:num_distances-1
+
+    β_factors = similar(state_vecs1, num_distances, 1, num_batches)
+    γ_factors = similar(state_vecs1, 1, num_costs, num_batches)
+    # I think I can construct the vector v using broadcasted multiplication
+    # with a column vector and row vector, then reshaping into a vector.
+
+    M = reshape(homodist, size(homodist,1), :) # Reshape to wide matrix
+    v_3D = similar(state_vecs1, num_distances, num_costs, num_batches)
+    v_mat_view = reshape(v_3D, :, num_batches)
+
+    for ℓ in 1:p
+        sinβ = reshape(sin.(betas[ℓ,:]), 1, 1, :)
+        cosβ = reshape(cos.(betas[ℓ,:]), 1, 1, :)
+        neg_im_sinβ = -1im .* sinβ
+        γ = reshape(gammas[ℓ,:], 1, 1, :)
+
+        @. β_factors = cosβ^(num_distances-1-distances) * neg_im_sinβ^(distances)
+        @. γ_factors = exp(-im*γ*costs)
+
+        state_row_vecs = reshape(state_vecs1, 1, :, num_batches)
+        @. v_3D = γ_factors * state_row_vecs * β_factors
+
+        # TODO Change this to a BLAS / CuBLAS call
+        state_vecs2 .= M*v_mat_view 
+
+        # swap state_vec1/2
+        state_vecs_tmp = state_vecs1
+        state_vecs1 = state_vecs2
+        state_vecs2 = state_vecs_tmp
+    end
+    return state_vecs1
+end
 
 
 """
