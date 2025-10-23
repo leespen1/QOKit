@@ -195,9 +195,9 @@ def fit_multiple_graphs(num_graphs, num_nodes, edge_probability = 0.5, graph_typ
         num_constraints=num_constraints,
         num_qubits=num_qubits,
         h_tweak_sub=initial_params[0],
-        hc_tweak_add=initialParams[1],
-        l_tweak_mul=initialParams[2],
-        r_tweak_mul=initialParams[3]
+        hc_tweak_add=initial_params[1],
+        l_tweak_mul=initial_params[2],
+        r_tweak_mul=initial_params[3]
     )
     # Compare MSE for initial and fitted parameters
     initial_mse = mse_dist_loss(initial_proxy, homodist)
@@ -545,7 +545,7 @@ def evaluate_paper_proxy(graphs, num_nodes, edge_probability, graph_type, ws_num
 
 if __name__ == "__main__":
     # Run the fitting process
-    num_graphs = 20
+    num_graphs = 10
     edge_probability = 0.5
     startnodes = 4
     endnodes = 6

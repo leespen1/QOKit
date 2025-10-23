@@ -380,11 +380,40 @@ def distribution_array_to_dict(distribution_array):
 
     return distribution_dict
 
-def distribution_mean_squared_error(proxy, homodist):
+def normalize_homodist_slices(homodist):
+    """
+    Normalize each N(c'; :, :) slice of a homogeneous distribution independently.
+    
+    For each cost c', the distribution N(c'; d, c) over all (distance, cost) pairs
+    is normalized to sum to 1. This allows for fair comparison between proxy and
+    real distributions when the total counts may differ.
+    
+    Args:
+        homodist: 3D array of shape (num_costs, num_distances, num_costs)
+                 representing N(c'; d, c)
+    
+    Returns:
+        normalized: 3D array with same shape where each N(c'; :, :) slice sums to 1
+    """
+    normalized = homodist.copy()
+    for c_prime in range(homodist.shape[0]):
+        total = np.sum(normalized[c_prime, :, :])
+        if total > 0:
+            normalized[c_prime, :, :] /= total
+    return normalized
+
+
+def distribution_mean_squared_error(proxy, homodist, normalize=True):
     """
     Given a proxy object and a homogeneous distribution array homodist (e.g. one
     computed by averaging over bitstrings), compute the mean-squared error between
     the two distributions.
+
+    Args:
+        proxy: A proxy object (PaperProxy, TriangleProxy, or NormalProxy)
+        homodist: The real homogeneous distribution as a 3D array
+        normalize: If True, normalize each N(c'; :, :) slice independently before
+                  computing MSE. Recommended for fair comparison across proxies.
 
     Currently only works for python proxies, not julia ones
     """
@@ -392,9 +421,10 @@ def distribution_mean_squared_error(proxy, homodist):
 
     predicted = get_homogeneous_distribution_from_proxy(proxy, num_constraints)
 
-    ## Normalize both to sum to 1 (or same scale)
-    #predicted /= predicted.sum()
-    #homodist_norm = homodist / homodist.sum()
+    if normalize:
+        # Normalize each N(c'; :, :) slice to sum to 1
+        predicted = normalize_homodist_slices(predicted)
+        homodist = normalize_homodist_slices(homodist)
 
     # Compute MSE
     mse = np.mean((predicted - homodist)**2)

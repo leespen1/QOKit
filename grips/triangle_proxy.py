@@ -69,7 +69,16 @@ class TriangleProxy:
 
     # P(c') from paper
     def P_cost_distribution(self, cost: int) -> float:
-        return 4 / ((self.num_constraints + 1) ** 2) * min(cost + 1, self.num_constraints + 1 - cost)
+        # Compute the normalization constant for the discrete triangle distribution
+        # Sum of min(c+1, n+1-c) for c=0 to n equals:
+        # - (n+2)^2 / 4 if n is even
+        # - (n+1)(n+3) / 4 if n is odd
+        if self.num_constraints % 2 == 0:
+            normalization = (self.num_constraints + 2) ** 2 / 4
+        else:
+            normalization = (self.num_constraints + 1) * (self.num_constraints + 3) / 4
+        
+        return min(cost + 1, self.num_constraints + 1 - cost) / normalization
 
 
     # N(c') from paper
@@ -115,7 +124,16 @@ class HardCodedTriangleProxy:
         """
         P(c') from paper but dumber
         """
-        return 4 / ((self.num_constraints + 1) ** 2) * min(cost + 1, self.num_constraints + 1 - cost)
+        # Compute the normalization constant for the discrete triangle distribution
+        # Sum of min(c+1, n+1-c) for c=0 to n equals:
+        # - (n+2)^2 / 4 if n is even
+        # - (n+1)(n+3) / 4 if n is odd
+        if self.num_constraints % 2 == 0:
+            normalization = (self.num_constraints + 2) ** 2 / 4
+        else:
+            normalization = (self.num_constraints + 1) * (self.num_constraints + 3) / 4
+        
+        return min(cost + 1, self.num_constraints + 1 - cost) / normalization
 
 
     def N_cost_distribution(self, cost: int) -> float:

@@ -47,7 +47,17 @@ class NormalProxy:
     def P_cost_distribution(self, cost: int) -> float:
         prob_cost_mean = self.num_qubits / 2
         prob_cost_cov = self.num_qubits / 4
-        return norm.pdf(cost, loc = prob_cost_mean, scale = prob_cost_cov)
+        
+        # Compute PDF value at this cost
+        pdf_value = norm.pdf(cost, loc = prob_cost_mean, scale = prob_cost_cov)
+        
+        # Compute normalization factor: sum of PDF values over all discrete costs [0, num_constraints]
+        # Note: costs range from 0 to num_constraints (num_edges), not num_qubits (num_vertices)
+        normalization = sum(norm.pdf(c, loc = prob_cost_mean, scale = prob_cost_cov) 
+                          for c in range(self.num_constraints + 1))
+        
+        # Return normalized probability
+        return pdf_value / normalization
 
     # N(c') from paper
     def N_cost_distribution(self, cost: int) -> float:
