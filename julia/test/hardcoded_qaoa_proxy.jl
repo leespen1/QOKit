@@ -1,5 +1,9 @@
-using JuliaQAOA, Test
+using JuliaQAOA, Test, BenchmarkTools
 using LinearAlgebra: norm
+
+benchmark = true
+use_gpu = true
+
 # Test that the QAOA proxy agrees with a hardcoded/manufactured solution
 N = zeros(2,2,2)
 N[1,:,:] .= [1 3
@@ -55,5 +59,55 @@ output_mat_matmat3 = JuliaQAOA.QAOA_proxy_matmat(N3, gammas3, betas3)
     @test isapprox(output_mat3, output_mat_matmat3, rtol=1e-14)
 end
 
+function benchmark_orig(N, gammas, betas)
+    return [JuliaQAOA.QAOA_proxy(N, gammas[:,i], betas[:,i]) for i in 1:size(gammas, 2)]
+end
+
+function benchmark_matvec(N, gammas, betas; use_BLAS=true)
+    return [JuliaQAOA.QAOA_proxy_matvec(N, gammas[:,i], betas[:,i], use_BLAS=use_BLAS) for i in 1:size(gammas, 2)]
+end
+
+function benchmark_matmat(N, gammas, betas; use_BLAS=true)
+    return JuliaQAOA.QAOA_proxy_matmat(N, gammas, betas, use_BLAS=use_BLAS)
+end
+
+if benchmark
+    println('='^40, "\nBenchmarks\n", '='^40, '\n')
+
+    println("Small Sample\n", '-'^40, '\n')
+    N4 = rand(50,8,50)
+    gammas4 = rand(4,10)
+    betas4 = rand(4,10)
+
+    println("Original version")
+    @btime benchmark_orig($N4, $gammas4, $betas4)
+    println("Matvec version with BLAS")
+    @btime benchmark_matvec($N4, $gammas4, $betas4)
+    println("Matvec version without BLAS")
+    @btime benchmark_matvec($N4, $gammas4, $betas4, use_BLAS=$false)
+    println("Matmat version with BLAS")
+    @btime benchmark_matmat($N4, $gammas4, $betas4)
+    println("Matmat version without BLAS")
+    @btime benchmark_matmat($N4, $gammas4, $betas4, use_BLAS=$false)
 
 
+    println('-'^40, "\nLarge Sample\n", '-'^40, '\n')
+    N5 = rand(190,20,190)
+    gammas5 = rand(4,100)
+    betas5 = rand(4,100)
+
+    println("Original version")
+    @btime benchmark_orig($N5, $gammas5, $betas5)
+    println("Matvec version with BLAS")
+    @btime benchmark_matvec($N5, $gammas5, $betas5)
+    println("Matvec version without BLAS")
+    @btime benchmark_matvec($N5, $gammas5, $betas5, use_BLAS=$false)
+    println("Matmat version with BLAS")
+    @btime benchmark_matmat($N5, $gammas5, $betas5)
+    println("Matmat version without BLAS")
+    @btime benchmark_matmat($N5, $gammas5, $betas5, use_BLAS=$false)
+
+
+
+    nothing
+end

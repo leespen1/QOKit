@@ -68,7 +68,8 @@ function QAOA_proxy_matvec(
     homodist::AbstractArray{<: Real, 3}, gammas::AbstractVector{<: Real},
     betas::AbstractVector{<: Real},
     state_vec1::AbstractVector{ComplexF64} = zeros(ComplexF64, size(homodist, 1)),
-    state_vec2::AbstractVector{ComplexF64} = zeros(ComplexF64, size(homodist, 1)),
+    state_vec2::AbstractVector{ComplexF64} = zeros(ComplexF64, size(homodist, 1));
+    use_BLAS=true,
 )::Vector{ComplexF64}
     @assert length(gammas) == length(betas) "Gamma vec and beta vec must be same length."
     @assert size(homodist, 1) == size(homodist, 3) "1st and 3rd dimensions of homogeneous distribution must be the same length."
@@ -105,7 +106,11 @@ function QAOA_proxy_matvec(
         state_row_vec = reshape(state_vec1, 1, :)
         @. v_mat = γ_factors * state_row_vec * β_factors
 
-        state_vec2 .= M*v_vec_view 
+        if use_BLAS
+            mul!(state_vec2, M, v_vec_view)
+        else
+            state_vec2 .= M*v_vec_view 
+        end
 
         # swap state_vec1/2
         state_vec_tmp = state_vec1
@@ -123,7 +128,8 @@ function QAOA_proxy_matmat(
     homodist::AbstractArray{<: Real, 3}, gammas::AbstractVecOrMat{<: Real},
     betas::AbstractVecOrMat{<: Real},
     state_vecs1::AbstractMatrix{<: Complex} = zeros(ComplexF64, size(homodist, 1), size(gammas, 2)),
-    state_vecs2::AbstractMatrix{<: Complex} = zeros(ComplexF64, size(homodist, 1), size(gammas, 2)),
+    state_vecs2::AbstractMatrix{<: Complex} = zeros(ComplexF64, size(homodist, 1), size(gammas, 2));
+    use_BLAS=true
 )
     @assert size(gammas) == size(betas) "Gamma vec and beta vec must be same shape."
     @assert size(homodist, 1) == size(homodist, 3) "1st and 3rd dimensions of homogeneous distribution must be the same length."
@@ -164,8 +170,19 @@ function QAOA_proxy_matmat(
         state_row_vecs = reshape(state_vecs1, 1, :, num_batches)
         @. v_3D = γ_factors * state_row_vecs * β_factors
 
-        # TODO Change this to a BLAS / CuBLAS call
-        state_vecs2 .= M*v_mat_view 
+        if use_BLAS # For some reason, mul! seems to invoke generic matmul, instead of BLAS gemm
+            # Problem seems to be that M is real, while the others are complex.
+            # Interestingly, BLAS is smart enough to use gemv when M is real
+            # and the others are vectors, but not if the others are matrices.
+            # Also note that 3-arg mul uses 5-arg mul under the hood, and LinearAlgebra.BLAS.gemv! can be called directly if desired.
+            @show typeof(state_vecs2), typeof(M), typeof(v_mat_view)
+            #println(@code_typed mul!(state_vecs2, M, v_mat_view))
+            mul!(state_vecs2, M, v_mat_view)
+        else
+            #println(@code_typed M*v_mat_view)
+            state_vecs2 .= M*v_mat_view 
+        end
+
 
         # swap state_vec1/2
         state_vecs_tmp = state_vecs1

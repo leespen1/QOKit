@@ -7,6 +7,7 @@ using LinearAlgebra: mul!
 using Base.Threads: @threads
 using CUDA
 using ProgressMeter: @showprogress
+using InteractiveUtils
 #using LoopVectorization: @turbo, vmap, vmapreduce, indices
 
 # Functions that will be made available when I call "using JuliaQAOA"
