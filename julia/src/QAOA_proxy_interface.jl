@@ -121,6 +121,22 @@ function QAOA_proxy_matvec(
 end
 
 """
+Given a homogeneous distribution, get the
+"""
+function get_costs_distances_vecs(homodist::AbstractArray{<: Real, 3})
+    num_distances = size(homodist, 2)
+    num_costs = size(homodist, 1)
+
+    costs = similar(homodist, Int32, num_costs)
+    costs .=  0:num_costs-1
+    distances = similar(homodist, Int32, num_distances)
+    distances .= 0:num_distances-1
+    return costs, distances
+end
+
+
+
+"""
 Version which uses a "fused matmat mult" approach, for multiple sets of gamma
 and beta.
 """
@@ -144,10 +160,8 @@ function QAOA_proxy_matmat(
     init_amplitude = 1 / sqrt(2 ^ (num_distances-1))
     state_vecs1 .= init_amplitude
 
-    costs = similar(homodist, Int32, 1, num_costs)
-    copyto!(costs, 0:num_costs-1)
-    distances = similar(homodist, Int32, num_distances)
-    distances .= 0:num_distances-1
+    costs, distances = get_costs_distances_vecs(homodist)
+    costs_row = reshape(costs, 1, :)
 
     β_factors = similar(state_vecs1, num_distances, 1, num_batches)
     γ_factors = similar(state_vecs1, 1, num_costs, num_batches)
@@ -164,8 +178,9 @@ function QAOA_proxy_matmat(
         neg_im_sinβ = -1im .* sinβ
         γ = reshape(gammas[ℓ,:], 1, 1, :)
 
+        # FIXME scalar indexing error here? Can I not broadcast = ?
         @. β_factors = cosβ^(num_distances-1-distances) * neg_im_sinβ^(distances)
-        @. γ_factors = exp(-im*γ*costs)
+        @. γ_factors = exp(-im*γ*costs_row)
 
         state_row_vecs = reshape(state_vecs1, 1, :, num_batches)
         @. v_3D = γ_factors * state_row_vecs * β_factors
@@ -175,7 +190,7 @@ function QAOA_proxy_matmat(
             # Interestingly, BLAS is smart enough to use gemv when M is real
             # and the others are vectors, but not if the others are matrices.
             # Also note that 3-arg mul uses 5-arg mul under the hood, and LinearAlgebra.BLAS.gemv! can be called directly if desired.
-            @show typeof(state_vecs2), typeof(M), typeof(v_mat_view)
+            #@show typeof(state_vecs2), typeof(M), typeof(v_mat_view)
             #println(@code_typed mul!(state_vecs2, M, v_mat_view))
             mul!(state_vecs2, M, v_mat_view)
         else

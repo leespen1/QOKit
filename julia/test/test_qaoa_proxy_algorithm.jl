@@ -57,10 +57,12 @@ end
 
 # Check that GPU works too
 if CUDA.has_cuda_gpu()
-    output_mat_matmat3_gpu = JuliaQAOA.QAOA_proxy_matmat(
-        CuArray(N3),
-        CuArray(gammas3),
-        CuArray(betas3),
-    )
-    @test isapprox(output_mat3_gpu, output_mat_matmat3, rtol=1e-14)
+    @testset "GPU Proxy agrees with CPU proxy" begin
+        output_mat_matmat3_gpu = JuliaQAOA.QAOA_proxy_matmat(
+            CuArray(N3),
+            CuArray(gammas3),
+            CuArray(betas3),
+        ) |> Array
+        @test isapprox(output_mat3_gpu, output_mat_matmat3, rtol=1e-14)
+    end
 end
