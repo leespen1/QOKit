@@ -134,8 +134,6 @@ function get_costs_distances_vecs(homodist::AbstractArray{<: Real, 3})
     return costs, distances
 end
 
-
-
 """
 Version which uses a "fused matmat mult" approach, for multiple sets of gamma
 and beta.
