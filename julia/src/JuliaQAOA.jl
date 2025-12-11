@@ -13,18 +13,18 @@ using InteractiveUtils
 # Functions that will be made available when I call "using JuliaQAOA"
 export P_cost_distribution, N_cost_distribution, N_cost_distance_distribution
 export NormalProxy, PaperProxy, TriangleProxy, HardCodedTriangleProxy, IntuitiveTriangleProxy, OldTriangleProxy
-export compute_amplitude_sum, QAOA_proxy, QAOA_proxy_expectation
-export inverse_proxy_objective_function
-export qaoa_proxy_circuit
+#export compute_amplitude_sum, QAOA_proxy, QAOA_proxy_expectation
+#export inverse_proxy_objective_function, QAOA_proxy_expectation
+
 
 include("utils.jl") # Has abstract type definitions! Include this first!
-include("QAOA_proxy_interface.jl")
-include("QAOA_proxy_transfer_matrix.jl")
+include("QAOA_proxy.jl")
+export _expand, get_β_factors, get_γ_factors, QAOA_proxy_basic, QAOA_proxy_single, QAOA_proxy_multi
+include("triangle_proxy.jl")
 include("normal_proxy.jl")
 include("paper_proxy.jl")
-include("triangle_proxy.jl")
 
-end
+end # Module
 
 #=
 To make the exported functions available in python, assuming you are using a
