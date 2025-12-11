@@ -19,7 +19,7 @@ export NormalProxy, PaperProxy, TriangleProxy, HardCodedTriangleProxy, Intuitive
 
 include("utils.jl") # Has abstract type definitions! Include this first!
 include("QAOA_proxy.jl")
-export _expand, get_β_factors, get_γ_factors, QAOA_proxy_basic, QAOA_proxy_single, QAOA_proxy_multi
+export _expand, get_β_factors, get_γ_factors, QAOA_proxy_basic, QAOA_proxy_single, QAOA_proxy_multi, expectation
 include("triangle_proxy.jl")
 include("normal_proxy.jl")
 include("paper_proxy.jl")
