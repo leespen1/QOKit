@@ -189,6 +189,39 @@ function QAOA_proxy_multi(
     return Qs
 end
 
+"""
+- Q: a QAOA proxy state vector
+- P: The cost distribution P(c')
+- n: problem size / number of nodes / number of qubits
+- return: Expectation value associated with state Q and cost distribution P
+"""
+function expectation(
+        Q::AbstractVector{<: Number},
+        P::AbstractVector{<: Real},
+        n::Integer,
+    )
+    @assert length(Q) == length(P) "Proxy QAOA state Q and cost distribution P must have the same length (1+m)."
+    m = length(Q)-1
+    return exp2(n) .* sum(abs2.(Q) .* P .* (0:m))
+end
+
+"""
+- Q: a matrix where each column is a QAOA proxy state vector
+- P: The cost distribution P(c')
+- n: problem size / number of nodes / number of qubits
+- return: row vector (matrix type) where each entry is the expectation value
+associated with the i-th column state of Q and cost distribution P
+"""
+function expectation(
+        Q::AbstractMatrix{<: Number},
+        P::AbstractVector{<: Real},
+        n::Integer,
+    )
+    @assert size(Q, 1) == length(P) "Proxy QAOA state Q and cost distribution P must have the same length (1+m)."
+    m = length(P)-1
+    return exp2(n) .* sum(abs2.(Q) .* P .* (0:m), dims=1)
+end
+
 
 #=
 

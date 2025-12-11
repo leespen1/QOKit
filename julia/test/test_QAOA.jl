@@ -64,11 +64,15 @@ end
     end
 
     @testset showtiming=true "CUDA result agrees with CPU result" begin
-        n = 4
-        γ_Array = rand(MersenneTwister(0), 4, 5, 6) 
-        @test get_γ_factors(γ_Array, n, pi_units=true) ≈ Array(get_γ_factors(CuArray(γ_Array), n, pi_units=true)) atol=1e-14
-        γpi_Array = γ_Array .* pi
-        @test get_γ_factors(γpi_Array, n, pi_units=false) ≈ Array(get_γ_factors(CuArray(γpi_Array), n, pi_units=false)) atol=1e-14
+        if CUDA.has_cuda_gpu()
+            n = 4
+            γ_Array = rand(MersenneTwister(0), 4, 5, 6) 
+            @test get_γ_factors(γ_Array, n, pi_units=true) ≈ Array(get_γ_factors(CuArray(γ_Array), n, pi_units=true)) atol=1e-14
+            γpi_Array = γ_Array .* pi
+            @test get_γ_factors(γpi_Array, n, pi_units=false) ≈ Array(get_γ_factors(CuArray(γpi_Array), n, pi_units=false)) atol=1e-14
+        else
+            @warn "Skipping GPU test because no GPU detected"
+        end 
     end
 end
 
@@ -156,4 +160,45 @@ end
 
     end
 end
+
+@testset showtiming=true "QAOA expectation value calculation" begin
+    @testset showtiming=true "Agrees with manufactured solution" begin
+        Q = [1, 2im, 3+4im]
+        Q_mat = reshape(Q, :, 1)
+        P = [4, 5, 6]
+        n = 2
+        @test expectation(Q, P, n) isa Real
+        @test size(expectation(Q_mat, P, n)) == (1,1)
+        @test expectation(Q, P, n) == 4*(0*1*4 + 1*4*5 + 2*25*6)
+        @test expectation(Q_mat, P, n) == [4*(0*1*4 + 1*4*5 + 2*25*6);;]
+    end
+    @testset showtiming=true "Matrix Q version agrees with vector Q version" begin
+        m = 5
+        n = 3
+        num_states = 4
+        Q = rand(MersenneTwister(0), ComplexF64, 1+m, num_states)
+        P = rand(MersenneTwister(1), 1+m)
+
+        vector_expectations = reduce(hcat, expectation(Qcol, P, n) for Qcol in eachcol(Q))
+        matrix_expectations = expectation(Q, P, n)
+        @test vector_expectations ≈ matrix_expectations atol=1e-14
+    end
+    @testset showtiming=true "GPU result agrees with CPU result"  begin
+        if CUDA.has_cuda_gpu()
+            m = 5
+            n = 3
+            num_states = 4
+            Qvec = rand(MersenneTwister(0), ComplexF64, 1+m)
+            Qmat = rand(MersenneTwister(0), ComplexF64, 1+m, num_states)
+            P = rand(MersenneTwister(1), 1+m)
+
+            @test Array(expectation(cu(Qvec), cu(P), n)) ≈ expectation(Qvec, P, n) atol=1e-14
+            @test Array(expectation(cu(Qmat), cu(P), n)) ≈ expectation(Qmat, P, n) atol=1e-14
+        else
+            @warn "Skipping GPU test because no GPU detected"
+        end
+    end
+
+end
+
 
