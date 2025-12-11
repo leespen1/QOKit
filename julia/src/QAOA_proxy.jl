@@ -202,7 +202,8 @@ function expectation(
     )
     @assert length(Q) == length(P) "Proxy QAOA state Q and cost distribution P must have the same length (1+m)."
     m = length(Q)-1
-    return exp2(n) .* sum(abs2.(Q) .* P .* (0:m))
+    n_float = convert(eltype(P), n)
+    return exp2(n_float) .* sum(abs2.(Q) .* P .* (0:m))
 end
 
 """
@@ -219,7 +220,8 @@ function expectation(
     )
     @assert size(Q, 1) == length(P) "Proxy QAOA state Q and cost distribution P must have the same length (1+m)."
     m = length(P)-1
-    return exp2(n) .* sum(abs2.(Q) .* P .* (0:m), dims=1)
+    n_float = convert(eltype(P), n)
+    return exp2(n_float) .* sum(abs2.(Q) .* P .* (0:m), dims=1)
 end
 
 
