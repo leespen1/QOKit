@@ -131,9 +131,9 @@ end
                 m = 50
                 n = 10
                 p = 5
-                N = rand(MersenneTwister(0), 1+m, 1+n, 1+m)
-                γs = rand(MersenneTwister(1), p)
-                βs = rand(MersenneTwister(2), p)
+                N = rand(MersenneTwister(0), Float32, 1+m, 1+n, 1+m)
+                γs = rand(MersenneTwister(1), Float32, p)
+                βs = rand(MersenneTwister(2), Float32, p)
                 Qs_CPU = reduce(hcat, QAOA_proxy_single(N, γs, βs))
                 Qs_GPU = reduce(hcat, QAOA_proxy_single(cu(N), cu(γs), cu(βs))) |> Array
                 @test Qs_CPU ≈ Qs_GPU
@@ -147,9 +147,9 @@ end
                 n = 10
                 p = 5
                 num_param_sets = 4
-                N = rand(MersenneTwister(0), 1+m, 1+n, 1+m)
-                γs = rand(MersenneTwister(1), num_param_sets, p)
-                βs = rand(MersenneTwister(2), num_param_sets, p)
+                N = rand(MersenneTwister(0), Float32, 1+m, 1+n, 1+m)
+                γs = rand(MersenneTwister(1), Float32, num_param_sets, p)
+                βs = rand(MersenneTwister(2), Float32, num_param_sets, p)
                 Qs_CPU = cat(QAOA_proxy_multi(N, γs, βs)..., dims=3)
                 Qs_GPU = cat(QAOA_proxy_multi(cu(N), cu(γs), cu(βs))..., dims=3) |> Array
                 @test Qs_CPU ≈ Qs_GPU
@@ -188,12 +188,12 @@ end
             m = 5
             n = 3
             num_states = 4
-            Qvec = rand(MersenneTwister(0), ComplexF64, 1+m)
-            Qmat = rand(MersenneTwister(0), ComplexF64, 1+m, num_states)
-            P = rand(MersenneTwister(1), 1+m)
+            Qvec = rand(MersenneTwister(0), ComplexF32, 1+m)
+            Qmat = rand(MersenneTwister(0), ComplexF32, 1+m, num_states)
+            P = rand(MersenneTwister(1), Float32, 1+m)
 
-            @test Array(expectation(cu(Qvec), cu(P), n)) ≈ expectation(Qvec, P, n) atol=1e-14
-            @test Array(expectation(cu(Qmat), cu(P), n)) ≈ expectation(Qmat, P, n) atol=1e-14
+            @test expectation(cu(Qvec), cu(P), n) ≈ expectation(Qvec, P, n) rtol=1e-7
+            @test Array(expectation(cu(Qmat), cu(P), n)) ≈ expectation(Qmat, P, n) rtol=1e-7
         else
             @warn "Skipping GPU test because no GPU detected"
         end
