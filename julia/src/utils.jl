@@ -1,5 +1,9 @@
 abstract type AbstractProxy end
 
+Base.iterate(proxy::AbstractProxy) = (proxy, nothing)
+Base.iterate(proxy::AbstractProxy, state) = nothing
+Base.length(proxy::AbstractProxy) = 1
+
 """
 Allocate an empty array full of undefined elements, to store the homogeneous
 distribution in.
