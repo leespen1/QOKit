@@ -7,7 +7,7 @@ Required arguments:
 - num_qubits: int
 - prob_edge: float
 """
-struct PaperProxy
+struct PaperProxy <: AbstractProxy
     num_constraints::Int64
     num_qubits::Int64
     binomial_distribution::Binomial{Float64}
