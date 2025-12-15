@@ -17,6 +17,7 @@ import numpy as np
 import typing, time, scipy, os
 from scipy.stats import binom, multinomial
 
+
 # Make the functions written in Julia available (call with `jl.function_name`)
 # (by having this in __init__.py, should be able to simply do from grips import jl)
 from juliacall import Main as jl
@@ -430,3 +431,165 @@ def inverse_proxy_objective_function(
         return -expectation
 
     return inverse_objective
+
+
+
+
+
+import numpy as np
+import networkx as nx
+from scipy.stats import norm, beta, skew, kurtosis
+from collections import defaultdict
+import math
+
+class CostDistribution:
+    """
+    A callable wrapper for the estimated distribution P(c').
+    Now supports advanced continuous approximations.
+    """
+    def __init__(self, method, probability_map=None, params=None, dist_type=None):
+        self.method = method
+        self.probability_map = probability_map # For Wang-Landau
+        self.params = params # For Moment-Matching
+        self.dist_type = dist_type # 'gaussian', 'beta', 'edgeworth'
+        
+        if probability_map:
+            self.support = set(probability_map.keys())
+        
+    def __call__(self, c):
+        if self.method == 'wang_landau':
+            # Discrete lookup
+            if isinstance(c, (int, np.integer)):
+                return self.probability_map.get(c, 0.0)
+            c_round = int(round(c))
+            if abs(c - c_round) < 1e-5:
+                return self.probability_map.get(c_round, 0.0)
+            return 0.0
+            
+        elif self.method == 'moment_matching':
+            if self.dist_type == 'gaussian':
+                mu, sigma = self.params
+                return norm.pdf(c, loc=mu, scale=sigma)
+            
+            elif self.dist_type == 'beta':
+                # params = (a, b, loc, scale)
+                return beta.pdf(c, *self.params)
+            
+            elif self.dist_type == 'edgeworth':
+                # Edgeworth expansion A (Gram-Charlier) around Gaussian
+                # params = (mu, sigma, skewness, kurtosis)
+                mu, sigma, S, K = self.params
+                z = (c - mu) / sigma
+                phi = norm.pdf(z)
+                # Expansion up to 4th moment (Kurtosis)
+                # H3(z) = z^3 - 3z
+                # H4(z) = z^4 - 6z^2 + 3
+                H3 = z**3 - 3*z
+                H4 = z**4 - 6*z**2 + 3
+                
+                term1 = (S / 6) * H3
+                term2 = (K / 24) * H4
+                term3 = (S**2 / 72) * (z**6 - 15*z**4 + 45*z**2 - 15) # higher order skew correction
+                
+                # p(z) = phi(z) * (1 + ...)
+                # Note: We omit term3 for stability if desired, but standard Edgeworth includes it.
+                # We return density in x space: 1/sigma * p(z)
+                density = (1 / sigma) * phi * (1 + term1 + term2)
+                return max(0.0, density) # Ensure non-negative
+
+def _get_cut_size_vectorized(adj_matrix, bitstrings):
+    """Computes cut sizes for a batch of bitstrings efficiently."""
+    spins = 2 * bitstrings - 1
+    interactions = (spins @ adj_matrix) * spins 
+    interaction_sum = interactions.sum(axis=1)
+    num_edges = adj_matrix.sum() / 2
+    return 0.5 * (num_edges - 0.5 * interaction_sum)
+
+def _run_wang_landau(graph, steps):
+    """Runs Wang-Landau sampling."""
+    n = graph.number_of_nodes()
+    adj = nx.to_dict_of_lists(graph)
+    x = np.random.randint(0, 2, n)
+    
+    current_cost = 0
+    for u, v in graph.edges():
+        if x[u] != x[v]: current_cost += 1
+            
+    log_g = defaultdict(float)
+    log_f = 1.0
+    decay_interval = max(100, steps // 10)
+    
+    for t in range(steps):
+        flip_node = np.random.randint(0, n)
+        delta = 0
+        original_val = x[flip_node]
+        for neighbor in adj[flip_node]:
+            if original_val != x[neighbor]: delta -= 1
+            else: delta += 1
+        
+        candidate_cost = current_cost + delta
+        if log_g[current_cost] - log_g[candidate_cost] >= np.log(np.random.rand()):
+            current_cost = candidate_cost
+            x[flip_node] = 1 - x[flip_node]
+        
+        log_g[current_cost] += log_f
+        if (t + 1) % decay_interval == 0: log_f /= 2.0
+            
+    return log_g
+
+def estimate_P_for_graphs(graphs, method='moment_matching', num_samples=10000, dist_type='edgeworth'):
+    """
+    Estimates P(c') with improved moment matching options.
+    
+    Args:
+        method (str): 'wang_landau' or 'moment_matching'
+        dist_type (str): Used if method='moment_matching'. 
+                         Options: 'gaussian', 'beta', 'edgeworth'.
+                         'beta' is recommended for bounded graph problems.
+    """
+    if not graphs: raise ValueError("Graph list is empty.")
+    num_graphs = len(graphs)
+    samples_per_graph = max(1, num_samples // num_graphs)
+    
+    if method == 'moment_matching':
+        all_costs = []
+        for G in graphs:
+            n = G.number_of_nodes()
+            adj = nx.to_scipy_sparse_array(G)
+            bitstrings = np.random.randint(0, 2, size=(samples_per_graph, n))
+            all_costs.extend(_get_cut_size_vectorized(adj, bitstrings))
+        
+        all_costs = np.array(all_costs)
+        
+        if dist_type == 'gaussian':
+            mu, sigma = norm.fit(all_costs)
+            return CostDistribution('moment_matching', params=(mu, sigma), dist_type='gaussian')
+            
+        elif dist_type == 'beta':
+            # Beta fits 4 parameters: alpha, beta, loc (min), scale (range)
+            # It handles skewness and finite support very well.
+            a, b, loc, scale = beta.fit(all_costs)
+            return CostDistribution('moment_matching', params=(a, b, loc, scale), dist_type='beta')
+            
+        elif dist_type == 'edgeworth':
+            mu = np.mean(all_costs)
+            sigma = np.std(all_costs)
+            S = skew(all_costs)
+            K = kurtosis(all_costs) # Fisher kurtosis (normal=0)
+            return CostDistribution('moment_matching', params=(mu, sigma, S, K), dist_type='edgeworth')
+            
+    elif method == 'wang_landau':
+        # Wang-Landau logic (same as before, aggregating histograms)
+        combined_prob_map = defaultdict(float)
+        for G in graphs:
+            log_g = _run_wang_landau(G, samples_per_graph)
+            max_log = max(log_g.values())
+            probs = {c: np.exp(val - max_log) for c, val in log_g.items()}
+            norm_factor = sum(probs.values())
+            for c, val in probs.items():
+                combined_prob_map[c] += (val / norm_factor) / num_graphs
+        return CostDistribution('wang_landau', probability_map=dict(combined_prob_map))
+
+    else:
+        raise ValueError(f"Unknown method: {method}")
+
