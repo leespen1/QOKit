@@ -8,6 +8,7 @@ using Base.Threads: @threads
 using CUDA
 using ProgressMeter: @showprogress
 using InteractiveUtils
+using Statistics: mean, std, cor
 #using LoopVectorization: @turbo, vmap, vmapreduce, indices
 
 # Functions that will be made available when I call "using JuliaQAOA"
@@ -23,6 +24,7 @@ export _expand, get_β_factors, get_γ_factors, QAOA_proxy_basic, QAOA_proxy_sin
 include("triangle_proxy.jl")
 include("normal_proxy.jl")
 include("paper_proxy.jl")
+include("cost_distributions.jl")
 
 end # Module
 
