@@ -372,3 +372,438 @@ end
         @test all(correlations_neg .≈ -1.0)
     end
 end
+
+
+#==============================================================================#
+#              Additional N(c'; d, c) Tests                                     #
+#==============================================================================#
+
+@testset showtiming=true "N(c'; d, c) properties" begin
+    @testset "Uniform costs - all bitstrings same cost" begin
+        # When all bitstrings have the same cost, N(c'; d, c) should have a specific structure
+        num_vertices = 4
+        num_edges = 5
+        uniform_cost = 3
+        costs = fill(Float64(uniform_cost), 2^num_vertices)
+
+        N_dist = get_homogeneous_distribution_from_costs_direct(costs, num_edges, num_vertices)
+
+        # Only one c' value should have non-zero entries (the uniform cost)
+        for c_prime in 0:num_edges
+            if c_prime != uniform_cost
+                @test all(N_dist[c_prime + 1, :, :] .== 0.0)
+            end
+        end
+
+        # For the uniform cost c', all neighbors at any distance also have that cost
+        # So N(uniform_cost; d, c) should be binomial(n, d) when c == uniform_cost, else 0
+        for d in 0:num_vertices
+            @test N_dist[uniform_cost + 1, d + 1, uniform_cost + 1] == binomial(num_vertices, d)
+            for c in 0:num_edges
+                if c != uniform_cost
+                    @test N_dist[uniform_cost + 1, d + 1, c + 1] == 0.0
+                end
+            end
+        end
+    end
+
+    @testset "Symmetry: N is symmetric in exchange of bitstring and complement" begin
+        # For MaxCut-like costs where c(x) = num_edges - c(~x), the distribution
+        # should exhibit certain symmetries. Here we test a simpler property:
+        # Sum over all c' of N(c'; d, c) weighted by count(c') should equal
+        # binomial(n, d) * 2^n / (num_edges + 1) approximately for well-distributed costs
+        num_vertices = 5
+        num_edges = 6
+        costs = rand(MersenneTwister(555), 0:num_edges, 2^num_vertices) .|> Float64
+
+        N_dist = get_homogeneous_distribution_from_costs_direct(costs, num_edges, num_vertices)
+
+        # For each d, the weighted average of N(c'; d, c) over c' should sum to binomial(n, d)
+        cost_counts = [count(==(c), costs) for c in 0:num_edges]
+
+        for d in 0:num_vertices
+            # Total count at distance d from all bitstrings = 2^n * binomial(n, d)
+            total_from_N = 0.0
+            for c_prime in 0:num_edges
+                if cost_counts[c_prime + 1] > 0
+                    total_from_N += cost_counts[c_prime + 1] * sum(N_dist[c_prime + 1, d + 1, :])
+                end
+            end
+            expected = 2^num_vertices * binomial(num_vertices, d)
+            @test total_from_N ≈ expected atol=1e-10
+        end
+    end
+
+    @testset "Binary costs (0 or 1 only)" begin
+        num_vertices = 4
+        num_edges = 1  # Only costs 0 or 1
+        costs = rand(MersenneTwister(666), 0:1, 2^num_vertices) .|> Float64
+
+        N_dist = get_homogeneous_distribution_from_costs_direct(costs, num_edges, num_vertices)
+
+        # Shape should be (2, 5, 2)
+        @test size(N_dist) == (2, num_vertices + 1, 2)
+
+        # For each c', sum over c at each d should be binomial(n, d)
+        for c_prime in 0:1
+            if any(costs .== c_prime)
+                for d in 0:num_vertices
+                    @test sum(N_dist[c_prime + 1, d + 1, :]) ≈ binomial(num_vertices, d) atol=1e-10
+                end
+            end
+        end
+    end
+
+    @testset "Larger system correctness" begin
+        # Test with larger system to catch indexing issues
+        num_vertices = 8
+        num_edges = 12
+        costs = rand(MersenneTwister(777), 0:num_edges, 2^num_vertices) .|> Float64
+
+        n_dist = get_real_distribution_from_costs(costs, num_edges, num_vertices)
+        N_dist_twostep = get_homogeneous_distribution_from_costs(costs, n_dist)
+        N_dist_direct = get_homogeneous_distribution_from_costs_direct(costs, num_edges, num_vertices)
+
+        # Both methods should agree
+        @test N_dist_twostep ≈ N_dist_direct atol=1e-10
+
+        # Basic properties should hold
+        @test size(N_dist_direct) == (num_edges + 1, num_vertices + 1, num_edges + 1)
+
+        # Check row sums for each c' that exists
+        for c_prime in 0:num_edges
+            if any(costs .== c_prime)
+                for d in 0:num_vertices
+                    @test sum(N_dist_direct[c_prime + 1, d + 1, :]) ≈ binomial(num_vertices, d) atol=1e-10
+                end
+            end
+        end
+    end
+
+    @testset "Distance 0 diagonal property" begin
+        # At distance 0, we're only counting the bitstring itself
+        # So N(c'; d=0, c) = 1 if c == c', else 0
+        num_vertices = 5
+        num_edges = 7
+        costs = rand(MersenneTwister(888), 0:num_edges, 2^num_vertices) .|> Float64
+
+        N_dist = get_homogeneous_distribution_from_costs_direct(costs, num_edges, num_vertices)
+
+        for c_prime in 0:num_edges
+            if any(costs .== c_prime)
+                # At d=0, only c == c' should have count 1
+                @test N_dist[c_prime + 1, 1, c_prime + 1] ≈ 1.0 atol=1e-10
+                for c in 0:num_edges
+                    if c != c_prime
+                        @test N_dist[c_prime + 1, 1, c + 1] ≈ 0.0 atol=1e-10
+                    end
+                end
+            end
+        end
+    end
+
+    @testset "Distance n (maximum) property" begin
+        # At distance n, we're only counting the complement bitstring
+        # The complement of x has some cost c_complement
+        num_vertices = 4
+        num_edges = 6
+        costs = rand(MersenneTwister(999), 0:num_edges, 2^num_vertices) .|> Float64
+
+        N_dist = get_homogeneous_distribution_from_costs_direct(costs, num_edges, num_vertices)
+
+        # For each c', sum at d=n should be 1 (only one bitstring at max distance)
+        for c_prime in 0:num_edges
+            if any(costs .== c_prime)
+                @test sum(N_dist[c_prime + 1, num_vertices + 1, :]) ≈ 1.0 atol=1e-10
+            end
+        end
+    end
+end
+
+
+@testset showtiming=true "N(c'; d, c) edge cases" begin
+    @testset "Single bitstring (n=1)" begin
+        # n=1: bitstrings are 0 and 1
+        costs = Float64[0, 1]  # cost 0 for bitstring 0, cost 1 for bitstring 1
+        num_edges = 1
+        num_vertices = 1
+
+        N_dist = get_homogeneous_distribution_from_costs_direct(costs, num_edges, num_vertices)
+
+        # Shape: (2 costs, 2 distances, 2 costs)
+        @test size(N_dist) == (2, 2, 2)
+
+        # N(0; 0, 0) = 1 (bitstring 0 at distance 0 from itself)
+        @test N_dist[1, 1, 1] == 1.0
+        # N(0; 1, 1) = 1 (bitstring 1 at distance 1 from bitstring 0)
+        @test N_dist[1, 2, 2] == 1.0
+        # N(1; 0, 1) = 1 (bitstring 1 at distance 0 from itself)
+        @test N_dist[2, 1, 2] == 1.0
+        # N(1; 1, 0) = 1 (bitstring 0 at distance 1 from bitstring 1)
+        @test N_dist[2, 2, 1] == 1.0
+    end
+
+    @testset "All zeros costs" begin
+        num_vertices = 3
+        num_edges = 0
+        costs = zeros(Float64, 2^num_vertices)
+
+        N_dist = get_homogeneous_distribution_from_costs_direct(costs, num_edges, num_vertices)
+
+        @test size(N_dist) == (1, num_vertices + 1, 1)
+
+        # All entries at c'=0, c=0 should be binomial coefficients
+        for d in 0:num_vertices
+            @test N_dist[1, d + 1, 1] == binomial(num_vertices, d)
+        end
+    end
+
+    @testset "Maximum cost everywhere" begin
+        num_vertices = 3
+        num_edges = 5
+        costs = fill(Float64(num_edges), 2^num_vertices)
+
+        N_dist = get_homogeneous_distribution_from_costs_direct(costs, num_edges, num_vertices)
+
+        # Only max cost slice should have non-zeros
+        for c_prime in 0:(num_edges - 1)
+            @test all(N_dist[c_prime + 1, :, :] .== 0.0)
+        end
+
+        # Max cost slice should have binomial structure
+        for d in 0:num_vertices
+            @test N_dist[num_edges + 1, d + 1, num_edges + 1] == binomial(num_vertices, d)
+        end
+    end
+
+    @testset "Sparse costs (only a few values used)" begin
+        num_vertices = 4
+        num_edges = 10
+        # Only use costs 0, 5, and 10
+        sparse_costs = [0, 5, 10]
+        costs = [Float64(sparse_costs[rand(MersenneTwister(i), 1:3)]) for i in 1:2^num_vertices]
+
+        N_dist = get_homogeneous_distribution_from_costs_direct(costs, num_edges, num_vertices)
+
+        # Unused cost indices should have all zeros
+        for c_prime in 0:num_edges
+            if !(c_prime in sparse_costs)
+                @test all(N_dist[c_prime + 1, :, :] .== 0.0)
+            end
+        end
+
+        # Used cost indices should satisfy binomial property
+        for c_prime in sparse_costs
+            for d in 0:num_vertices
+                @test sum(N_dist[c_prime + 1, d + 1, :]) ≈ binomial(num_vertices, d) atol=1e-10
+            end
+        end
+    end
+end
+
+
+#==============================================================================#
+#              GPU vs CPU Agreement Tests                                       #
+#==============================================================================#
+
+@testset showtiming=true "GPU vs CPU agreement - comprehensive" begin
+    if CUDA.has_cuda_gpu()
+        @testset "Real distribution: various sizes" begin
+            for num_vertices in [4, 5, 6, 7]
+                num_edges = num_vertices + 2
+                costs = rand(MersenneTwister(num_vertices * 100), 0:num_edges, 2^num_vertices) .|> Float64
+
+                cpu_result = get_real_distribution_from_costs(costs, num_edges, num_vertices)
+                gpu_result = gpu_get_real_distribution_from_costs(costs, num_edges, num_vertices) |> Array
+
+                @test size(cpu_result) == size(gpu_result)
+                @test cpu_result ≈ gpu_result atol=1e-10
+            end
+        end
+
+        @testset "Homogeneous distribution: various sizes" begin
+            for num_vertices in [4, 5, 6, 7, 8]
+                num_edges = num_vertices + 3
+                costs = rand(MersenneTwister(num_vertices * 200), 0:num_edges, 2^num_vertices) .|> Float64
+
+                cpu_result = get_homogeneous_distribution_from_costs_direct(costs, num_edges, num_vertices)
+                gpu_result = gpu_get_homogeneous_distribution_from_costs_direct(costs, num_edges, num_vertices) |> Array
+
+                @test size(cpu_result) == size(gpu_result)
+                @test cpu_result ≈ gpu_result atol=1e-10
+            end
+        end
+
+        @testset "GPU with uniform costs" begin
+            num_vertices = 6
+            num_edges = 4
+            uniform_cost = 2
+            costs = fill(Float64(uniform_cost), 2^num_vertices)
+
+            cpu_result = get_homogeneous_distribution_from_costs_direct(costs, num_edges, num_vertices)
+            gpu_result = gpu_get_homogeneous_distribution_from_costs_direct(costs, num_edges, num_vertices) |> Array
+
+            @test cpu_result ≈ gpu_result atol=1e-10
+
+            # Verify the expected structure
+            for d in 0:num_vertices
+                @test gpu_result[uniform_cost + 1, d + 1, uniform_cost + 1] ≈ binomial(num_vertices, d) atol=1e-10
+            end
+        end
+
+        @testset "GPU with binary costs" begin
+            num_vertices = 7
+            num_edges = 1
+            costs = rand(MersenneTwister(1234), 0:1, 2^num_vertices) .|> Float64
+
+            cpu_result = get_homogeneous_distribution_from_costs_direct(costs, num_edges, num_vertices)
+            gpu_result = gpu_get_homogeneous_distribution_from_costs_direct(costs, num_edges, num_vertices) |> Array
+
+            @test cpu_result ≈ gpu_result atol=1e-10
+        end
+
+        @testset "GPU with sparse costs" begin
+            num_vertices = 6
+            num_edges = 15
+            # Only use costs 0, 7, 15
+            sparse_costs = [0, 7, 15]
+            costs = [Float64(sparse_costs[rand(MersenneTwister(i + 5000), 1:3)]) for i in 1:2^num_vertices]
+
+            cpu_result = get_homogeneous_distribution_from_costs_direct(costs, num_edges, num_vertices)
+            gpu_result = gpu_get_homogeneous_distribution_from_costs_direct(costs, num_edges, num_vertices) |> Array
+
+            @test cpu_result ≈ gpu_result atol=1e-10
+        end
+
+        @testset "GPU with max_num_edges padding - various sizes" begin
+            for num_vertices in [4, 5, 6]
+                num_edges = num_vertices
+                max_num_edges = num_vertices * 3
+                costs = rand(MersenneTwister(num_vertices * 300), 0:num_edges, 2^num_vertices) .|> Float64
+
+                cpu_result = get_homogeneous_distribution_from_costs_direct(
+                    costs, num_edges, num_vertices; max_num_edges=max_num_edges
+                )
+                gpu_result = gpu_get_homogeneous_distribution_from_costs_direct(
+                    costs, num_edges, num_vertices; max_num_edges=max_num_edges
+                ) |> Array
+
+                @test size(cpu_result) == size(gpu_result)
+                @test size(cpu_result, 1) == max_num_edges + 1
+                @test cpu_result ≈ gpu_result atol=1e-10
+
+                # Padded region should be zeros
+                @test all(cpu_result[num_edges + 2:end, :, :] .== 0.0)
+                @test all(gpu_result[num_edges + 2:end, :, :] .≈ 0.0)
+            end
+        end
+
+        @testset "GPU real distribution with padding" begin
+            num_vertices = 5
+            num_edges = 4
+            max_num_edges = 12
+            costs = rand(MersenneTwister(4321), 0:num_edges, 2^num_vertices) .|> Float64
+
+            cpu_result = get_real_distribution_from_costs(costs, num_edges, num_vertices; max_num_edges=max_num_edges)
+            gpu_result = gpu_get_real_distribution_from_costs(costs, num_edges, num_vertices; max_num_edges=max_num_edges) |> Array
+
+            @test size(cpu_result) == size(gpu_result)
+            @test size(cpu_result, 3) == max_num_edges + 1
+            @test cpu_result ≈ gpu_result atol=1e-10
+        end
+
+        @testset "GPU consistency across multiple runs" begin
+            # Ensure GPU results are deterministic
+            num_vertices = 6
+            num_edges = 8
+            costs = rand(MersenneTwister(9999), 0:num_edges, 2^num_vertices) .|> Float64
+
+            gpu_result1 = gpu_get_homogeneous_distribution_from_costs_direct(costs, num_edges, num_vertices) |> Array
+            gpu_result2 = gpu_get_homogeneous_distribution_from_costs_direct(costs, num_edges, num_vertices) |> Array
+            gpu_result3 = gpu_get_homogeneous_distribution_from_costs_direct(costs, num_edges, num_vertices) |> Array
+
+            @test gpu_result1 ≈ gpu_result2 atol=1e-14
+            @test gpu_result2 ≈ gpu_result3 atol=1e-14
+        end
+    else
+        @warn "Skipping comprehensive GPU tests because no GPU detected"
+    end
+end
+
+
+@testset showtiming=true "GPU vs CPU - special cost patterns" begin
+    if CUDA.has_cuda_gpu()
+        @testset "Alternating costs" begin
+            # Costs alternate: 0, 1, 0, 1, ...
+            num_vertices = 6
+            num_edges = 1
+            costs = Float64[i % 2 for i in 0:(2^num_vertices - 1)]
+
+            cpu_result = get_homogeneous_distribution_from_costs_direct(costs, num_edges, num_vertices)
+            gpu_result = gpu_get_homogeneous_distribution_from_costs_direct(costs, num_edges, num_vertices) |> Array
+
+            @test cpu_result ≈ gpu_result atol=1e-10
+        end
+
+        @testset "Linearly increasing costs" begin
+            num_vertices = 5
+            num_edges = 2^num_vertices - 1
+            costs = Float64.(0:(2^num_vertices - 1))
+
+            cpu_result = get_homogeneous_distribution_from_costs_direct(costs, num_edges, num_vertices)
+            gpu_result = gpu_get_homogeneous_distribution_from_costs_direct(costs, num_edges, num_vertices) |> Array
+
+            @test cpu_result ≈ gpu_result atol=1e-10
+
+            # Each bitstring has unique cost, so N(c'; d, c) = n(x; d, c) for the unique x with cost c'
+            # This means each c' slice should have exactly one count per distance
+            for c_prime in 0:num_edges
+                for d in 0:num_vertices
+                    total = sum(cpu_result[c_prime + 1, d + 1, :])
+                    @test total ≈ binomial(num_vertices, d) atol=1e-10
+                end
+            end
+        end
+
+        @testset "Popcount-based costs" begin
+            # Cost = number of 1s in the bitstring (popcount)
+            num_vertices = 6
+            num_edges = num_vertices  # max cost is n
+            costs = Float64[count_ones(i) for i in 0:(2^num_vertices - 1)]
+
+            cpu_result = get_homogeneous_distribution_from_costs_direct(costs, num_edges, num_vertices)
+            gpu_result = gpu_get_homogeneous_distribution_from_costs_direct(costs, num_edges, num_vertices) |> Array
+
+            @test cpu_result ≈ gpu_result atol=1e-10
+
+            # Verify: number of bitstrings with cost c is binomial(n, c)
+            for c in 0:num_vertices
+                @test count(==(c), costs) == binomial(num_vertices, c)
+            end
+        end
+
+        @testset "MaxCut-like cost structure" begin
+            # Simulate MaxCut costs: c(x) + c(~x) = num_edges for all x
+            # We create costs where this property roughly holds
+            num_vertices = 5
+            num_edges = 10
+            num_bitstrings = 2^num_vertices
+
+            # Generate costs respecting MaxCut symmetry
+            costs = zeros(Float64, num_bitstrings)
+            for x in 0:(num_bitstrings ÷ 2 - 1)
+                c = rand(MersenneTwister(x + 10000), 0:num_edges)
+                complement_x = (2^num_vertices - 1) - x
+                costs[x + 1] = Float64(c)
+                costs[complement_x + 1] = Float64(num_edges - c)
+            end
+
+            cpu_result = get_homogeneous_distribution_from_costs_direct(costs, num_edges, num_vertices)
+            gpu_result = gpu_get_homogeneous_distribution_from_costs_direct(costs, num_edges, num_vertices) |> Array
+
+            @test cpu_result ≈ gpu_result atol=1e-10
+        end
+    else
+        @warn "Skipping special pattern GPU tests because no GPU detected"
+    end
+end
