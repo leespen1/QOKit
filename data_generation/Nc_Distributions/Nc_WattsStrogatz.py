@@ -4,6 +4,29 @@ from pathlib import Path
 import h5py
 
 
+def write_homodist_hdf5(filepath, N_dist_mean, args_dict, seeds, num_graphs):
+    """Write averaged N(c'; d, c) homogeneous distribution to HDF5 file.
+
+    Structure:
+    - /N_distribution: 3D array (num_costs, num_distances, num_costs)
+    - /seeds: 1D array of graph seeds used
+    - Attributes: all parameters from args_dict plus metadata
+    """
+    with h5py.File(filepath, "w") as f:
+        # Store distribution with compression
+        f.create_dataset("N_distribution", data=N_dist_mean, compression="gzip", compression_opts=4)
+        f.create_dataset("seeds", data=np.array(seeds))
+
+        # Store parameters as attributes
+        for key, val in args_dict.items():
+            f.attrs[key] = val
+
+        # Add metadata about the distribution
+        f.attrs["distribution_format"] = "N[c', d, c] - averaged over graphs"
+        f.attrs["num_graphs_averaged"] = num_graphs
+        f.attrs["index_order"] = "Python (0-indexed): N_distribution[c_prime, distance, cost]"
+
+
 def write_costs_text(filepath, costs_list, args_dict):
     """Write raw costs (cost of each bitstring) to human-readable text file.
 
@@ -100,6 +123,7 @@ def main(args):
     args_dict.pop("backend")  # Don't keep track of backend
     args_dict.pop("format")   # Don't keep track of format
     store_costs = args_dict.pop("storeCosts")  # Don't keep track of storeCosts
+    compute_homodist = args_dict.pop("computeHomodist")  # Don't keep track in filename
     graphType = "WattsStrogatz"
     args_dict["graphType"] = graphType
 
@@ -118,7 +142,6 @@ def main(args):
     k = args.nearestNeighbors
     p = args.rewiringProbability
     seeds = list(range(args.seedStart, args.seedStart + args.numGraphs))
-    graphs = [nx.watts_strogatz_graph(n, k, p, seed=seed) for seed in seeds]
 
     # Directory of this script
     script_dir = Path(__file__).resolve().parent
@@ -127,15 +150,33 @@ def main(args):
     data_dir = script_dir / f"Data_graphType={graphType}/numNodes={n}"
     data_dir.mkdir(exist_ok=True, parents=True)
 
-    # Compute all N(c) distributions (and optionally store raw costs)
+    # Initialize Julia distribution accumulator if needed
+    homodist_accumulator = None
+    if compute_homodist:
+        from grips.julia_distributions import HomogeneousDistributionAccumulator
+        # Pre-allocate for expected max edges (n*(n-1)/2 for complete graph)
+        max_possible_edges = n * (n - 1) // 2
+        homodist_accumulator = HomogeneousDistributionAccumulator(max_num_edges=max_possible_edges)
+        use_gpu = args.backend in ("gpu", "gpumpi")
+        print(f"Computing N(c',d,c) distributions using {'GPU' if use_gpu else 'CPU'}...")
+
+    # Compute all N(c) distributions (and optionally store raw costs / compute homodist)
     Nc_list = []
     costs_list = []
-    for graph in graphs:
+    for i, seed in enumerate(seeds):
+        graph = nx.watts_strogatz_graph(n, k, p, seed=seed)
         costs = np.rint(grips.get_costs(graph, args.backend)).astype(int)
         N_c = np.bincount(costs)
         Nc_list.append(N_c)
+
         if store_costs:
             costs_list.append(costs)
+
+        if compute_homodist:
+            num_edges = graph.number_of_edges()
+            homodist_accumulator.add(costs, num_edges, n, use_gpu=use_gpu)
+            if (i + 1) % 10 == 0 or (i + 1) == len(seeds):
+                print(f"  Processed {i + 1}/{len(seeds)} graphs")
 
     # Output file base name (no extension)
     basename = grips.args_to_str(args_dict, "_")
@@ -164,6 +205,13 @@ def main(args):
             write_costs_hdf5(filepath, costs_list, args_dict, seeds)
             print(f"Wrote costs HDF5 file: {filepath}")
 
+    # Write averaged N(c',d,c) distribution if computed
+    if compute_homodist:
+        filepath = data_dir / (basename + "_homodist.h5")
+        write_homodist_hdf5(filepath, homodist_accumulator.mean, args_dict, seeds, len(seeds))
+        print(f"Wrote homogeneous distribution HDF5 file: {filepath}")
+        print(f"  Shape: {homodist_accumulator.mean.shape} (num_costs, num_distances, num_costs)")
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
@@ -176,9 +224,10 @@ if __name__ == "__main__":
     parser.add_argument("-p", "--rewiringProbability", type=float, required=True, help="Probability of rewiring each edge.")
     parser.add_argument("-s", "--seedStart", type=int, required=True, help="Start of the range of seeds.")
     parser.add_argument("-g", "--numGraphs", type=int, required=True, help="Number of graphs to use (seeds will be contiguous range).")
-    parser.add_argument("-b", "--backend", default="auto", choices=["auto", "python", "c", "gpu", "gpumpi"], type=str, help="Backend to use for computing maxcut costs.")
+    parser.add_argument("-b", "--backend", default="auto", choices=["auto", "python", "c", "gpu", "gpumpi"], type=str, help="Backend to use for computing maxcut costs. Use 'gpu' for GPU-accelerated N(c',d,c) computation.")
     parser.add_argument("-f", "--format", default="hdf5", choices=["text", "hdf5", "both"], type=str, help="Output format: text (human-readable), hdf5 (compressed, fast), or both.")
     parser.add_argument("-c", "--storeCosts", action="store_true", help="Additionally store raw costs (cost of each bitstring) in separate file(s).")
+    parser.add_argument("-d", "--computeHomodist", action="store_true", help="Compute averaged N(c',d,c) homogeneous distribution using Julia. Uses GPU if backend is 'gpu'.")
 
     try:
         args = parser.parse_args()
