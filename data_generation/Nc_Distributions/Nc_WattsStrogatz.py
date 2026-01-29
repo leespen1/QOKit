@@ -2,6 +2,7 @@ import grips, argparse, networkx as nx, numpy as np
 from collections import OrderedDict
 from pathlib import Path
 import h5py
+import time
 
 
 def write_homodist_hdf5(filepath, N_dist_mean, args_dict, seeds, num_graphs):
@@ -163,6 +164,8 @@ def main(args):
     # Compute all N(c) distributions (and optionally store raw costs / compute homodist)
     Nc_list = []
     costs_list = []
+    num_seeds = len(seeds)
+    start_time = time.time()
     for i, seed in enumerate(seeds):
         graph = nx.watts_strogatz_graph(n, k, p, seed=seed)
         costs = np.rint(grips.get_costs(graph, args.backend)).astype(int)
@@ -175,8 +178,14 @@ def main(args):
         if compute_homodist:
             num_edges = graph.number_of_edges()
             homodist_accumulator.add(costs, num_edges, n, use_gpu=use_gpu)
-            if (i + 1) % 10 == 0 or (i + 1) == len(seeds):
-                print(f"  Processed {i + 1}/{len(seeds)} graphs")
+
+        # Progress reporting with timing
+        if (i + 1) % 10 == 0 or (i + 1) == num_seeds:
+            elapsed = time.time() - start_time
+            graphs_done = i + 1
+            graphs_remaining = num_seeds - graphs_done
+            eta = (elapsed / graphs_done) * graphs_remaining if graphs_done > 0 else 0
+            print(f"  Processed {graphs_done}/{num_seeds} graphs | Elapsed: {elapsed:.1f}s | ETA: {eta:.1f}s")
 
     # Output file base name (no extension)
     basename = grips.args_to_str(args_dict, "_")
