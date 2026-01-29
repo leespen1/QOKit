@@ -3,6 +3,7 @@ from collections import OrderedDict
 from pathlib import Path
 import h5py
 import time
+from datetime import datetime
 
 
 def write_homodist_hdf5(filepath, N_dist_mean, args_dict, seeds, num_graphs):
@@ -138,6 +139,7 @@ def main(args):
 
     print("Running script with the following parameters:")
     print("\t", grips.args_to_str(args_dict, "\n\t"))
+    print(f"Started at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
 
     n = args.numNodes
     k = args.nearestNeighbors
