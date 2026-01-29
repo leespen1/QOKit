@@ -120,6 +120,7 @@ def write_hdf5(filepath, Nc_list, args_dict, seeds):
 
 
 def main(args):
+    script_start_time = time.time()
     args_dict = OrderedDict(sorted(vars(args).items()))
     args_dict.pop("backend")  # Don't keep track of backend
     args_dict.pop("format")   # Don't keep track of format
@@ -165,9 +166,16 @@ def main(args):
     costs_list = []
     num_seeds = len(seeds)
     start_time = time.time()
+    print(f"Startup completed in {start_time - script_start_time:.1f}s, beginning data collection...")
+    total_costs_time = 0.0
+    total_homodist_time = 0.0
     for i, seed in enumerate(seeds):
         graph = nx.erdos_renyi_graph(n, p, seed=seed)
+
+        t0 = time.time()
         costs = np.rint(grips.get_costs(graph, args.backend)).astype(int)
+        total_costs_time += time.time() - t0
+
         N_c = np.bincount(costs)
         Nc_list.append(N_c)
 
@@ -176,7 +184,9 @@ def main(args):
 
         if compute_homodist:
             num_edges = graph.number_of_edges()
+            t0 = time.time()
             homodist_accumulator.add(costs, num_edges, n, use_gpu=use_gpu)
+            total_homodist_time += time.time() - t0
 
         # Progress reporting with timing
         if (i + 1) % 10 == 0 or (i + 1) == num_seeds:
@@ -184,7 +194,11 @@ def main(args):
             graphs_done = i + 1
             graphs_remaining = num_seeds - graphs_done
             eta = (elapsed / graphs_done) * graphs_remaining if graphs_done > 0 else 0
-            print(f"  Processed {graphs_done}/{num_seeds} graphs | Elapsed: {elapsed:.1f}s | ETA: {eta:.1f}s")
+            timing_parts = [f"costs: {total_costs_time:.1f}s"]
+            if compute_homodist:
+                timing_parts.append(f"homodist: {total_homodist_time:.1f}s")
+            timing_str = ", ".join(timing_parts)
+            print(f"  Processed {graphs_done}/{num_seeds} graphs | Elapsed: {elapsed:.1f}s ({timing_str}) | ETA: {eta:.1f}s")
 
     # Output file base name (no extension)
     basename = grips.args_to_str(args_dict, "_")
