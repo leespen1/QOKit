@@ -164,6 +164,16 @@ def main(args):
         use_gpu = args.backend in ("gpu", "gpumpi")
         print(f"Computing N(c',d,c) distributions using {'GPU' if use_gpu else 'CPU'}...")
 
+        # JIT warmup: run a small dummy computation to trigger Julia compilation
+        print("  Julia JIT warmup...", end=" ", flush=True)
+        warmup_start = time.time()
+        warmup_n = 4
+        warmup_graph = nx.complete_graph(warmup_n)
+        warmup_costs = np.rint(grips.get_costs(warmup_graph, "python")).astype(int)
+        warmup_acc = HomogeneousDistributionAccumulator(max_num_edges=warmup_graph.number_of_edges())
+        warmup_acc.add(warmup_costs, warmup_graph.number_of_edges(), warmup_n, use_gpu=use_gpu)
+        print(f"done in {time.time() - warmup_start:.1f}s")
+
     # Compute all N(c) distributions (and optionally store raw costs / compute homodist)
     Nc_list = []
     costs_list = []
@@ -201,7 +211,7 @@ def main(args):
             if compute_homodist:
                 timing_parts.append(f"homodist: {total_homodist_time:.1f}s")
             timing_str = ", ".join(timing_parts)
-            print(f"  Processed {graphs_done}/{num_seeds} graphs | Elapsed: {elapsed:.1f}s ({timing_str}) | ETA: {eta:.1f}s")
+            print(f"  Processed {graphs_done}/{num_seeds} graphs | Elapsed: {elapsed:.1f}s ({timing_str}) | ETA: {eta:.1f}s", flush=True)
 
     # Output file base name (no extension)
     basename = grips.args_to_str(args_dict, "_")
