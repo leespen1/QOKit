@@ -44,6 +44,7 @@ dependencies = [
     'nbstripout', # For stripping jupyter notebook output
     'dwave-networkx',
     'QAOAKit @ git+https://github.com/leespen1/QAOAKit.git@v0.1.18', # custom QAOAKit fork, for package compatibility
+    'h5py>=3.10',
 ]
 
 [project.optional-dependencies]

@@ -17,5 +17,6 @@ from .scipy_additional_optimizers import *
 from .triangle_proxy import *
 from .solve_maxcut_exact import *
 from .sendai_opt import *
+from .utils import *
 
 #from .stddev_mean_heatmaps import *

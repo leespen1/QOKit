@@ -545,10 +545,10 @@ def evaluate_paper_proxy(graphs, num_nodes, edge_probability, graph_type, ws_num
 
 if __name__ == "__main__":
     # Run the fitting process
-    num_graphs = 10
+    num_graphs = 20
     edge_probability = 0.5
     startnodes = 4
-    endnodes = 6
+    endnodes = 5
     graph_type = 'barabasi_albert'  # Change to 'barabasi_albert' or 'watts_strogatz' as needed
 
     print(f"\n\n---------------------\nFitting for {startnodes} nodes...")

@@ -1,15 +1,15 @@
 using JuliaQAOA, Test
 
-@testset "CPU and GPU homogeneous distributions agree for a single proxy" begin
-    num_qubits = 10
-    num_constraints = div(num_qubits^2, 2)
-    proxy_hard = HardCodedTriangleProxy(num_constraints, num_qubits)
-    proxy_soft = IntuitiveTriangleProxy(num_constraints, num_qubits)
-    proxy_soft2 = IntuitiveTriangleProxy(num_constraints, num_qubits, 2, 0.4, 0.3, 0.2)
-    proxies = [proxy_hard, proxy_soft, proxy_soft2]
-    for proxy in proxies
-        cpu_homodist = JuliaQAOA.cpu_compute_homodist(proxy)
-        gpu_homodist = JuliaQAOA.gpu_compute_homodist(proxy) |> Array
+if CUDA.has_cuda_gpu()
+    @testset "CPU and GPU homogeneous distributions agree for a single proxy" begin
+        num_qubits = 10
+        num_constraints = div(num_qubits^2, 2)
+        proxy_hard = HardCodedTriangleProxy(num_constraints, num_qubits)
+        proxy_soft = IntuitiveTriangleProxy(num_constraints, num_qubits)
+        proxy_soft2 = IntuitiveTriangleProxy(num_constraints, num_qubits, 2, 0.4, 0.3, 0.2)
+        proxies = [proxy_hard, proxy_soft, proxy_soft2]
+        for proxy in proxies
+            cpu_homodist = JuliaQAOA.cpu_compute_homodist(proxy) gpu_homodist = JuliaQAOA.gpu_compute_homodist(proxy) |> Array
 
         @test all(isapprox.(cpu_homodist, gpu_homodist, rtol=1e-15, atol=1e-12))
         println("Maximum disagreement: ", maximum(abs, cpu_homodist .- gpu_homodist))
@@ -48,4 +48,3 @@ end
     end
     
 end
-
