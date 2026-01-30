@@ -4,7 +4,7 @@ using Distributions: pdf, Normal, MvNormal, Binomial, Multinomial
 using StaticArrays: @SVector, @SMatrix, SVector
 using PythonCall: PyArray, pyconvert
 using LinearAlgebra: mul!
-using Base.Threads: @threads
+using Base.Threads: @threads, nthreads, threadid
 using CUDA
 using ProgressMeter: @showprogress
 using InteractiveUtils

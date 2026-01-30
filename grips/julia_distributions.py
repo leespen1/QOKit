@@ -20,6 +20,10 @@ def _init_julia():
     if _julia_initialized:
         return _jl
 
+    # Set thread count before Julia starts (must be set before first import)
+    if "JULIA_NUM_THREADS" not in os.environ:
+        os.environ["JULIA_NUM_THREADS"] = "auto"
+
     from juliacall import Main as jl
     _jl = jl
 

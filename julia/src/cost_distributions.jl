@@ -97,8 +97,8 @@ function get_real_distribution_from_costs(
     n_distribution = zeros(Float64, num_bitstrings, num_distances, cost_axis_size)
 
     # Main computation loop - O(2^(2n))
-    # Each (x, y) pair is independent, making this parallelizable
-    @inbounds for x in 0:(num_bitstrings - 1)
+    # Each x writes to its own row n_distribution[x+1, :, :], so no contention
+    @inbounds @threads for x in 0:(num_bitstrings - 1)
         for y in 0:(num_bitstrings - 1)
             d = hamming_distance(x, y)
             cost_y = Int(costs[y + 1])  # +1 for Julia 1-indexing
@@ -135,20 +135,35 @@ function get_homogeneous_distribution_from_costs(
     num_bitstrings, num_distances, num_costs = size(real_distribution)
     cost_axis_size = max(num_costs, max_num_edges + 1)
 
-    homogeneous_distribution = zeros(Float64, cost_axis_size, num_distances, cost_axis_size)
+    # Count cost occurrences for normalization (single-threaded, cheap)
     num_cost_occurrences = zeros(Int, num_costs)
-
-    # Sum n(x; d, c) over all x with same cost c'
     @inbounds for bitstring_i in 1:num_bitstrings
         bitstring_cost = Int(costs[bitstring_i]) + 1  # +1 for 1-indexing
         num_cost_occurrences[bitstring_cost] += 1
+    end
 
-        # Add this bitstring's distribution to the accumulator for its cost
+    # Allocate one accumulator per thread to avoid write contention
+    # (multiple bitstrings can share the same cost)
+    nt = nthreads()
+    thread_accumulators = [zeros(Float64, cost_axis_size, num_distances, cost_axis_size) for _ in 1:nt]
+
+    # Sum n(x; d, c) over all x with same cost c', using thread-local accumulators
+    @inbounds @threads :static for bitstring_i in 1:num_bitstrings
+        tid = threadid()
+        local_acc = thread_accumulators[tid]
+        bitstring_cost = Int(costs[bitstring_i]) + 1  # +1 for 1-indexing
+
         for d in 1:num_distances
             for c in 1:num_costs
-                homogeneous_distribution[bitstring_cost, d, c] += real_distribution[bitstring_i, d, c]
+                local_acc[bitstring_cost, d, c] += real_distribution[bitstring_i, d, c]
             end
         end
+    end
+
+    # Reduce: sum all thread-local accumulators
+    homogeneous_distribution = thread_accumulators[1]
+    for t in 2:nt
+        homogeneous_distribution .+= thread_accumulators[t]
     end
 
     # Normalize by number of bitstrings with each cost
@@ -198,27 +213,36 @@ function get_homogeneous_distribution_from_costs_direct(
 
     @assert length(costs) == num_bitstrings "Length of costs must equal 2^num_vertices"
 
-    # Allocate accumulators
-    homogeneous_distribution = zeros(Float64, cost_axis_size, num_distances, cost_axis_size)
+    # Count occurrences of each cost (for normalization, single-threaded, cheap)
     num_cost_occurrences = zeros(Int, cost_axis_size)
-
-    # Count occurrences of each cost (for normalization)
     @inbounds for bitstring_i in 1:num_bitstrings
         cost_x = Int(costs[bitstring_i]) + 1
         num_cost_occurrences[cost_x] += 1
     end
 
+    # Allocate one accumulator per thread to avoid write contention
+    # (multiple x values can share the same cost_x)
+    nt = nthreads()
+    thread_accumulators = [zeros(Float64, cost_axis_size, num_distances, cost_axis_size) for _ in 1:nt]
+
     # Main computation: for each pair (x, y), accumulate to N(c(x); d(x,y), c(y))
-    @inbounds for x in 0:(num_bitstrings - 1)
+    @inbounds @threads :static for x in 0:(num_bitstrings - 1)
+        tid = threadid()
+        local_acc = thread_accumulators[tid]
         cost_x = Int(costs[x + 1]) + 1  # c'
 
         for y in 0:(num_bitstrings - 1)
             d = hamming_distance(x, y) + 1  # d, +1 for 1-indexing
             cost_y = Int(costs[y + 1]) + 1  # c, +1 for 1-indexing
 
-            # Accumulate (will normalize later)
-            homogeneous_distribution[cost_x, d, cost_y] += 1.0
+            local_acc[cost_x, d, cost_y] += 1.0
         end
+    end
+
+    # Reduce: sum all thread-local accumulators
+    homogeneous_distribution = thread_accumulators[1]
+    for t in 2:nt
+        homogeneous_distribution .+= thread_accumulators[t]
     end
 
     # Normalize by number of bitstrings with each cost c'
@@ -326,6 +350,11 @@ GPU-accelerated version that computes N(c'; d, c) directly.
 This is more memory-efficient than computing the full n(x; d, c) first,
 as it only allocates O(m × n × m) storage instead of O(2^n × n × m).
 
+Uses two optimizations over a naive GPU implementation:
+1. Int32 atomics instead of Float64 (faster native support and higher throughput)
+2. Privatized global memory: multiple copies of the output array reduce
+   atomic contention by spreading thread blocks across independent copies.
+
 # Arguments
 Same as `get_homogeneous_distribution_from_costs_direct`
 
@@ -349,8 +378,16 @@ function gpu_get_homogeneous_distribution_from_costs_direct(
     # Transfer costs to GPU
     costs_gpu = CuArray{Int32}(Int32.(costs))
 
-    # Allocate accumulators on GPU
-    homogeneous_distribution = CUDA.zeros(Float64, cost_axis_size, num_distances, cost_axis_size)
+    # Determine number of privatized copies based on GPU SM count.
+    # More copies = less atomic contention, but more memory and reduction work.
+    dev = CUDA.device()
+    num_sms = CUDA.attribute(dev, CUDA.DEVICE_ATTRIBUTE_MULTIPROCESSOR_COUNT)
+    num_copies = max(min(num_sms, 64), 1)
+
+    # Allocate privatized accumulators on GPU using Int32 for fast native atomics.
+    # Shape: (cost_axis_size, num_distances, cost_axis_size, num_copies)
+    # Copies as last dimension so each 3D slice is contiguous (column-major).
+    privatized_counts = CUDA.zeros(Int32, cost_axis_size, num_distances, cost_axis_size, num_copies)
 
     # Count cost occurrences on CPU (small array, not worth GPU kernel)
     num_cost_occurrences = zeros(Float64, cost_axis_size)
@@ -364,12 +401,16 @@ function gpu_get_homogeneous_distribution_from_costs_direct(
     num_pairs = num_bitstrings * num_bitstrings
     blocks = cld(num_pairs, threads_per_block)
 
-    @cuda threads=threads_per_block blocks=blocks _homogeneous_distribution_kernel!(
-        homogeneous_distribution, costs_gpu, num_bitstrings, num_vertices
+    @cuda threads=threads_per_block blocks=blocks _homogeneous_distribution_kernel_priv!(
+        privatized_counts, costs_gpu, num_bitstrings, num_vertices, num_copies
     )
 
     # Wait for kernel to complete
     CUDA.synchronize()
+
+    # Reduce across privatized copies (sum along dim 4) and convert to Float64
+    total_counts = dropdims(sum(privatized_counts, dims=4), dims=4)
+    homogeneous_distribution = Float64.(total_counts)
 
     # Normalize (can be done on GPU with broadcasting)
     num_cost_occurrences_gpu = CuArray(num_cost_occurrences)
@@ -386,14 +427,17 @@ function gpu_get_homogeneous_distribution_from_costs_direct(
 end
 
 """
-CUDA kernel for computing homogeneous distribution N(c'; d, c) directly.
-Each thread handles one (x, y) pair.
+CUDA kernel for computing homogeneous distribution N(c'; d, c) directly,
+using privatized global memory to reduce atomic contention.
+Each thread handles one (x, y) pair and writes to its block's assigned copy.
+Uses Int32 atomics for maximum throughput.
 """
-function _homogeneous_distribution_kernel!(
-    homogeneous_distribution::CuDeviceArray{Float64, 3},
+function _homogeneous_distribution_kernel_priv!(
+    privatized_counts::CuDeviceArray{Int32, 4},
     costs::CuDeviceArray{Int32, 1},
     num_bitstrings::Int,
-    num_vertices::Int
+    num_vertices::Int,
+    num_copies::Int
 )
     # Global thread index
     idx = (blockIdx().x - 1) * blockDim().x + threadIdx().x
@@ -411,9 +455,12 @@ function _homogeneous_distribution_kernel!(
         # Compute Hamming distance
         d = count_ones(x ⊻ y)
 
-        # Atomic add to handle concurrent writes
+        # Determine which privatized copy this block writes to
+        copy_idx = ((blockIdx().x - 1) % num_copies) + 1
+
+        # Atomic add to handle concurrent writes within the same copy
         # Array indices are 1-indexed
-        CUDA.@atomic homogeneous_distribution[cost_x + 1, d + 1, cost_y + 1] += 1.0
+        CUDA.@atomic privatized_counts[cost_x + 1, d + 1, cost_y + 1, copy_idx] += Int32(1)
     end
 
     return nothing
