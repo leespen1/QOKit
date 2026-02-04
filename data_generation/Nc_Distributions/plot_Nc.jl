@@ -14,7 +14,7 @@ import Pkg
 Pkg.activate(joinpath(@__DIR__, "..", "..", "julia"))
 
 using HDF5
-using GLMakie
+using CairoMakie
 using Statistics
 using Printf
 
@@ -100,6 +100,73 @@ function make_label(attrs::Dict)
     return join(parts, ", ")
 end
 
+"""
+    make_filename(attrs) -> String
+
+Build a filename-safe string from the HDF5 attributes.
+"""
+function make_filename(attrs::Dict)
+    parts = String[]
+    gt = get(attrs, "graphType", "Unknown")
+    push!(parts, gt)
+    if haskey(attrs, "numNodes")
+        push!(parts, "n=$(attrs["numNodes"])")
+    end
+    if haskey(attrs, "edgesPerNode")
+        push!(parts, "m=$(attrs["edgesPerNode"])")
+    end
+    if haskey(attrs, "edgeProbability")
+        push!(parts, "p=$(attrs["edgeProbability"])")
+    end
+    if haskey(attrs, "nearestNeighbors")
+        push!(parts, "k=$(attrs["nearestNeighbors"])")
+    end
+    if haskey(attrs, "rewiringProbability")
+        push!(parts, "r=$(attrs["rewiringProbability"])")
+    end
+    return join(parts, "_")
+end
+
+"""
+    plot_nc!(ax, Nc, num_graphs)
+
+Plot N(c) data on the given axis. Chooses bar plot, individual lines + mean,
+or mean ± std band depending on the number of graphs.
+"""
+function plot_nc!(ax, Nc, num_graphs)
+    if num_graphs == 1
+        # Single graph: simple bar plot
+        nc_vec = trim_padding(vec(Nc[:, 1]))
+        costs = 0:(length(nc_vec) - 1)
+        barplot!(ax, collect(costs), Float64.(nc_vec); color = :steelblue)
+    elseif num_graphs <= 10
+        # Few graphs: show individual lines + mean
+        for g in 1:num_graphs
+            nc_vec = trim_padding(vec(Nc[:, g]))
+            costs = 0:(length(nc_vec) - 1)
+            lines!(ax, collect(costs), Float64.(nc_vec); color = (:gray60, 0.5), linewidth = 1)
+        end
+        # Mean
+        mean_nc = Float64.(mean(Nc, dims = 2)[:, 1])
+        mean_trimmed = trim_padding(mean_nc)
+        costs = 0:(length(mean_trimmed) - 1)
+        lines!(ax, collect(costs), mean_trimmed; color = :steelblue, linewidth = 2.5, label = "Mean")
+        axislegend(ax; position = :rt)
+    else
+        # Many graphs: show mean ± std as a band
+        mean_nc = Float64.(mean(Nc, dims = 2)[:, 1])
+        std_nc = Float64.(std(Nc, dims = 2)[:, 1])
+        mean_trimmed = trim_padding(mean_nc)
+        n = length(mean_trimmed)
+        std_trimmed = std_nc[1:n]
+        costs = collect(0:(n - 1))
+        band!(ax, costs, mean_trimmed .- std_trimmed, mean_trimmed .+ std_trimmed;
+              color = (:steelblue, 0.25))
+        lines!(ax, costs, mean_trimmed; color = :steelblue, linewidth = 2.5, label = "Mean ± σ")
+        axislegend(ax; position = :rt)
+    end
+end
+
 function main()
     # Determine which files to plot
     args = ARGS
@@ -150,61 +217,152 @@ function main()
         return
     end
 
-    # Create figure — one row per dataset
-    n_datasets = length(datasets)
-    fig = Figure(size = (900, 300 * n_datasets + 50))
-
-    for (i, ds) in enumerate(datasets)
-        Nc = ds.Nc  # shape: (num_costs, num_graphs) — HDF5.jl reads column-major
+    # Save individual plots
+    individual_dir = "Nc_individual_plots"
+    mkpath(individual_dir)
+    for ds in datasets
+        Nc = ds.Nc
         attrs = ds.attrs
         label = make_label(attrs)
         num_graphs = size(Nc, 2)
 
+        ifig = Figure(size = (900, 350))
         ax = Axis(
-            fig[i, 1];
+            ifig[1, 1];
             xlabel = "Cost c",
             ylabel = "N(c)",
             title = "$label  ($num_graphs graph$(num_graphs > 1 ? "s" : ""))",
         )
+        plot_nc!(ax, Nc, num_graphs)
 
-        if num_graphs == 1
-            # Single graph: simple bar plot
-            nc_vec = trim_padding(vec(Nc[:, 1]))
-            costs = 0:(length(nc_vec) - 1)
-            barplot!(ax, collect(costs), Float64.(nc_vec); color = :steelblue)
-        elseif num_graphs <= 10
-            # Few graphs: show individual lines + mean
-            max_len = 0
-            for g in 1:num_graphs
-                nc_vec = trim_padding(vec(Nc[:, g]))
-                max_len = max(max_len, length(nc_vec))
-                costs = 0:(length(nc_vec) - 1)
-                lines!(ax, collect(costs), Float64.(nc_vec); color = (:gray60, 0.5), linewidth = 1)
-            end
-            # Mean
-            mean_nc = Float64.(mean(Nc, dims = 2)[:, 1])
-            mean_trimmed = trim_padding(mean_nc)
-            costs = 0:(length(mean_trimmed) - 1)
-            lines!(ax, collect(costs), mean_trimmed; color = :steelblue, linewidth = 2.5, label = "Mean")
-            axislegend(ax; position = :rt)
-        else
-            # Many graphs: show mean ± std as a band
-            mean_nc = Float64.(mean(Nc, dims = 2)[:, 1])
-            std_nc = Float64.(std(Nc, dims = 2)[:, 1])
-            mean_trimmed = trim_padding(mean_nc)
-            n = length(mean_trimmed)
-            std_trimmed = std_nc[1:n]
-            costs = collect(0:(n - 1))
-            band!(ax, costs, mean_trimmed .- std_trimmed, mean_trimmed .+ std_trimmed;
-                  color = (:steelblue, 0.25))
-            lines!(ax, costs, mean_trimmed; color = :steelblue, linewidth = 2.5, label = "Mean ± σ")
-            axislegend(ax; position = :rt)
-        end
+        fname = "Nc_$(make_filename(attrs)).png"
+        ipath = joinpath(individual_dir, fname)
+        save(ipath, ifig)
+        println("  Saved $ipath")
     end
 
-    outpath = "Nc_distributions.png"
-    save(outpath, fig; px_per_unit = 2)
-    println("\nPlot saved to $outpath")
+    # Save a combined plot for a group of datasets
+    function save_group_plot(group, outpath)
+        n = length(group)
+        fig = Figure(size = (900, 300 * n + 50))
+        for (i, ds) in enumerate(group)
+            Nc = ds.Nc
+            attrs = ds.attrs
+            label = make_label(attrs)
+            num_graphs = size(Nc, 2)
+            ax = Axis(
+                fig[i, 1];
+                xlabel = "Cost c",
+                ylabel = "N(c)",
+                title = "$label  ($num_graphs graph$(num_graphs > 1 ? "s" : ""))",
+            )
+            plot_nc!(ax, Nc, num_graphs)
+        end
+        save(outpath, fig)
+        println("  Saved $outpath")
+    end
+
+    # Helper: get non-numNodes parameter keys for a dataset
+    other_param_keys = ["edgesPerNode", "edgeProbability", "nearestNeighbors", "rewiringProbability"]
+
+    combined_dir = "Nc_combined_plots"
+    mkpath(combined_dir)
+
+    # Group by graph type
+    by_type = Dict{String,Vector}()
+    for ds in datasets
+        gt = get(ds.attrs, "graphType", "Unknown")
+        push!(get!(by_type, gt, []), ds)
+    end
+    for (gt, group) in sort(collect(by_type))
+        save_group_plot(group, joinpath(combined_dir, "Nc_$(gt).png"))
+    end
+
+    # Group by (graph type, numNodes)
+    by_nodes = Dict{String,Vector}()
+    for ds in datasets
+        gt = get(ds.attrs, "graphType", "Unknown")
+        nn = get(ds.attrs, "numNodes", "?")
+        key = "$(gt)_n=$(nn)"
+        push!(get!(by_nodes, key, []), ds)
+    end
+    for (key, group) in sort(collect(by_nodes))
+        save_group_plot(group, joinpath(combined_dir, "Nc_$(key).png"))
+    end
+
+    # Group by (graph type, other params) — varying numNodes
+    by_other = Dict{String,Vector}()
+    for ds in datasets
+        gt = get(ds.attrs, "graphType", "Unknown")
+        parts = [gt]
+        for k in other_param_keys
+            if haskey(ds.attrs, k)
+                push!(parts, "$(k)=$(ds.attrs[k])")
+            end
+        end
+        key = join(parts, "_")
+        push!(get!(by_other, key, []), ds)
+    end
+    for (key, group) in sort(collect(by_other))
+        save_group_plot(group, joinpath(combined_dir, "Nc_$(key).png"))
+    end
+
+    # Grid plots: rows = numNodes, columns = other parameters, one per graph type
+    for (gt, group) in sort(collect(by_type))
+        # Build a lookup: (numNodes, other_params_string) -> dataset
+        lookup = Dict{Tuple{Any,String},Any}()
+        all_nodes = Set()
+        all_params = Set{String}()
+        for ds in group
+            nn = get(ds.attrs, "numNodes", "?")
+            parts = String[]
+            for k in other_param_keys
+                if haskey(ds.attrs, k)
+                    push!(parts, "$(k)=$(ds.attrs[k])")
+                end
+            end
+            param_key = isempty(parts) ? "" : join(parts, ", ")
+            push!(all_nodes, nn)
+            push!(all_params, param_key)
+            lookup[(nn, param_key)] = ds
+        end
+
+        sorted_nodes = sort(collect(all_nodes))
+        sorted_params = sort(collect(all_params))
+        nrows = length(sorted_nodes)
+        ncols = length(sorted_params)
+
+        fig = Figure(size = (max(400, 350 * ncols), 250 * nrows + 80))
+        Label(fig[0, 1:ncols], gt; fontsize = 20, font = :bold)
+
+        for (ci, param) in enumerate(sorted_params)
+            # Column header
+            col_label = isempty(param) ? "" : param
+            if !isempty(col_label)
+                Label(fig[1, ci, Top()], col_label; fontsize = 14, padding = (0, 0, 5, 0))
+            end
+
+            for (ri, nn) in enumerate(sorted_nodes)
+                ds = get(lookup, (nn, param), nothing)
+                ax = Axis(
+                    fig[ri, ci];
+                    xlabel = "Cost c",
+                    ylabel = "N(c)",
+                    title = "n=$nn",
+                    titlesize = 12,
+                )
+                if ds !== nothing
+                    plot_nc!(ax, ds.Nc, size(ds.Nc, 2))
+                end
+            end
+        end
+
+        outpath = joinpath(combined_dir, "Nc_grid_$(gt).png")
+        save(outpath, fig)
+        println("  Saved $outpath")
+    end
+
+    println("\nAll plots saved.")
 end
 
 main()
