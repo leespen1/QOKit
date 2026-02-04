@@ -29,6 +29,9 @@ PROBS=(0.1 0.25 0.5 0.75 0.9)
 
 # -----------------------------
 # Fixed parameters
+# Override from outside via inline prefix or export:
+#   STORE_COSTS=true bash slurm_Nc_ErdosRenyi.slurm
+#   export STORE_COSTS=true && sbatch slurm_Nc_ErdosRenyi.slurm
 # -----------------------------
 SEEDSTART="${SEEDSTART:-0}"
 NUMGRAPHS="${NUMGRAPHS:-100}"

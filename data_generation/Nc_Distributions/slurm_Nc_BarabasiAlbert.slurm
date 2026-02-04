@@ -27,6 +27,9 @@ EDGES_PER_NODE=(1 2 3)
 
 # -----------------------------
 # Fixed parameters
+# Override from outside via inline prefix or export:
+#   STORE_COSTS=true bash slurm_Nc_BarabasiAlbert.slurm
+#   export STORE_COSTS=true && sbatch slurm_Nc_BarabasiAlbert.slurm
 # -----------------------------
 SEEDSTART="${SEEDSTART:-0}"
 NUMGRAPHS="${NUMGRAPHS:-100}"

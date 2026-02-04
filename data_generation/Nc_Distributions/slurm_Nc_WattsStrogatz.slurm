@@ -29,6 +29,9 @@ BETAS=(0.05 0.10 0.20 0.30)
 
 # -----------------------------
 # Fixed parameters
+# Override from outside via inline prefix or export:
+#   STORE_COSTS=true bash slurm_Nc_WattsStrogatz.slurm
+#   export STORE_COSTS=true && sbatch slurm_Nc_WattsStrogatz.slurm
 # -----------------------------
 SEEDSTART="${SEEDSTART:-0}"
 NUMGRAPHS="${NUMGRAPHS:-100}"
