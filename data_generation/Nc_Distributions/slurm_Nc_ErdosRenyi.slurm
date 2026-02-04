@@ -52,6 +52,19 @@ else
     NUM_BATCHES=1
 fi
 
+echo "=== Erdos-Renyi Parameters ==="
+echo "  NODES:            ${NODES[*]}"
+echo "  PROBS:            ${PROBS[*]}"
+echo "  SEEDSTART:        ${SEEDSTART}"
+echo "  NUMGRAPHS:        ${NUMGRAPHS}"
+echo "  FORMAT:           ${FORMAT}"
+echo "  BACKEND:          ${BACKEND}"
+echo "  STORE_COSTS:      ${STORE_COSTS}"
+echo "  COMPUTE_HOMODIST: ${COMPUTE_HOMODIST}"
+echo "  BATCH_ID:         ${BATCH_ID}"
+echo "  NUM_BATCHES:      ${NUM_BATCHES}"
+echo "================================"
+
 OPTIONAL_FLAGS=()
 [[ "${STORE_COSTS}" == "true" ]] && OPTIONAL_FLAGS+=(-c)
 [[ "${COMPUTE_HOMODIST}" == "true" ]] && OPTIONAL_FLAGS+=(-d)

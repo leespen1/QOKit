@@ -50,6 +50,19 @@ else
     NUM_BATCHES=1
 fi
 
+echo "=== Barabasi-Albert Parameters ==="
+echo "  NODES:            ${NODES[*]}"
+echo "  EDGES_PER_NODE:   ${EDGES_PER_NODE[*]}"
+echo "  SEEDSTART:        ${SEEDSTART}"
+echo "  NUMGRAPHS:        ${NUMGRAPHS}"
+echo "  FORMAT:           ${FORMAT}"
+echo "  BACKEND:          ${BACKEND}"
+echo "  STORE_COSTS:      ${STORE_COSTS}"
+echo "  COMPUTE_HOMODIST: ${COMPUTE_HOMODIST}"
+echo "  BATCH_ID:         ${BATCH_ID}"
+echo "  NUM_BATCHES:      ${NUM_BATCHES}"
+echo "=================================="
+
 OPTIONAL_FLAGS=()
 [[ "${STORE_COSTS}" == "true" ]] && OPTIONAL_FLAGS+=(-c)
 [[ "${COMPUTE_HOMODIST}" == "true" ]] && OPTIONAL_FLAGS+=(-d)
