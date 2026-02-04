@@ -22,10 +22,12 @@ source ../../../qokitvenv/bin/activate
 
 # -----------------------------
 # Parameter grids
+# Override from outside, e.g.:
+#   NODES="10 15 20" KVALUES="4 6" BETAS="0.1 0.2" sbatch slurm_Nc_WattsStrogatz.slurm
 # -----------------------------
-NODES=(10 11 12 13 14 15 16 17 18 19 20)
-KVALUES=(4 6 8)
-BETAS=(0.05 0.10 0.20 0.30)
+NODES=(${NODES:-10 11 12 13 14 15 16 17 18 19 20})           # override: NODES="10 15 20"
+KVALUES=(${KVALUES:-4 6 8})                                 # override: KVALUES="4 6"
+BETAS=(${BETAS:-0.05 0.10 0.20 0.30})                      # override: BETAS="0.1 0.2"
 
 # -----------------------------
 # Fixed parameters

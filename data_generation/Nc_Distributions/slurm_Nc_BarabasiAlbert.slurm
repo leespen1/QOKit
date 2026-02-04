@@ -21,9 +21,11 @@ source ../../../qokitvenv/bin/activate
 
 # -----------------------------
 # Parameter grids
+# Override from outside, e.g.:
+#   NODES="10 12 15 20" EDGES_PER_NODE="2 3" sbatch slurm_Nc_BarabasiAlbert.slurm
 # -----------------------------
-NODES=(10 11 12 13 14 15 16 17 18 19 20)
-EDGES_PER_NODE=(1 2 3)
+NODES=(${NODES:-10 11 12 13 14 15 16 17 18 19 20})           # override: NODES="10 15 20"
+EDGES_PER_NODE=(${EDGES_PER_NODE:-1 2 3})                   # override: EDGES_PER_NODE="2 3"
 
 # -----------------------------
 # Fixed parameters

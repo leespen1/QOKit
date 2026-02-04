@@ -22,10 +22,11 @@ source ../../../qokitvenv/bin/activate
 
 # -----------------------------
 # Parameter grids
+# Override from outside, e.g.:
+#   NODES="10 12 15" PROBS="0.1 0.5 0.9" sbatch slurm_Nc_ErdosRenyi.slurm
 # -----------------------------
-NODES=(10 11 12 13 14 15 16 17 18 19 20)
-#NODES=(10 11 12)
-PROBS=(0.1 0.25 0.5 0.75 0.9)
+NODES=(${NODES:-10 11 12 13 14 15 16 17 18 19 20})           # override: NODES="10 15 20"
+PROBS=(${PROBS:-0.1 0.25 0.5 0.75 0.9})                    # override: PROBS="0.1 0.5 0.9"
 
 # -----------------------------
 # Fixed parameters
