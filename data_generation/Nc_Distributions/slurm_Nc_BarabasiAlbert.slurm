@@ -9,6 +9,7 @@
 #SBATCH --output=logs/Nc_BA_%A_%a.out
 #SBATCH --error=logs/Nc_BA_%A_%a.err
 #SBATCH --constraint=amd20
+#SBATCH --export=ALL
 
 set -euo pipefail
 
