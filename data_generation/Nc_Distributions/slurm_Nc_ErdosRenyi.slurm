@@ -39,6 +39,7 @@ FORMAT="${FORMAT:-hdf5}"
 BACKEND="${BACKEND:-auto}"
 STORE_COSTS="${STORE_COSTS:-false}"      # Store raw cost of each bitstring (-c)
 COMPUTE_HOMODIST="${COMPUTE_HOMODIST:-false}" # Compute homogeneous distribution N(c',d,c) via Julia (-d)
+export JULIA_NUM_THREADS="${JULIA_NUM_THREADS:-1}" # Avoid JuliaCall segfault with multithreading
 
 # -----------------------------
 # Determine batch ID and count
