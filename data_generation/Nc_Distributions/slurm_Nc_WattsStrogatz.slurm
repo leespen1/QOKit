@@ -10,10 +10,14 @@
 #SBATCH --error=logs/Nc_WS_%A_%a.err
 #SBATCH --constraint=amd20
 
+# Fail fast
 set -euo pipefail
 
-module purge
-module load CUDA
+if [[ -n "${SLURM_JOB_ID:-}" ]]; then
+    module purge
+    module load CUDA
+fi
+
 source ../../../qokitvenv/bin/activate
 
 # -----------------------------
@@ -28,20 +32,6 @@ NUM_K=${#KVALUES[@]}
 NUM_BETA=${#BETAS[@]}
 
 # -----------------------------
-# Map SLURM_ARRAY_TASK_ID -> (n, k, beta)
-# -----------------------------
-TASK_ID=${SLURM_ARRAY_TASK_ID}
-
-NODE_INDEX=$(( TASK_ID / (NUM_K * NUM_BETA) ))
-REM=$(( TASK_ID % (NUM_K * NUM_BETA) ))
-K_INDEX=$(( REM / NUM_BETA ))
-BETA_INDEX=$(( REM % NUM_BETA ))
-
-NUMNODES=${NODES[$NODE_INDEX]}
-K=${KVALUES[$K_INDEX]}
-BETA=${BETAS[$BETA_INDEX]}
-
-# -----------------------------
 # Fixed parameters
 # -----------------------------
 SEEDSTART=0
@@ -50,33 +40,64 @@ FORMAT=hdf5
 BACKEND=auto
 
 # -----------------------------
-# Sanity checks (Watts–Strogatz constraints)
+# Run a single task by TASK_ID
 # -----------------------------
-if (( K >= NUMNODES )); then
-    echo "Invalid WS parameters: k=${K} >= n=${NUMNODES}"
-    exit 1
+run_task() {
+    local TASK_ID=$1
+
+    local NODE_INDEX=$(( TASK_ID / (NUM_K * NUM_BETA) ))
+    local REM=$(( TASK_ID % (NUM_K * NUM_BETA) ))
+    local K_INDEX=$(( REM / NUM_BETA ))
+    local BETA_INDEX=$(( REM % NUM_BETA ))
+
+    local NUMNODES=${NODES[$NODE_INDEX]}
+    local K=${KVALUES[$K_INDEX]}
+    local BETA=${BETAS[$BETA_INDEX]}
+
+    # Sanity checks (Watts–Strogatz constraints)
+    if (( K >= NUMNODES )); then
+        echo "Invalid WS parameters: k=${K} >= n=${NUMNODES}"
+        return 1
+    fi
+
+    if (( K % 2 != 0 )); then
+        echo "Invalid WS parameters: k=${K} must be even"
+        return 1
+    fi
+
+    echo "Running N(c) collection (Watts–Strogatz)"
+    echo "  numNodes            = ${NUMNODES}"
+    echo "  nearestNeighbors k  = ${K}"
+    echo "  rewiringProbability = ${BETA}"
+    echo "  seedStart           = ${SEEDSTART}"
+    echo "  numGraphs           = ${NUMGRAPHS}"
+
+    python Nc_WattsStrogatz.py \
+        -n "${NUMNODES}" \
+        -k "${K}" \
+        -p "${BETA}" \
+        -s "${SEEDSTART}" \
+        -g "${NUMGRAPHS}" \
+        -b "${BACKEND}" \
+        -f "${FORMAT}"
+}
+
+# -----------------------------
+# Determine task ID(s) to run
+# -----------------------------
+NUM_TASKS=$(( NUM_NODES * NUM_K * NUM_BETA ))
+
+if [[ -n "${SLURM_ARRAY_TASK_ID:-}" ]]; then
+    # Running under SLURM job array
+    run_task "${SLURM_ARRAY_TASK_ID}"
+elif [[ -n "${1:-}" ]]; then
+    # Task ID passed as command-line argument
+    run_task "$1"
+else
+    # No SLURM, no argument: run all tasks sequentially
+    echo "No SLURM_ARRAY_TASK_ID or argument provided. Running all ${NUM_TASKS} tasks sequentially."
+    for (( i=0; i<NUM_TASKS; i++ )); do
+        echo "========== Task ${i}/${NUM_TASKS} =========="
+        run_task "$i"
+    done
 fi
-
-if (( K % 2 != 0 )); then
-    echo "Invalid WS parameters: k=${K} must be even"
-    exit 1
-fi
-
-# -----------------------------
-# Run
-# -----------------------------
-echo "Running N(c) collection (Watts–Strogatz)"
-echo "  numNodes            = ${NUMNODES}"
-echo "  nearestNeighbors k  = ${K}"
-echo "  rewiringProbability = ${BETA}"
-echo "  seedStart           = ${SEEDSTART}"
-echo "  numGraphs           = ${NUMGRAPHS}"
-
-python Nc_WattsStrogatz.py \
-    -n "${NUMNODES}" \
-    -k "${K}" \
-    -p "${BETA}" \
-    -s "${SEEDSTART}" \
-    -g "${NUMGRAPHS}" \
-    -b "${BACKEND}" \
-    -f "${FORMAT}"

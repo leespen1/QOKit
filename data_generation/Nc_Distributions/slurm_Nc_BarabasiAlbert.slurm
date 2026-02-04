@@ -12,8 +12,11 @@
 
 set -euo pipefail
 
-module purge
-module load CUDA
+if [[ -n "${SLURM_JOB_ID:-}" ]]; then
+    module purge
+    module load CUDA
+fi
+
 source ../../../qokitvenv/bin/activate
 
 # -----------------------------
@@ -26,17 +29,6 @@ NUM_NODES=${#NODES[@]}
 NUM_M=${#EDGES_PER_NODE[@]}
 
 # -----------------------------
-# Map SLURM_ARRAY_TASK_ID -> (n, m)
-# -----------------------------
-TASK_ID=${SLURM_ARRAY_TASK_ID}
-
-NODE_INDEX=$(( TASK_ID / NUM_M ))
-M_INDEX=$(( TASK_ID % NUM_M ))
-
-NUMNODES=${NODES[$NODE_INDEX]}
-EDGESPERNODE=${EDGES_PER_NODE[$M_INDEX]}
-
-# -----------------------------
 # Fixed parameters
 # -----------------------------
 SEEDSTART=0
@@ -45,26 +37,54 @@ FORMAT=hdf5
 BACKEND=auto
 
 # -----------------------------
-# Sanity check: BA constraint 1 <= m < n
+# Run a single task by TASK_ID
 # -----------------------------
-if (( EDGESPERNODE >= NUMNODES )); then
-    echo "Invalid BA parameters: m=${EDGESPERNODE} >= n=${NUMNODES}"
-    exit 1
+run_task() {
+    local TASK_ID=$1
+
+    local NODE_INDEX=$(( TASK_ID / NUM_M ))
+    local M_INDEX=$(( TASK_ID % NUM_M ))
+
+    local NUMNODES=${NODES[$NODE_INDEX]}
+    local EDGESPERNODE=${EDGES_PER_NODE[$M_INDEX]}
+
+    # Sanity check: BA constraint 1 <= m < n
+    if (( EDGESPERNODE >= NUMNODES )); then
+        echo "Invalid BA parameters: m=${EDGESPERNODE} >= n=${NUMNODES}"
+        return 1
+    fi
+
+    echo "Running N(c) collection (Barabasi–Albert)"
+    echo "  numNodes       = ${NUMNODES}"
+    echo "  edgesPerNode   = ${EDGESPERNODE}"
+    echo "  seedStart      = ${SEEDSTART}"
+    echo "  numGraphs      = ${NUMGRAPHS}"
+
+    python Nc_BarabasiAlbert.py \
+        -n "${NUMNODES}" \
+        -m "${EDGESPERNODE}" \
+        -s "${SEEDSTART}" \
+        -g "${NUMGRAPHS}" \
+        -b "${BACKEND}" \
+        -f "${FORMAT}"
+}
+
+# -----------------------------
+# Determine task ID(s) to run
+# -----------------------------
+NUM_TASKS=$(( NUM_NODES * NUM_M ))
+
+if [[ -n "${SLURM_ARRAY_TASK_ID:-}" ]]; then
+    # Running under SLURM job array
+    run_task "${SLURM_ARRAY_TASK_ID}"
+elif [[ -n "${1:-}" ]]; then
+    # Task ID passed as command-line argument
+    run_task "$1"
+else
+    # No SLURM, no argument: run all tasks sequentially
+    echo "No SLURM_ARRAY_TASK_ID or argument provided. Running all ${NUM_TASKS} tasks sequentially."
+    for (( i=0; i<NUM_TASKS; i++ )); do
+        echo "========== Task ${i}/${NUM_TASKS} =========="
+        run_task "$i"
+    done
 fi
-
-# -----------------------------
-# Run
-# -----------------------------
-echo "Running N(c) collection (Barabasi–Albert)"
-echo "  numNodes       = ${NUMNODES}"
-echo "  edgesPerNode   = ${EDGESPERNODE}"
-echo "  seedStart      = ${SEEDSTART}"
-echo "  numGraphs      = ${NUMGRAPHS}"
-
-python Nc_BarabasiAlbert.py \
-    -n "${NUMNODES}" \
-    -m "${EDGESPERNODE}" \
-    -s "${SEEDSTART}" \
-    -g "${NUMGRAPHS}" \
-    -b "${BACKEND}" \
-    -f "${FORMAT}"

@@ -13,8 +13,11 @@
 # Fail fast
 set -euo pipefail
 
-module purge
-module load CUDA
+if [[ -n "${SLURM_JOB_ID:-}" ]]; then
+    module purge
+    module load CUDA
+fi
+
 source ../../../qokitvenv/bin/activate
 
 # -----------------------------
@@ -27,17 +30,6 @@ NUM_NODES=${#NODES[@]}
 NUM_PROBS=${#PROBS[@]}
 
 # -----------------------------
-# Map SLURM_ARRAY_TASK_ID -> (n, p)
-# -----------------------------
-TASK_ID=${SLURM_ARRAY_TASK_ID}
-
-NODE_INDEX=$(( TASK_ID / NUM_PROBS ))
-PROB_INDEX=$(( TASK_ID % NUM_PROBS ))
-
-NUMNODES=${NODES[$NODE_INDEX]}
-EDGEPROBABILITY=${PROBS[$PROB_INDEX]}
-
-# -----------------------------
 # Fixed parameters
 # -----------------------------
 SEEDSTART=0
@@ -46,18 +38,48 @@ FORMAT=hdf5
 BACKEND=auto
 
 # -----------------------------
-# Run
+# Run a single task by TASK_ID
 # -----------------------------
-echo "Running N(c) collection"
-echo "  numNodes        = ${NUMNODES}"
-echo "  edgeProbability = ${EDGEPROBABILITY}"
-echo "  seedStart       = ${SEEDSTART}"
-echo "  numGraphs       = ${NUMGRAPHS}"
+run_task() {
+    local TASK_ID=$1
 
-python Nc_ErdosRenyi.py \
-    -n "${NUMNODES}" \
-    -p "${EDGEPROBABILITY}" \
-    -s "${SEEDSTART}" \
-    -g "${NUMGRAPHS}" \
-    -b "${BACKEND}" \
-    -f "${FORMAT}"
+    local NODE_INDEX=$(( TASK_ID / NUM_PROBS ))
+    local PROB_INDEX=$(( TASK_ID % NUM_PROBS ))
+
+    local NUMNODES=${NODES[$NODE_INDEX]}
+    local EDGEPROBABILITY=${PROBS[$PROB_INDEX]}
+
+    echo "Running N(c) collection (Erdos–Renyi)"
+    echo "  numNodes        = ${NUMNODES}"
+    echo "  edgeProbability = ${EDGEPROBABILITY}"
+    echo "  seedStart       = ${SEEDSTART}"
+    echo "  numGraphs       = ${NUMGRAPHS}"
+
+    python Nc_ErdosRenyi.py \
+        -n "${NUMNODES}" \
+        -p "${EDGEPROBABILITY}" \
+        -s "${SEEDSTART}" \
+        -g "${NUMGRAPHS}" \
+        -b "${BACKEND}" \
+        -f "${FORMAT}"
+}
+
+# -----------------------------
+# Determine task ID(s) to run
+# -----------------------------
+NUM_TASKS=$(( NUM_NODES * NUM_PROBS ))
+
+if [[ -n "${SLURM_ARRAY_TASK_ID:-}" ]]; then
+    # Running under SLURM job array
+    run_task "${SLURM_ARRAY_TASK_ID}"
+elif [[ -n "${1:-}" ]]; then
+    # Task ID passed as command-line argument
+    run_task "$1"
+else
+    # No SLURM, no argument: run all tasks sequentially
+    echo "No SLURM_ARRAY_TASK_ID or argument provided. Running all ${NUM_TASKS} tasks sequentially."
+    for (( i=0; i<NUM_TASKS; i++ )); do
+        echo "========== Task ${i}/${NUM_TASKS} =========="
+        run_task "$i"
+    done
+fi
