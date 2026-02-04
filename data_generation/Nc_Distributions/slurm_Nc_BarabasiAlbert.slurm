@@ -25,9 +25,6 @@ source ../../../qokitvenv/bin/activate
 NODES=(10 11 12 13 14 15 16 17 18 19 20)
 EDGES_PER_NODE=(1 2 3)
 
-NUM_NODES=${#NODES[@]}
-NUM_M=${#EDGES_PER_NODE[@]}
-
 # -----------------------------
 # Fixed parameters
 # -----------------------------
@@ -37,54 +34,23 @@ FORMAT=hdf5
 BACKEND=auto
 
 # -----------------------------
-# Run a single task by TASK_ID
+# Determine batch ID and count
 # -----------------------------
-run_task() {
-    local TASK_ID=$1
-
-    local NODE_INDEX=$(( TASK_ID / NUM_M ))
-    local M_INDEX=$(( TASK_ID % NUM_M ))
-
-    local NUMNODES=${NODES[$NODE_INDEX]}
-    local EDGESPERNODE=${EDGES_PER_NODE[$M_INDEX]}
-
-    # Sanity check: BA constraint 1 <= m < n
-    if (( EDGESPERNODE >= NUMNODES )); then
-        echo "Invalid BA parameters: m=${EDGESPERNODE} >= n=${NUMNODES}"
-        return 1
-    fi
-
-    echo "Running N(c) collection (Barabasi–Albert)"
-    echo "  numNodes       = ${NUMNODES}"
-    echo "  edgesPerNode   = ${EDGESPERNODE}"
-    echo "  seedStart      = ${SEEDSTART}"
-    echo "  numGraphs      = ${NUMGRAPHS}"
-
-    python Nc_BarabasiAlbert.py \
-        -n "${NUMNODES}" \
-        -m "${EDGESPERNODE}" \
-        -s "${SEEDSTART}" \
-        -g "${NUMGRAPHS}" \
-        -b "${BACKEND}" \
-        -f "${FORMAT}"
-}
-
-# -----------------------------
-# Determine task ID(s) to run
-# -----------------------------
-NUM_TASKS=$(( NUM_NODES * NUM_M ))
-
 if [[ -n "${SLURM_ARRAY_TASK_ID:-}" ]]; then
-    # Running under SLURM job array
-    run_task "${SLURM_ARRAY_TASK_ID}"
-elif [[ -n "${1:-}" ]]; then
-    # Task ID passed as command-line argument
-    run_task "$1"
+    BATCH_ID=$(( SLURM_ARRAY_TASK_ID - SLURM_ARRAY_TASK_MIN ))
+    NUM_BATCHES=$(( SLURM_ARRAY_TASK_MAX - SLURM_ARRAY_TASK_MIN + 1 ))
+elif [[ -n "${2:-}" ]]; then
+    # Manual batching: bash slurm_Nc_BarabasiAlbert.slurm <batchId> <numBatches>
+    BATCH_ID=$1
+    NUM_BATCHES=$2
 else
-    # No SLURM, no argument: run all tasks sequentially
-    echo "No SLURM_ARRAY_TASK_ID or argument provided. Running all ${NUM_TASKS} tasks sequentially."
-    for (( i=0; i<NUM_TASKS; i++ )); do
-        echo "========== Task ${i}/${NUM_TASKS} =========="
-        run_task "$i"
-    done
+    BATCH_ID=0
+    NUM_BATCHES=1
 fi
+
+python Nc_BarabasiAlbert.py \
+    -n "${NODES[@]}" \
+    -m "${EDGES_PER_NODE[@]}" \
+    -s "${SEEDSTART}" -g "${NUMGRAPHS}" \
+    -b "${BACKEND}" -f "${FORMAT}" \
+    --numBatches "${NUM_BATCHES}" --batchId "${BATCH_ID}"

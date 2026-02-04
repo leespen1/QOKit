@@ -26,9 +26,6 @@ source ../../../qokitvenv/bin/activate
 NODES=(10 11 12 13 14 15 16 17 18 19 20)
 PROBS=(0.1 0.25 0.5 0.75 0.9)
 
-NUM_NODES=${#NODES[@]}
-NUM_PROBS=${#PROBS[@]}
-
 # -----------------------------
 # Fixed parameters
 # -----------------------------
@@ -38,48 +35,23 @@ FORMAT=hdf5
 BACKEND=auto
 
 # -----------------------------
-# Run a single task by TASK_ID
+# Determine batch ID and count
 # -----------------------------
-run_task() {
-    local TASK_ID=$1
-
-    local NODE_INDEX=$(( TASK_ID / NUM_PROBS ))
-    local PROB_INDEX=$(( TASK_ID % NUM_PROBS ))
-
-    local NUMNODES=${NODES[$NODE_INDEX]}
-    local EDGEPROBABILITY=${PROBS[$PROB_INDEX]}
-
-    echo "Running N(c) collection (Erdos–Renyi)"
-    echo "  numNodes        = ${NUMNODES}"
-    echo "  edgeProbability = ${EDGEPROBABILITY}"
-    echo "  seedStart       = ${SEEDSTART}"
-    echo "  numGraphs       = ${NUMGRAPHS}"
-
-    python Nc_ErdosRenyi.py \
-        -n "${NUMNODES}" \
-        -p "${EDGEPROBABILITY}" \
-        -s "${SEEDSTART}" \
-        -g "${NUMGRAPHS}" \
-        -b "${BACKEND}" \
-        -f "${FORMAT}"
-}
-
-# -----------------------------
-# Determine task ID(s) to run
-# -----------------------------
-NUM_TASKS=$(( NUM_NODES * NUM_PROBS ))
-
 if [[ -n "${SLURM_ARRAY_TASK_ID:-}" ]]; then
-    # Running under SLURM job array
-    run_task "${SLURM_ARRAY_TASK_ID}"
-elif [[ -n "${1:-}" ]]; then
-    # Task ID passed as command-line argument
-    run_task "$1"
+    BATCH_ID=$(( SLURM_ARRAY_TASK_ID - SLURM_ARRAY_TASK_MIN ))
+    NUM_BATCHES=$(( SLURM_ARRAY_TASK_MAX - SLURM_ARRAY_TASK_MIN + 1 ))
+elif [[ -n "${2:-}" ]]; then
+    # Manual batching: bash slurm_Nc_ErdosRenyi.slurm <batchId> <numBatches>
+    BATCH_ID=$1
+    NUM_BATCHES=$2
 else
-    # No SLURM, no argument: run all tasks sequentially
-    echo "No SLURM_ARRAY_TASK_ID or argument provided. Running all ${NUM_TASKS} tasks sequentially."
-    for (( i=0; i<NUM_TASKS; i++ )); do
-        echo "========== Task ${i}/${NUM_TASKS} =========="
-        run_task "$i"
-    done
+    BATCH_ID=0
+    NUM_BATCHES=1
 fi
+
+python Nc_ErdosRenyi.py \
+    -n "${NODES[@]}" \
+    -p "${PROBS[@]}" \
+    -s "${SEEDSTART}" -g "${NUMGRAPHS}" \
+    -b "${BACKEND}" -f "${FORMAT}" \
+    --numBatches "${NUM_BATCHES}" --batchId "${BATCH_ID}"

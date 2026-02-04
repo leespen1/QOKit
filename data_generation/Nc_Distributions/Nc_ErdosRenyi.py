@@ -1,4 +1,4 @@
-import grips, argparse, networkx as nx, numpy as np
+import grips, argparse, itertools, networkx as nx, numpy as np
 from collections import OrderedDict
 from pathlib import Path
 import h5py
@@ -124,6 +124,8 @@ def main(args):
     args_dict = OrderedDict(sorted(vars(args).items()))
     args_dict.pop("backend")  # Don't keep track of backend
     args_dict.pop("format")   # Don't keep track of format
+    args_dict.pop("numBatches", None)  # Don't keep track of batching
+    args_dict.pop("batchId", None)     # Don't keep track of batching
     store_costs = args_dict.pop("storeCosts")  # Don't keep track of storeCosts
     compute_homodist = args_dict.pop("computeHomodist")  # Don't keep track in filename
     graphType = "ErdosRenyi"
@@ -251,18 +253,38 @@ if __name__ == "__main__":
         description="Collects the number of occurences of each cost N(c) for Erdos-Renyi graphs.",
     )
 
-    parser.add_argument("-n", "--numNodes", type=int, required=True, help="Number of nodes/vertices in the graph.")
-    parser.add_argument("-p", "--edgeProbability", type=float, required=True, help="Probability of an edge between each pair of vertices")
+    parser.add_argument("-n", "--numNodes", type=int, nargs="+", required=True, help="Number of nodes/vertices in the graph (supports multiple values).")
+    parser.add_argument("-p", "--edgeProbability", type=float, nargs="+", required=True, help="Probability of an edge between each pair of vertices (supports multiple values).")
     parser.add_argument("-s", "--seedStart", type=int, required=True, help="Start of the range of seeds.")
     parser.add_argument("-g", "--numGraphs", type=int, required=True, help="Number of graphs to use (seeds will be contiguous range).")
     parser.add_argument("-b", "--backend", default="auto", choices=["auto", "python", "c", "gpu", "gpumpi"], type=str, help="Backend to use for computing maxcut costs. Use 'gpu' for GPU-accelerated N(c',d,c) computation.")
     parser.add_argument("-f", "--format", default="hdf5", choices=["text", "hdf5", "both"], type=str, help="Output format: text (human-readable), hdf5 (compressed, fast), or both.")
     parser.add_argument("-c", "--storeCosts", action="store_true", help="Additionally store raw costs (cost of each bitstring) in separate file(s).")
     parser.add_argument("-d", "--computeHomodist", action="store_true", help="Compute averaged N(c',d,c) homogeneous distribution using Julia. Uses GPU if backend is 'gpu'.")
+    parser.add_argument("--numBatches", type=int, default=1, help="Split work into this many batches (for SLURM job arrays).")
+    parser.add_argument("--batchId", type=int, default=0, help="Which batch to run (0-indexed).")
 
     try:
         args = parser.parse_args()
-        main(args)
+
+        all_combos = list(itertools.product(args.edgeProbability, args.numNodes))
+        chunk_size = -(-len(all_combos) // args.numBatches)
+        start = args.batchId * chunk_size
+        end = min(start + chunk_size, len(all_combos))
+        combos = all_combos[start:end]
+        num_combos = len(combos)
+        for idx, (p, n) in enumerate(combos):
+            if num_combos > 1:
+                print(f"\n{'='*60}")
+                print(f"Parameter combination {idx + 1}/{num_combos}: n={n}, p={p}")
+                print(f"{'='*60}")
+            single_args = argparse.Namespace(
+                numNodes=n, edgeProbability=p,
+                seedStart=args.seedStart, numGraphs=args.numGraphs,
+                backend=args.backend, format=args.format,
+                storeCosts=args.storeCosts, computeHomodist=args.computeHomodist,
+            )
+            main(single_args)
 
     except SystemExit as e:
         print("\nArgument parser failed. Did you provide the correct args?")

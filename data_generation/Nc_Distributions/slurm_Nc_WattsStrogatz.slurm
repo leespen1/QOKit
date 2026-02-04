@@ -27,10 +27,6 @@ NODES=(10 11 12 13 14 15 16 17 18 19 20)
 KVALUES=(4 6 8)
 BETAS=(0.05 0.10 0.20 0.30)
 
-NUM_NODES=${#NODES[@]}
-NUM_K=${#KVALUES[@]}
-NUM_BETA=${#BETAS[@]}
-
 # -----------------------------
 # Fixed parameters
 # -----------------------------
@@ -40,64 +36,24 @@ FORMAT=hdf5
 BACKEND=auto
 
 # -----------------------------
-# Run a single task by TASK_ID
+# Determine batch ID and count
 # -----------------------------
-run_task() {
-    local TASK_ID=$1
-
-    local NODE_INDEX=$(( TASK_ID / (NUM_K * NUM_BETA) ))
-    local REM=$(( TASK_ID % (NUM_K * NUM_BETA) ))
-    local K_INDEX=$(( REM / NUM_BETA ))
-    local BETA_INDEX=$(( REM % NUM_BETA ))
-
-    local NUMNODES=${NODES[$NODE_INDEX]}
-    local K=${KVALUES[$K_INDEX]}
-    local BETA=${BETAS[$BETA_INDEX]}
-
-    # Sanity checks (Watts–Strogatz constraints)
-    if (( K >= NUMNODES )); then
-        echo "Invalid WS parameters: k=${K} >= n=${NUMNODES}"
-        return 1
-    fi
-
-    if (( K % 2 != 0 )); then
-        echo "Invalid WS parameters: k=${K} must be even"
-        return 1
-    fi
-
-    echo "Running N(c) collection (Watts–Strogatz)"
-    echo "  numNodes            = ${NUMNODES}"
-    echo "  nearestNeighbors k  = ${K}"
-    echo "  rewiringProbability = ${BETA}"
-    echo "  seedStart           = ${SEEDSTART}"
-    echo "  numGraphs           = ${NUMGRAPHS}"
-
-    python Nc_WattsStrogatz.py \
-        -n "${NUMNODES}" \
-        -k "${K}" \
-        -p "${BETA}" \
-        -s "${SEEDSTART}" \
-        -g "${NUMGRAPHS}" \
-        -b "${BACKEND}" \
-        -f "${FORMAT}"
-}
-
-# -----------------------------
-# Determine task ID(s) to run
-# -----------------------------
-NUM_TASKS=$(( NUM_NODES * NUM_K * NUM_BETA ))
-
 if [[ -n "${SLURM_ARRAY_TASK_ID:-}" ]]; then
-    # Running under SLURM job array
-    run_task "${SLURM_ARRAY_TASK_ID}"
-elif [[ -n "${1:-}" ]]; then
-    # Task ID passed as command-line argument
-    run_task "$1"
+    BATCH_ID=$(( SLURM_ARRAY_TASK_ID - SLURM_ARRAY_TASK_MIN ))
+    NUM_BATCHES=$(( SLURM_ARRAY_TASK_MAX - SLURM_ARRAY_TASK_MIN + 1 ))
+elif [[ -n "${2:-}" ]]; then
+    # Manual batching: bash slurm_Nc_WattsStrogatz.slurm <batchId> <numBatches>
+    BATCH_ID=$1
+    NUM_BATCHES=$2
 else
-    # No SLURM, no argument: run all tasks sequentially
-    echo "No SLURM_ARRAY_TASK_ID or argument provided. Running all ${NUM_TASKS} tasks sequentially."
-    for (( i=0; i<NUM_TASKS; i++ )); do
-        echo "========== Task ${i}/${NUM_TASKS} =========="
-        run_task "$i"
-    done
+    BATCH_ID=0
+    NUM_BATCHES=1
 fi
+
+python Nc_WattsStrogatz.py \
+    -n "${NODES[@]}" \
+    -k "${KVALUES[@]}" \
+    -p "${BETAS[@]}" \
+    -s "${SEEDSTART}" -g "${NUMGRAPHS}" \
+    -b "${BACKEND}" -f "${FORMAT}" \
+    --numBatches "${NUM_BATCHES}" --batchId "${BATCH_ID}"
