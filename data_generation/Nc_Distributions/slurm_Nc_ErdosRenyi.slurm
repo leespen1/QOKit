@@ -24,6 +24,7 @@ source ../../../qokitvenv/bin/activate
 # Parameter grids
 # -----------------------------
 NODES=(10 11 12 13 14 15 16 17 18 19 20)
+#NODES=(10 11 12)
 PROBS=(0.1 0.25 0.5 0.75 0.9)
 
 # -----------------------------
@@ -33,6 +34,8 @@ SEEDSTART=0
 NUMGRAPHS=100
 FORMAT=hdf5
 BACKEND=auto
+STORE_COSTS=false      # Store raw cost of each bitstring (-c)
+COMPUTE_HOMODIST=false # Compute homogeneous distribution N(c',d,c) via Julia (-d)
 
 # -----------------------------
 # Determine batch ID and count
@@ -49,9 +52,14 @@ else
     NUM_BATCHES=1
 fi
 
+OPTIONAL_FLAGS=()
+[[ "${STORE_COSTS}" == "true" ]] && OPTIONAL_FLAGS+=(-c)
+[[ "${COMPUTE_HOMODIST}" == "true" ]] && OPTIONAL_FLAGS+=(-d)
+
 python Nc_ErdosRenyi.py \
     -n "${NODES[@]}" \
     -p "${PROBS[@]}" \
     -s "${SEEDSTART}" -g "${NUMGRAPHS}" \
     -b "${BACKEND}" -f "${FORMAT}" \
-    --numBatches "${NUM_BATCHES}" --batchId "${BATCH_ID}"
+    --numBatches "${NUM_BATCHES}" --batchId "${BATCH_ID}" \
+    "${OPTIONAL_FLAGS[@]+"${OPTIONAL_FLAGS[@]}"}"

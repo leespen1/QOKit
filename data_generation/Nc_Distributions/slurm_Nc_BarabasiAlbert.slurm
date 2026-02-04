@@ -32,6 +32,8 @@ SEEDSTART=0
 NUMGRAPHS=100
 FORMAT=hdf5
 BACKEND=auto
+STORE_COSTS=false      # Store raw cost of each bitstring (-c)
+COMPUTE_HOMODIST=false # Compute homogeneous distribution N(c',d,c) via Julia (-d)
 
 # -----------------------------
 # Determine batch ID and count
@@ -48,9 +50,14 @@ else
     NUM_BATCHES=1
 fi
 
+OPTIONAL_FLAGS=()
+[[ "${STORE_COSTS}" == "true" ]] && OPTIONAL_FLAGS+=(-c)
+[[ "${COMPUTE_HOMODIST}" == "true" ]] && OPTIONAL_FLAGS+=(-d)
+
 python Nc_BarabasiAlbert.py \
     -n "${NODES[@]}" \
     -m "${EDGES_PER_NODE[@]}" \
     -s "${SEEDSTART}" -g "${NUMGRAPHS}" \
     -b "${BACKEND}" -f "${FORMAT}" \
-    --numBatches "${NUM_BATCHES}" --batchId "${BATCH_ID}"
+    --numBatches "${NUM_BATCHES}" --batchId "${BATCH_ID}" \
+    "${OPTIONAL_FLAGS[@]+"${OPTIONAL_FLAGS[@]}"}"
