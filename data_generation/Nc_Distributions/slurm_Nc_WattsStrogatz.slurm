@@ -6,6 +6,7 @@
 #SBATCH --ntasks-per-node=1          # Maximum number of tasks on each node
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=16G
+#SBATCH --gpus=v100:1
 #SBATCH --output=logs/Nc_WS_%A_%a.out
 #SBATCH --error=logs/Nc_WS_%A_%a.err
 #SBATCH --constraint=amd20
