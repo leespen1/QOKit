@@ -1,10 +1,10 @@
 #!/bin/bash --login
 #SBATCH --job-name=Nc_WS
 #SBATCH --array=0-131
-#SBATCH --time=02:00:00
+#SBATCH --time=03:59:00
 #SBATCH --nodes=1                    # Maximum number of nodes to be allocated
 #SBATCH --ntasks-per-node=1          # Maximum number of tasks on each node
-#SBATCH --cpus-per-task=8
+#SBATCH --cpus-per-task=1
 #SBATCH --mem=16G
 #SBATCH --output=logs/Nc_WS_%A_%a.out
 #SBATCH --error=logs/Nc_WS_%A_%a.err
