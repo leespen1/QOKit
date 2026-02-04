@@ -10,6 +10,9 @@
 #
 # Requires: HDF5, CairoMakie
 
+import Pkg
+Pkg.activate(joinpath(@__DIR__, "..", "..", "julia"))
+
 using HDF5
 using GLMakie
 using Statistics
