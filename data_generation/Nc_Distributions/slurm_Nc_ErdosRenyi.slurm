@@ -30,12 +30,12 @@ PROBS=(0.1 0.25 0.5 0.75 0.9)
 # -----------------------------
 # Fixed parameters
 # -----------------------------
-SEEDSTART=0
-NUMGRAPHS=100
-FORMAT=hdf5
-BACKEND=auto
-STORE_COSTS=false      # Store raw cost of each bitstring (-c)
-COMPUTE_HOMODIST=false # Compute homogeneous distribution N(c',d,c) via Julia (-d)
+SEEDSTART="${SEEDSTART:-0}"
+NUMGRAPHS="${NUMGRAPHS:-100}"
+FORMAT="${FORMAT:-hdf5}"
+BACKEND="${BACKEND:-auto}"
+STORE_COSTS="${STORE_COSTS:-false}"      # Store raw cost of each bitstring (-c)
+COMPUTE_HOMODIST="${COMPUTE_HOMODIST:-false}" # Compute homogeneous distribution N(c',d,c) via Julia (-d)
 
 # -----------------------------
 # Determine batch ID and count
