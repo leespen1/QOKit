@@ -1,13 +1,20 @@
-#!/bin/bash
+#!/bin/bash --login
 #SBATCH --job-name=Nc_BA
 #SBATCH --array=0-32
 #SBATCH --time=02:00:00
-#SBATCH --cpus-per-task=1
-#SBATCH --mem=4G
+#SBATCH --nodes=1                    # Maximum number of nodes to be allocated
+#SBATCH --ntasks-per-node=1          # Maximum number of tasks on each node
+#SBATCH --cpus-per-task=8
+#SBATCH --mem=16G
 #SBATCH --output=logs/Nc_BA_%A_%a.out
 #SBATCH --error=logs/Nc_BA_%A_%a.err
+#SBATCH --constraint=amd20
 
 set -euo pipefail
+
+module purge
+module load CUDA
+source ../../../qokitvenv/bin/activate
 
 # -----------------------------
 # Parameter grids
