@@ -133,7 +133,7 @@ end
 Plot N(c) data on the given axis. Chooses bar plot, individual lines + mean,
 or mean ± std band depending on the number of graphs.
 """
-function plot_nc!(ax, Nc, num_graphs)
+function plot_nc!(ax, Nc, num_graphs; show_legend = true)
     if num_graphs == 1
         # Single graph: simple bar plot
         nc_vec = trim_padding(vec(Nc[:, 1]))
@@ -151,7 +151,7 @@ function plot_nc!(ax, Nc, num_graphs)
         mean_trimmed = trim_padding(mean_nc)
         costs = 0:(length(mean_trimmed) - 1)
         lines!(ax, collect(costs), mean_trimmed; color = :steelblue, linewidth = 2.5, label = "Mean")
-        axislegend(ax; position = :rt)
+        show_legend && axislegend(ax; position = :rt)
     else
         # Many graphs: show mean ± std as a band
         mean_nc = Float64.(mean(Nc, dims = 2)[:, 1])
@@ -163,7 +163,7 @@ function plot_nc!(ax, Nc, num_graphs)
         band!(ax, costs, mean_trimmed .- std_trimmed, mean_trimmed .+ std_trimmed;
               color = (:steelblue, 0.25))
         lines!(ax, costs, mean_trimmed; color = :steelblue, linewidth = 2.5, label = "Mean ± σ")
-        axislegend(ax; position = :rt)
+        show_legend && axislegend(ax; position = :rt)
     end
 end
 
@@ -256,7 +256,7 @@ function main()
                 ylabel = "N(c)",
                 title = "$label  ($num_graphs graph$(num_graphs > 1 ? "s" : ""))",
             )
-            plot_nc!(ax, Nc, num_graphs)
+            plot_nc!(ax, Nc, num_graphs; show_legend = (i == 1))
         end
         save(outpath, fig)
         println("  Saved $outpath")
@@ -335,6 +335,7 @@ function main()
         fig = Figure(size = (max(400, 350 * ncols), 250 * nrows + 80))
         Label(fig[0, 1:ncols], gt; fontsize = 20, font = :bold)
 
+        first_plotted = true
         for (ci, param) in enumerate(sorted_params)
             # Column header
             col_label = isempty(param) ? "" : param
@@ -352,7 +353,8 @@ function main()
                     titlesize = 12,
                 )
                 if ds !== nothing
-                    plot_nc!(ax, ds.Nc, size(ds.Nc, 2))
+                    plot_nc!(ax, ds.Nc, size(ds.Nc, 2); show_legend = first_plotted)
+                    first_plotted = false
                 end
             end
         end
