@@ -1,0 +1,24 @@
+Comments:
+more relationship with other parameter setting strategies
+paragraph on incorporating with other strategies
+define apx as |<homog|true>|^2
+paragraph in intro about general parameter setting with heuristics
+STUART: clean up disc of shaydulin
+
+(GLOSSARY):
+    cost function: underlying cost function
+    cost operator: equivalent quantum operator
+    parameter objective function: objective function params are set wrt
+    typical parameter objective function: the commonly used param objective function, <C>
+    homogeneous parameter objective function: our introduced c_homog
+    parameter objective function evaluation: inner loop that evaluates parameter objective function with given parameters
+    parameter searching routine: outer loop that optimizes parames wrt parameter objective function
+    parameter setting or parameter setting strategy: entire process for choosing parameters
+
+
+Further: 
+minor revisions to intro/abstract/conclusion
+one or two lines about surrogate models (Stuart)
+classical symmetries paper connection (Stuart)
+choice of random class (Stuart)
+

@@ -1,0 +1,317 @@
+\begin{thebibliography}{10}
+
+\bibitem{hadfield19}
+Stuart Hadfield, Zhihui Wang, Bryan O’Gorman, Eleanor~G. Rieffel, Davide
+  Venturelli, and Rupak Biswas.
+\newblock From the {Quantum} {Approximate} {Optimization} {Algorithm} to a
+  {Quantum} {Alternating} {Operator} {Ansatz}.
+\newblock {\em Algorithms}, 12(2):34, February 2019.
+\newblock Number: 2 Publisher: Multidisciplinary Digital Publishing Institute.
+
+\bibitem{farhi14}
+Edward Farhi, Jeffrey Goldstone, and Sam Gutmann.
+\newblock A {Quantum} {Approximate} {Optimization} {Algorithm}.
+\newblock {\em arXiv:1411.4028 [quant-ph]}, 10(2), November 2014.
+\newblock arXiv: 1411.4028.
+
+\bibitem{hogg00}
+Tad Hogg.
+\newblock Quantum search heuristics.
+\newblock {\em Physical Review A}, 61(5):052311, April 2000.
+\newblock Publisher: American Physical Society.
+
+\bibitem{hogg00-1}
+Tad Hogg and Dmitriy Portnov.
+\newblock Quantum optimization.
+\newblock {\em Information Sciences}, 128(3):181--197, October 2000.
+
+\bibitem{cerezo21}
+M.~Cerezo, Andrew Arrasmith, Ryan Babbush, Simon~C. Benjamin, Suguru Endo,
+  Keisuke Fujii, Jarrod~R. McClean, Kosuke Mitarai, Xiao Yuan, Lukasz Cincio,
+  and Patrick~J. Coles.
+\newblock Variational quantum algorithms.
+\newblock {\em Nature Reviews Physics}, 3(9):625--644, September 2021.
+\newblock Number: 9 Publisher: Nature Publishing Group.
+
+\bibitem{wierichs20}
+David Wierichs, Christian Gogolin, and Michael Kastoryano.
+\newblock Avoiding local minima in variational quantum eigensolvers with the
+  natural gradient optimizer.
+\newblock {\em Physical Review Research}, 2(4):043246, November 2020.
+\newblock arXiv:2004.14666 [quant-ph].
+
+\bibitem{mcclean18}
+Jarrod~R. McClean, Sergio Boixo, Vadim~N. Smelyanskiy, Ryan Babbush, and
+  Hartmut Neven.
+\newblock Barren plateaus in quantum neural network training landscapes.
+\newblock {\em Nature Communications}, 9(1):4812, November 2018.
+\newblock Number: 1 Publisher: Nature Publishing Group.
+
+\bibitem{larocca22}
+Martin Larocca, Piotr Czarnik, Kunal Sharma, Gopikrishnan Muraleedharan,
+  Patrick~J. Coles, and M.~Cerezo.
+\newblock Diagnosing barren plateaus with tools from quantum optimal control.
+\newblock Technical Report arXiv:2105.14377, arXiv, March 2022.
+\newblock arXiv:2105.14377 [quant-ph] type: article.
+
+\bibitem{wang21}
+Samson Wang, Enrico Fontana, M.~Cerezo, Kunal Sharma, Akira Sone, Lukasz
+  Cincio, and Patrick~J. Coles.
+\newblock Noise-induced barren plateaus in variational quantum algorithms.
+\newblock {\em Nature Communications}, 12(1):6961, November 2021.
+\newblock Number: 1 Publisher: Nature Publishing Group.
+
+\bibitem{lotshaw21}
+Phillip~C. Lotshaw, Travis~S. Humble, Rebekah Herrman, James Ostrowski, and
+  George Siopsis.
+\newblock Empirical performance bounds for quantum approximate optimization.
+\newblock {\em arXiv:2102.06813 [physics, physics:quant-ph]}, February 2021.
+\newblock arXiv: 2102.06813.
+
+\bibitem{shaydulin21_qaoakit}
+Ruslan Shaydulin, Kunal Marwaha, Jonathan Wurtz, and Phillip~C. Lotshaw.
+\newblock {QAOAKit}: {A} {Toolkit} for {Reproducible} {Study}, {Application},
+  and {Verification} of the {QAOA}.
+\newblock {\em arXiv:2110.05555 [quant-ph]}, November 2021.
+\newblock arXiv: 2110.05555.
+
+\bibitem{khairy20}
+Sami Khairy, Ruslan Shaydulin, Lukasz Cincio, Yuri Alexeev, and Prasanna
+  Balaprakash.
+\newblock Learning to {Optimize} {Variational} {Quantum} {Circuits} to {Solve}
+  {Combinatorial} {Problems}.
+\newblock {\em Proceedings of the AAAI Conference on Artificial Intelligence},
+  34(03):2367--2375, April 2020.
+\newblock Number: 03.
+
+\bibitem{zhou20}
+Leo Zhou, Sheng-Tao Wang, Soonwon Choi, Hannes Pichler, and Mikhail~D. Lukin.
+\newblock Quantum {Approximate} {Optimization} {Algorithm}: {Performance},
+  {Mechanism}, and {Implementation} on {Near}-{Term} {Devices}.
+\newblock {\em Physical Review X}, page 021067, June 2020.
+\newblock Publisher: American Physical Society.
+
+\bibitem{crooks18}
+Gavin~E. Crooks.
+\newblock Performance of the {Quantum} {Approximate} {Optimization} {Algorithm}
+  on the {Maximum} {Cut} {Problem}.
+\newblock {\em arXiv:1811.08419 [quant-ph]}, November 2018.
+\newblock arXiv: 1811.08419.
+
+\bibitem{shaydulin19}
+Ruslan Shaydulin, Ilya Safro, and Jeffrey Larson.
+\newblock Multistart {Methods} for {Quantum} {Approximate} optimization.
+\newblock In {\em 2019 {IEEE} {High} {Performance} {Extreme} {Computing}
+  {Conference} ({HPEC})}, pages 1--8, September 2019.
+\newblock ISSN: 2643-1971.
+
+\bibitem{alam2020accelerating}
+Mahabubul Alam, Abdullah Ash-Saki, and Swaroop Ghosh.
+\newblock Accelerating quantum approximate optimization algorithm using machine
+  learning.
+\newblock In {\em 2020 Design, Automation \& Test in Europe Conference \&
+  Exhibition (DATE)}, pages 686--689. IEEE, 2020.
+
+\bibitem{verdon19}
+Guillaume Verdon, Michael Broughton, Jarrod~R. McClean, Kevin~J. Sung, Ryan
+  Babbush, Zhang Jiang, Hartmut Neven, and Masoud Mohseni.
+\newblock Learning to learn with quantum neural networks via classical neural
+  networks.
+\newblock {\em arXiv:1907.05415 [quant-ph]}, July 2019.
+\newblock arXiv: 1907.05415.
+
+\bibitem{wilson21}
+Max Wilson, Rachel Stromswold, Filip Wudarski, Stuart Hadfield, Norm~M. Tubman,
+  and Eleanor~G. Rieffel.
+\newblock Optimizing quantum heuristics with meta-learning.
+\newblock {\em Quantum Machine Intelligence}, 3(1):13, April 2021.
+
+\bibitem{skolik2021layerwise}
+Andrea Skolik, Jarrod~R McClean, Masoud Mohseni, Patrick van~der Smagt, and
+  Martin Leib.
+\newblock Layerwise learning for quantum neural networks.
+\newblock {\em Quantum Machine Intelligence}, 3(1):1--11, 2021.
+
+\bibitem{rivera2021avoiding}
+Javier Rivera-Dean, Patrick Huembeli, Antonio Ac{\'\i}n, and Joseph Bowles.
+\newblock Avoiding local minima in variational quantum algorithms with neural
+  networks.
+\newblock {\em arXiv preprint arXiv:2104.02955}, 2021.
+
+\bibitem{bittel2021training}
+Lennart Bittel and Martin Kliesch.
+\newblock Training variational quantum algorithms is {NP-hard}.
+\newblock {\em Physical Review Letters}, 127(12):120502, 2021.
+
+\bibitem{streif20}
+Michael Streif and Martin Leib.
+\newblock Training the quantum approximate optimization algorithm without
+  access to a quantum processing unit.
+\newblock {\em Quantum Science and Technology}, 5(3):034008, May 2020.
+\newblock Publisher: IOP Publishing.
+
+\bibitem{shaydulin21_symmetries}
+Ruslan Shaydulin, Stuart Hadfield, Tad Hogg, and Ilya Safro.
+\newblock Classical symmetries and the {Quantum} {Approximate} {Optimization}
+  {Algorithm}.
+\newblock {\em Quantum Information Processing}, 20(11):359, November 2021.
+\newblock arXiv: 2012.04713.
+
+\bibitem{brady21}
+Lucas~T. Brady, Christopher~L. Baldwin, Aniruddha Bapat, Yaroslav Kharkov, and
+  Alexey~V. Gorshkov.
+\newblock Optimal {Protocols} in {Quantum} {Annealing} and {Quantum}
+  {Approximate} {Optimization} {Algorithm} {Problems}.
+\newblock {\em Physical Review Letters}, 126(7):070505, February 2021.
+\newblock Publisher: American Physical Society.
+
+\bibitem{sack21}
+Stefan~H. Sack and Maksym Serbyn.
+\newblock Quantum annealing initialization of the quantum approximate
+  optimization algorithm.
+\newblock {\em Quantum}, 5:491, July 2021.
+\newblock Publisher: Verein zur Förderung des Open Access Publizierens in den
+  Quantenwissenschaften.
+
+\bibitem{wurtz21_counteradiabaticity}
+Jonathan Wurtz and Peter~J. Love.
+\newblock Counterdiabaticity and the quantum approximate optimization
+  algorithm.
+\newblock {\em arXiv:2106.15645 [quant-ph]}, July 2021.
+\newblock arXiv: 2106.15645.
+
+\bibitem{brandao18}
+Fernando G. S.~L. Brandao, Michael Broughton, Edward Farhi, Sam Gutmann, and
+  Hartmut Neven.
+\newblock For {Fixed} {Control} {Parameters} the {Quantum} {Approximate}
+  {Optimization} {Algorithm}'s {Objective} {Function} {Value} {Concentrates}
+  for {Typical} {Instances}.
+\newblock {\em arXiv:1812.04170 [quant-ph]}, December 2018.
+\newblock arXiv: 1812.04170.
+
+\bibitem{lee21}
+Xinwei Lee, Yoshiyuki Saito, Dongsheng Cai, and Nobuyoshi Asai.
+\newblock Parameters {Fixing} {Strategy} for {Quantum} {Approximate}
+  {Optimization} {Algorithm}.
+\newblock {\em arXiv:2108.05288 [quant-ph]}, August 2021.
+\newblock arXiv: 2108.05288.
+
+\bibitem{galda21}
+Alexey Galda, Xiaoyuan Liu, Danylo Lykov, Yuri Alexeev, and Ilya Safro.
+\newblock Transferability of optimal {QAOA} parameters between random graphs.
+\newblock {\em arXiv:2106.07531 [quant-ph]}, June 2021.
+\newblock arXiv: 2106.07531.
+
+\bibitem{brady2021behavior}
+Lucas~T Brady, Lucas Kocia, Przemyslaw Bienias, Aniruddha Bapat, Yaroslav
+  Kharkov, and Alexey~V Gorshkov.
+\newblock Behavior of analog quantum algorithms.
+\newblock {\em arXiv preprint arXiv:2107.01218}, 2021.
+
+\bibitem{wang18}
+Zhihui Wang, Stuart Hadfield, Zhang Jiang, and Eleanor~G. Rieffel.
+\newblock Quantum approximate optimization algorithm for {MaxCut}: {A}
+  fermionic view.
+\newblock {\em Physical Review A}, 97(2):022304, February 2018.
+\newblock Publisher: American Physical Society.
+
+\bibitem{marwaha21}
+Kunal Marwaha.
+\newblock Local classical {MAX}-{CUT} algorithm outperforms p=2 {QAOA} on
+  high-girth regular graphs.
+\newblock {\em Quantum}, 5:437, April 2021.
+
+\bibitem{barkoutsos20}
+Panagiotis~Kl Barkoutsos, Giacomo Nannicini, Anton Robert, Ivano Tavernelli,
+  and Stefan Woerner.
+\newblock Improving {Variational} {Quantum} {Optimization} using {CVaR}.
+\newblock {\em Quantum}, 4:256, April 2020.
+\newblock arXiv:1907.04769 [quant-ph].
+
+\bibitem{li20}
+Li~Li, Minjie Fan, Marc Coram, Patrick Riley, and Stefan Leichenauer.
+\newblock Quantum optimization with a novel {Gibbs} objective function and
+  ansatz architecture search.
+\newblock {\em Physical Review Research}, 2(2):023074, April 2020.
+
+\bibitem{sung2020using}
+Kevin~J Sung, Jiahao Yao, Matthew~P Harrigan, Nicholas~C Rubin, Zhang Jiang,
+  Lin Lin, Ryan Babbush, and Jarrod~R McClean.
+\newblock Using models to improve optimizers for variational quantum
+  algorithms.
+\newblock {\em Quantum Science and Technology}, 5(4):044008, 2020.
+
+\bibitem{shaffer22}
+Ryan Shaffer, Lucas Kocia, and Mohan Sarovar.
+\newblock Surrogate-based optimization for variational quantum algorithms,
+  April 2022.
+\newblock Number: arXiv:2204.05451 arXiv:2204.05451 [quant-ph].
+
+\bibitem{mueller2022accelerating}
+Juliane Mueller, Wim Lavrijsen, Costin Iancu, et~al.
+\newblock Accelerating noisy {VQE} optimization with gaussian processes.
+\newblock {\em arXiv preprint arXiv:2204.07331}, 2022.
+
+\bibitem{DiezValle22}
+Pablo Díez-Valle, Diego Porras, and Juan~José García-Ripoll.
+\newblock {QAOA} pseudo-{Boltzmann} states.
+\newblock {\em arXiv:2201.03358 [quant-ph]}, March 2022.
+\newblock arXiv: 2201.03358.
+
+\bibitem{hadfield2021analytical}
+Stuart Hadfield, Tad Hogg, and Eleanor~G Rieffel.
+\newblock Analytical framework for quantum alternating operator ans\"atze.
+\newblock {\em arXiv preprint arXiv:2105.06996}, 2021.
+
+\bibitem{barak2015beating}
+Boaz Barak, Ankur Moitra, Ryan O'Donnell, Prasad Raghavendra, Oded Regev, David
+  Steurer, Luca Trevisan, Aravindan Vijayaraghavan, David Witmer, and John
+  Wright.
+\newblock Beating the random assignment on constraint satisfaction problems of
+  bounded degree.
+\newblock {\em arXiv preprint arXiv:1505.03424}, 2015.
+
+\bibitem{hastings19}
+Matthew Hastings.
+\newblock Classical and quantum bounded depth approximation algorithms.
+\newblock {\em Quantum Information and Computation}, 19:1116--1140, November
+  2019.
+
+\bibitem{marwaha2022bounds}
+Kunal Marwaha and Stuart Hadfield.
+\newblock Bounds on approximating {Max$k$XOR} with quantum and classical local
+  algorithms.
+\newblock {\em Quantum}, 6:757, 2022.
+
+\bibitem{chou2022limitations}
+Chi-Ning Chou, Peter~J Love, Juspreet~Singh Sandhu, and Jonathan Shi.
+\newblock Limitations of local quantum algorithms on random {Max-k-XOR} and
+  beyond.
+\newblock In {\em 49th International Colloquium on Automata, Languages, and
+  Programming (ICALP 2022)}, 2022.
+
+\bibitem{mandra21}
+Salvatore Mandrà, Jeffrey Marshall, Eleanor~G. Rieffel, and Rupak Biswas.
+\newblock {HybridQ}: {A} {Hybrid} {Simulator} for {Quantum} {Circuits}.
+\newblock {\em arXiv:2111.06868 [quant-ph]}, November 2021.
+\newblock arXiv: 2111.06868.
+
+\bibitem{fletcher87}
+R.~(Roger) Fletcher.
+\newblock {\em Practical methods of optimization}.
+\newblock Chichester ; New York : Wiley, 1987.
+
+\bibitem{virtanen20}
+Pauli Virtanen, Ralf Gommers, Travis~E. Oliphant, Matt Haberland, Tyler Reddy,
+  David Cournapeau, Evgeni Burovski, Pearu Peterson, Warren Weckesser, Jonathan
+  Bright, Stéfan~J. van~der Walt, Matthew Brett, Joshua Wilson, K.~Jarrod
+  Millman, Nikolay Mayorov, Andrew R.~J. Nelson, Eric Jones, Robert Kern, Eric
+  Larson, C.~J. Carey, İlhan Polat, Yu~Feng, Eric~W. Moore, Jake VanderPlas,
+  Denis Laxalde, Josef Perktold, Robert Cimrman, Ian Henriksen, E.~A. Quintero,
+  Charles~R. Harris, Anne~M. Archibald, Antônio~H. Ribeiro, Fabian Pedregosa,
+  and Paul van Mulbregt.
+\newblock {SciPy} 1.0: fundamental algorithms for scientific computing in
+  {Python}.
+\newblock {\em Nature Methods}, 17(3):261--272, March 2020.
+
+\end{thebibliography}
