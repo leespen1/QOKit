@@ -395,3 +395,89 @@ active or potential research areas for the Sendai team:
 6. **Approximation ratio**: The standard evaluation metric. For MaxCut:
    ApxRatio = ⟨C⟩ / c_opt, where c_opt is found by brute force. The `grips/solve_maxcut_exact.py`
    module computes c_opt.
+
+---
+
+## Experimental Findings: P(c') Investigation
+
+The script `grips_examples/investigate_P_distribution.py` tested whether replacing
+the paper's analytical P(c') = Binomial(m, 0.5) with the real empirical P(c') from
+specific graph instances improves QAOA proxy parameter setting.
+
+### Experiment Setup
+
+Three proxy configurations were compared on G(10, 0.5) Erdős-Rényi MaxCut at p=1:
+1. **Paper N + Paper P**: Analytical N(c';d,c) from PaperProxy + Binomial P(c')
+2. **Paper N + Real P**: Analytical N(c';d,c) + empirical P(c') from graph instance
+3. **Real N + Real P**: Instance-specific N(c';d,c) computed via
+   `get_homogeneous_distribution_from_costs_direct()` + empirical P(c')
+
+For each configuration, a (γ, β) grid was swept using `QAOA_proxy_multi()` and
+`expectation()`, the proxy-optimal parameters were found, and real QAOA was evaluated
+at those parameters via `get_expectation()`.
+
+### Key Results
+
+- **Paper N + Paper P wins consistently** (100/100 seeds over Paper N + Real P;
+  10/10 seeds over Real N + Real P).
+- Paper N + Real P performs worst (mean approximation ratio deficit ~0.025 vs Paper).
+- Real N + Real P is closer to Paper (mean deficit ~0.009) but still worse.
+
+### Interpretation
+
+The analytical proxy's N and P are derived from the same probabilistic model
+(Binomial/Multinomial over independent edges), making them **mutually consistent**.
+The Q amplitudes computed from analytical N are calibrated to the analytical P's
+assumptions. Swapping in real P breaks this consistency. Furthermore, the analytical
+formulas act as a **regularizer**: they smooth over instance-specific noise in the
+cost landscape, producing a proxy landscape whose optima generalize better.
+
+This means instance-specific distributions are unlikely to beat the paper's approach
+for Erdős-Rényi graphs, where the analytical formula is available and accurate.
+
+---
+
+## Current Research Directions
+
+Based on the P(c') investigation findings, the following directions have been
+identified for improving on the paper's results. **Spencer is currently focusing
+on direction 2.**
+
+### Direction 1: Better Fitted Proxy Shapes
+
+Fit TriangleProxy or NormalProxy to N(c';d,c) data averaged over *many* graph
+instances (not just one). Multi-instance averaging provides the same regularization
+benefit as the analytical formula. The fitted proxy could then be paired with the
+analytical Binomial P(c') for consistency. This leverages the speed advantage of
+TriangleProxy while potentially matching PaperProxy's accuracy.
+
+### Direction 2: Non-Erdős-Rényi Graph Families (Current Focus)
+
+**This is the most promising direction.** PaperProxy's analytical formula is derived
+specifically for Erdős-Rényi random graphs. For other graph families (Barabási-Albert,
+Watts-Strogatz, real-world networks), no analytical formula exists, so the PaperProxy
+cannot be used at all. This makes fitted proxies (TriangleProxy, NormalProxy) the
+*only* option for these graph types. The data_generation/ directory already includes
+scripts for generating Barabási-Albert and Watts-Strogatz graphs. The key question
+is whether fitted proxies can achieve good approximation ratios on these non-ER
+graph families where PaperProxy is unavailable.
+
+### Direction 3: Higher Depth with Linear Ramp Schedules
+
+The P(c') investigation used p=1. At higher depths (p=5, 10, 20), the proxy
+landscape becomes more structured and the gap between proxy and real QAOA may
+change. Linear ramp schedules (4 parameters: γ_1, γ_f, β_1, β_f) reduce the
+search space and are already supported by the proxy infrastructure.
+
+### Direction 4: Hybrid Proxy Warmstart + Local Refinement
+
+Use the proxy to find a good starting point (γ*, β*), then run a few iterations of
+real QAOA optimization (COBYLA/BFGS) starting from that point. This combines the
+proxy's cheap global search with real QAOA's accuracy for local refinement.
+
+### Direction 5: Multi-Instance Averaged Homodist
+
+Compute empirical N(c';d,c) from multiple graph instances of the same class,
+averaged together. This provides class-level smoothing similar to the analytical
+formula but works for any graph family. Combine with a consistent P(c') estimated
+from the same set of instances (e.g., via moment matching or Wang-Landau).
