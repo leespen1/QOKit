@@ -167,6 +167,35 @@ function plot_nc!(ax, Nc, num_graphs; show_legend = true)
     end
 end
 
+"""
+    plot_nc_spaghetti!(ax, Nc, num_graphs)
+
+Spaghetti-plot version: draw every individual N(c) line with transparency so
+that the density of the ensemble is visible, then overlay the mean as a bold
+line.  For a single graph a bar plot is used (identical to `plot_nc!`).
+"""
+function plot_nc_spaghetti!(ax, Nc, num_graphs; show_legend = true)
+    if num_graphs == 1
+        # Single graph: simple bar plot (same as plot_nc!)
+        nc_vec = trim_padding(vec(Nc[:, 1]))
+        costs = 0:(length(nc_vec) - 1)
+        barplot!(ax, collect(costs), Float64.(nc_vec); color = :steelblue)
+    else
+        # Every individual line, semi-transparent
+        for g in 1:num_graphs
+            nc_vec = trim_padding(vec(Nc[:, g]))
+            costs = 0:(length(nc_vec) - 1)
+            lines!(ax, collect(costs), Float64.(nc_vec); color = (:steelblue, 0.15), linewidth = 1)
+        end
+        # Bold mean overlay
+        mean_nc = Float64.(mean(Nc, dims = 2)[:, 1])
+        mean_trimmed = trim_padding(mean_nc)
+        costs = 0:(length(mean_trimmed) - 1)
+        lines!(ax, collect(costs), mean_trimmed; color = :firebrick, linewidth = 2.5, label = "Mean")
+        show_legend && axislegend(ax; position = :rt)
+    end
+end
+
 function main()
     # Determine which files to plot
     args = ARGS
@@ -217,7 +246,7 @@ function main()
         return
     end
 
-    # Save individual plots
+    # Save individual plots (standard + spaghetti)
     individual_dir = "Nc_individual_plots"
     mkpath(individual_dir)
     for ds in datasets
@@ -225,24 +254,26 @@ function main()
         attrs = ds.attrs
         label = make_label(attrs)
         num_graphs = size(Nc, 2)
+        fname_base = "Nc_$(make_filename(attrs))"
 
-        ifig = Figure(size = (900, 350))
-        ax = Axis(
-            ifig[1, 1];
-            xlabel = "Cost c",
-            ylabel = "N(c)",
-            title = "$label  ($num_graphs graph$(num_graphs > 1 ? "s" : ""))",
-        )
-        plot_nc!(ax, Nc, num_graphs)
+        for (plot_fn, suffix) in [(plot_nc!, ""), (plot_nc_spaghetti!, "_spaghetti")]
+            ifig = Figure(size = (900, 350))
+            ax = Axis(
+                ifig[1, 1];
+                xlabel = "Cost c",
+                ylabel = "N(c)",
+                title = "$label  ($num_graphs graph$(num_graphs > 1 ? "s" : ""))",
+            )
+            plot_fn(ax, Nc, num_graphs)
 
-        fname = "Nc_$(make_filename(attrs)).png"
-        ipath = joinpath(individual_dir, fname)
-        save(ipath, ifig)
-        println("  Saved $ipath")
+            ipath = joinpath(individual_dir, "$(fname_base)$(suffix).png")
+            save(ipath, ifig)
+            println("  Saved $ipath")
+        end
     end
 
     # Save a combined plot for a group of datasets
-    function save_group_plot(group, outpath)
+    function save_group_plot(group, outpath; plot_fn = plot_nc!)
         n = length(group)
         fig = Figure(size = (900, 300 * n + 50))
         for (i, ds) in enumerate(group)
@@ -256,7 +287,7 @@ function main()
                 ylabel = "N(c)",
                 title = "$label  ($num_graphs graph$(num_graphs > 1 ? "s" : ""))",
             )
-            plot_nc!(ax, Nc, num_graphs; show_legend = (i == 1))
+            plot_fn(ax, Nc, num_graphs; show_legend = (i == 1))
         end
         save(outpath, fig)
         println("  Saved $outpath")
@@ -275,7 +306,9 @@ function main()
         push!(get!(by_type, gt, []), ds)
     end
     for (gt, group) in sort(collect(by_type))
-        save_group_plot(group, joinpath(combined_dir, "Nc_$(gt).png"))
+        for (plot_fn, suffix) in [(plot_nc!, ""), (plot_nc_spaghetti!, "_spaghetti")]
+            save_group_plot(group, joinpath(combined_dir, "Nc_$(gt)$(suffix).png"); plot_fn)
+        end
     end
 
     # Group by (graph type, numNodes)
@@ -287,7 +320,9 @@ function main()
         push!(get!(by_nodes, key, []), ds)
     end
     for (key, group) in sort(collect(by_nodes))
-        save_group_plot(group, joinpath(combined_dir, "Nc_$(key).png"))
+        for (plot_fn, suffix) in [(plot_nc!, ""), (plot_nc_spaghetti!, "_spaghetti")]
+            save_group_plot(group, joinpath(combined_dir, "Nc_$(key)$(suffix).png"); plot_fn)
+        end
     end
 
     # Group by (graph type, other params) — varying numNodes
@@ -304,7 +339,9 @@ function main()
         push!(get!(by_other, key, []), ds)
     end
     for (key, group) in sort(collect(by_other))
-        save_group_plot(group, joinpath(combined_dir, "Nc_$(key).png"))
+        for (plot_fn, suffix) in [(plot_nc!, ""), (plot_nc_spaghetti!, "_spaghetti")]
+            save_group_plot(group, joinpath(combined_dir, "Nc_$(key)$(suffix).png"); plot_fn)
+        end
     end
 
     # Grid plots: rows = numNodes, columns = other parameters, one per graph type
@@ -332,36 +369,38 @@ function main()
         nrows = length(sorted_nodes)
         ncols = length(sorted_params)
 
-        fig = Figure(size = (max(400, 350 * ncols), 250 * nrows + 80))
-        Label(fig[0, 1:ncols], gt; fontsize = 20, font = :bold)
+        for (plot_fn, suffix) in [(plot_nc!, ""), (plot_nc_spaghetti!, "_spaghetti")]
+            fig = Figure(size = (max(400, 350 * ncols), 250 * nrows + 80))
+            Label(fig[0, 1:ncols], gt; fontsize = 20, font = :bold)
 
-        first_plotted = true
-        for (ci, param) in enumerate(sorted_params)
-            # Column header
-            col_label = isempty(param) ? "" : param
-            if !isempty(col_label)
-                Label(fig[1, ci, Top()], col_label; fontsize = 14, padding = (0, 0, 5, 0))
-            end
+            first_plotted = true
+            for (ci, param) in enumerate(sorted_params)
+                # Column header
+                col_label = isempty(param) ? "" : param
+                if !isempty(col_label)
+                    Label(fig[1, ci, Top()], col_label; fontsize = 14, padding = (0, 0, 5, 0))
+                end
 
-            for (ri, nn) in enumerate(sorted_nodes)
-                ds = get(lookup, (nn, param), nothing)
-                ax = Axis(
-                    fig[ri, ci];
-                    xlabel = "Cost c",
-                    ylabel = "N(c)",
-                    title = "n=$nn",
-                    titlesize = 12,
-                )
-                if ds !== nothing
-                    plot_nc!(ax, ds.Nc, size(ds.Nc, 2); show_legend = first_plotted)
-                    first_plotted = false
+                for (ri, nn) in enumerate(sorted_nodes)
+                    ds = get(lookup, (nn, param), nothing)
+                    ax = Axis(
+                        fig[ri, ci];
+                        xlabel = "Cost c",
+                        ylabel = "N(c)",
+                        title = "n=$nn",
+                        titlesize = 12,
+                    )
+                    if ds !== nothing
+                        plot_fn(ax, ds.Nc, size(ds.Nc, 2); show_legend = first_plotted)
+                        first_plotted = false
+                    end
                 end
             end
-        end
 
-        outpath = joinpath(combined_dir, "Nc_grid_$(gt).png")
-        save(outpath, fig)
-        println("  Saved $outpath")
+            outpath = joinpath(combined_dir, "Nc_grid_$(gt)$(suffix).png")
+            save(outpath, fig)
+            println("  Saved $outpath")
+        end
     end
 
     println("\nAll plots saved.")
