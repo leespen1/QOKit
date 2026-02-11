@@ -9,7 +9,7 @@ benchmarking the Quantum Approximate Optimization Algorithm (QAOA). The `grips/`
 directory contains G-RIPS 2024 Sendai research on improving QAOA
 parameter-setting heuristics based on the paper "Parameter-setting heuristic for
 the quantum alternating operator ansatz." The users of Claude Code in this
-project are the Sendai researchers. 
+project are the Sendai researchers.
 
 **Branches**: Main branch is `grips` (stable). Active development on `gpu` branch.
 
@@ -100,3 +100,298 @@ Julia implementations in `julia/src/` provide high-performance alternatives. Con
 - **LABS**: Low Autocorrelation Binary Sequences problem
 - **Hamming Distance**: Number of differing bits between two bitstrings
 - **FUR**: Fast Unitary Rotation - efficient state evolution algorithm
+
+
+---
+
+## The Parameter-Setting Paper: Concepts and Code Mapping
+
+The paper "A Parameter Setting Heuristic for the Quantum Alternating Operator
+Ansatz" (Sud, Hadfield, Rieffel, Tubman, Hogg) is the theoretical foundation for
+the `grips/` code. The full LaTeX source is in
+`References/ParameterSettingHeuristicLatexSource/main.tex`. Below is a plain-English
+summary of the paper's key ideas, each linked to the specific functions that implement
+them.
+
+---
+
+### Idea 1: Perfect Homogeneity (paper §2)
+
+**Plain English**: In a normal QAOA run, each of the 2^n bitstrings gets its own
+complex probability amplitude. "Perfect Homogeneity" is the assumption that all
+bitstrings with the *same cost value* always have *exactly the same amplitude*. This
+means instead of tracking 2^n amplitudes, you only need to track one amplitude per
+unique cost value. For MaxCut on m-edge graphs, there are at most m+1 unique costs,
+so this can reduce the state description from exponentially large to polynomially
+large.
+
+Perfect Homogeneity holds exactly for some symmetric problems (e.g. the Hamming ramp
+c(x)~|x|) and is approximately true empirically for random instances of many CSPs,
+especially when the QAOA parameters γ are small.
+
+**Code**: This is the core assumption underlying all proxy classes. No single function
+implements it, but it motivates the data structure used by every proxy: instead of a
+2^n state vector, the proxy tracks a vector of length `num_constraints + 1` (one
+amplitude per cost value).
+
+---
+
+### Idea 2: The n(x; d, c) Distribution (paper §2)
+
+**Plain English**: For any bitstring x, `n(x; d, c)` counts how many bitstrings are
+simultaneously (a) at Hamming distance d from x, and (b) have cost c. This is the
+key quantity needed to propagate QAOA amplitudes: when applying one QAOA layer to
+bitstring x, the new amplitude is a sum over all other bitstrings y, weighted by the
+mixing operator matrix element (which depends only on Hamming distance d(x,y)) and
+the phase factor (which depends only on cost c(y)).
+
+**Code**:
+- `grips/real_distribution.py: get_real_distribution()` — computes n(x; d, c) for
+  every bitstring x in a graph, as a 3D array indexed by `[x, d, c]`. This is the
+  *exact* distribution, computed by brute force in O(2^(2n)) time.
+- `grips/real_distribution.py: get_real_distribution_from_costs()` — the core Numba
+  JIT-compiled loop. Takes a pre-computed cost array and fills the 3D array.
+- `julia/src/cost_distributions.jl: get_real_distribution_from_costs()` — Julia
+  equivalent, with multithreading (`@threads`) for speedup.
+- `julia/src/cost_distributions.jl: gpu_get_real_distribution_from_costs()` — GPU
+  (CUDA) version using a kernel where each thread handles one (x, y) pair.
+
+---
+
+### Idea 3: The Homogeneous Distribution N(c'; d, c) (paper §2)
+
+**Plain English**: Under Perfect Homogeneity, we replace the per-bitstring n(x; d, c)
+with a per-*cost* version N(c'; d, c). For a given source cost c', N(c'; d, c) is the
+*average* n(x; d, c) over all bitstrings x with cost c(x) = c'. If this average is
+a good representative for all individual x, then the proxy faithfully approximates
+QAOA. The paper shows empirically (for Erdős-Rényi MaxCut) that the variance of
+n(x; d, c) around its cost-class mean is small for the dominant terms of the sum.
+
+There are two ways to compute N(c'; d, c):
+
+**Method A — Empirical averaging** (exact for given instances, O(2^(2n))):
+Average n(x; d, c) over all bitstrings x with the same cost. Expensive but exact.
+- `grips/real_distribution.py: get_homogeneous_distribution()` — top-level function
+  accepting a single graph or list of graphs; returns the averaged N(c'; d, c).
+- `grips/real_distribution.py: get_homogeneous_distribution_from_costs()` — low-level
+  Numba JIT loop that does the averaging given a pre-computed real distribution.
+- `julia/src/cost_distributions.jl: get_homogeneous_distribution_from_costs()` — Julia
+  multithreaded version.
+- `julia/src/cost_distributions.jl: get_homogeneous_distribution_from_costs_direct()` —
+  more memory-efficient Julia version that skips storing the full n(x; d, c).
+- `julia/src/cost_distributions.jl: gpu_get_homogeneous_distribution_from_costs_direct()` —
+  GPU version using privatized global memory to reduce atomic contention.
+
+**Method B — Analytical formula** (class-level only, O(poly(n)), paper §3):
+For random CSPs, N(c'; d, c) can be computed analytically without any graph instances,
+using a multinomial formula that depends only on the problem class (n, m, edge
+probability). The paper derives this for MaxCut, MaxE3Lin2/Max-k-XOR, and Rand-k-SAT
+(paper Eq. 12-16). Implemented in the Proxy classes described below.
+
+---
+
+### Idea 4: Proxy Classes — Implementations of N(c'; d, c) (paper §3)
+
+Each proxy class implements three methods:
+- `P_cost_distribution(c')` — probability that a random bitstring has cost c'
+- `N_cost_distribution(c')` — expected number of bitstrings with cost c' (= 2^n × P(c'))
+- `N_cost_distance_distribution(c', d, c)` — the key N(c'; d, c) value
+
+**PaperProxy** (`grips/paper_proxy.py`, `julia/src/paper_proxy.jl`):
+- Directly implements the paper's analytical formula (paper §3.1, Eq. 11-16) for
+  MaxCut on Erdős-Rényi graphs.
+- `P_cost_distribution`: Binomial distribution (paper Eq. 11).
+- `N_cost_distance_distribution`: Multinomial sum (paper Eq. 12-16, involving
+  P_both, P_one, P_neither probabilities).
+- Parameters: `num_constraints` (number of edges m), `num_qubits` (number of vertices n),
+  `prob_edge` (edge probability p_e, default 0.5).
+- This is the "ground truth" analytical proxy from the paper; no fitting required.
+
+**TriangleProxy** (`grips/triangle_proxy.py`, `julia/src/triangle_proxy.jl`):
+- **GRIPS contribution**: Approximates N(c'; d, c) as a "prism" shape: for each fixed
+  distance d, the distribution over costs c is a triangle (piecewise linear function
+  with one peak). The peak location slides linearly from c' (at d=0) to m/2 (at
+  d=n/2), and the peak height scales with distance.
+- Much faster to evaluate than PaperProxy (no multinomial sums).
+- Has 4 tunable parameters: `h_tweak_sub` (peak height offset), `hc_tweak_add` (peak
+  cost offset), `l_tweak_mul` (left slope), `r_tweak_mul` (right slope).
+- `HardCodedTriangleProxy`: Obsolete version with hardcoded default parameters.
+- `TriangleProxy` is Numba `@jitclass` compiled for maximum speed.
+- Parameters must be fit to real N(c'; d, c) data using `sendai_opt.fit_proxy_to_real()`.
+
+**NormalProxy** (`grips/normal_proxy.py`, `julia/src/normal_proxy.jl`):
+- **GRIPS contribution**: Approximates N(c'; d, c) as a 2D multivariate normal
+  distribution over (cost c, distance d).
+- The covariance matrix is constructed from 3 parameters: `cost_mean`, `cov_1`,
+  `cov_2`, rotated by the deviation of c' from the mean.
+- Parameters must be fit to real N(c'; d, c) data using `sendai_opt.fit_proxy_to_real()`.
+
+---
+
+### Idea 5: Running the Proxy — Algorithm 1 (paper §2.3)
+
+**Plain English**: Given the N(c'; d, c) distributions, QAOA parameters (γ, β), and
+an initial uniform state (all costs get amplitude 1/√2^n), iterate p times:
+
+  Q_l(c') = Σ_{d,c} cos(β)^(n-d) × (-i·sin(β))^d × exp(-iγc) × Q_{l-1}(c) × N(c'; d, c)
+
+This is Eq. (8) in the paper. Instead of the full 2^n quantum state vector, we only
+work with a vector of `m+1` complex amplitudes (one per unique cost). Time complexity
+O(n × m² × p) vs O(2^n × p) for full simulation.
+
+**Code**:
+- `grips/QAOA_proxy_interface.py: QAOA_proxy()` — dispatcher that routes to the
+  appropriate backend (Numba JIT, Python, or Julia) based on proxy type.
+- `grips/QAOA_proxy_interface.py: compute_amplitude_sum()` — computes one step of the
+  inner loop (one new Q_l(c') value). Implements the triple sum over d and c.
+- `grips/QAOA_proxy_interface.py: compute_amplitude_sum_njit()` — Numba JIT version.
+- `grips/QAOA_proxy_interface.py: QAOA_proxy_njit()` — full Numba JIT proxy run.
+- `julia/src/QAOA_proxy.jl: QAOA_proxy_basic()` — readable Julia reference implementation.
+- `julia/src/QAOA_proxy.jl: QAOA_proxy_single()` — faster Julia version using BLAS
+  matrix-vector multiplication (reshapes the sum into a mat-vec product).
+- `julia/src/QAOA_proxy.jl: QAOA_proxy_multi()` — batch Julia version for evaluating
+  multiple (γ, β) parameter sets simultaneously via BLAS matrix-matrix multiplication.
+- `julia/src/QAOA_proxy.jl: get_β_factors()` / `get_γ_factors()` — helper functions
+  that precompute the cos/sin and exp factors for all distances/costs at once.
+
+---
+
+### Idea 6: Computing the Expected Cost from the Proxy (paper §2.2, Eq. 9)
+
+**Plain English**: After running the proxy to get amplitudes Q_p(c'), compute the
+expected cost as:
+
+  ⟨C⟩ ≈ Σ_{c'} 2^n × P(c') × |Q_p(c')|² × c'
+
+This is the "homogeneous parameter objective function" — the quantity we maximize
+when optimizing γ and β. It replaces the expensive exact quantum expectation value.
+
+**Code**:
+- `grips/QAOA_proxy_interface.py: QAOA_proxy_expectation()` — computes this sum given
+  the final proxy amplitudes. Dispatches to Numba or Julia versions.
+- `grips/QAOA_proxy_interface.py: QAOA_proxy_expectation_njit()` — Numba JIT version.
+- `grips/QAOA_proxy_interface.py: QAOA_proxy_expectation_from_gamma_beta()` —
+  convenience function that runs the proxy and returns the expectation in one call.
+- `julia/src/QAOA_proxy.jl: expectation()` — Julia version. Has two overloads: one
+  for a single state vector Q, and one for a matrix Q where each column is a state
+  (used with `QAOA_proxy_multi`).
+
+---
+
+### Idea 7: Homogeneous Heuristic for Parameter Setting — Algorithm 3 (paper §4)
+
+**Plain English**: The full parameter-setting strategy:
+1. Precompute N(c'; d, c) and P(c') for the problem class.
+2. Choose initial parameters (γ_in, β_in), e.g. a linear ramp schedule.
+3. Run a classical optimizer (e.g. COBYLA, BFGS) that calls the proxy to evaluate
+   the objective function for each candidate (γ, β).
+4. The optimizer outputs (γ_out, β_out) which are then used in real QAOA.
+
+Key insight: each proxy evaluation is O(n × m² × p) instead of O(2^n × p), so
+high-depth optimization (e.g. p=20) becomes tractable on a laptop.
+
+**Code**:
+- `grips/QAOA_proxy_interface.py: QAOA_proxy_optimize_gamma_beta()` — main
+  optimization loop. Takes a proxy, initial parameters, and an optimizer method
+  (default COBYLA). Returns optimized γ, β, and diagnostics. Dispatches to Numba or
+  Julia backends.
+- `grips/QAOA_proxy_interface.py: inverse_proxy_objective_function()` — wraps the
+  proxy evaluation as a minimization objective (negates because scipy minimizes).
+
+---
+
+### Idea 8: Fitting Proxy Parameters to Real Distributions (GRIPS-specific)
+
+**Plain English**: The TriangleProxy and NormalProxy have free parameters that need
+to be tuned so their N(c'; d, c) shape matches the empirically observed distribution.
+This is done by minimizing MSE between the proxy's predicted N(c'; d, c) and the
+real averaged N(c'; d, c) computed from actual graph instances.
+
+**Code**:
+- `grips/sendai_opt.py: fit_proxy_to_real()` — main fitting function. Uses "smart
+  random search": perturb randomly, reuse helpful perturbations, shrink step sizes
+  after consecutive failures. Optional grid search for initial parameters.
+- `grips/real_distribution.py: distribution_mean_squared_error()` — computes MSE
+  between a proxy's predicted N(c'; d, c) and a real distribution array.
+- `grips/real_distribution.py: get_homogeneous_distribution_from_proxy()` — evaluates
+  a proxy's N(c'; d, c) for all cost/distance/cost combinations, returning a 3D array
+  for comparison with the real distribution.
+- `grips/real_distribution.py: normalize_homodist_slices()` — normalizes each N(c'; :, :)
+  slice independently (useful for fair comparison across proxies with different scales).
+
+---
+
+### Idea 9: Validating the Proxy (paper §5)
+
+**Plain English**: The paper provides three empirical checks that the proxy is good:
+1. The standard deviation of n(x; d, c) across different x with same cost c' is small
+   (relative to the mean) for the dominant terms.
+2. The analytically-computed N(c'; d, c) correlates well (Pearson correlation ~1) with
+   the empirical average over graph instances, for dominant terms.
+3. The squared overlap between the proxy state and the true QAOA state stays high
+   across p layers (especially for small γ values and linear ramp schedules).
+
+**Code**:
+- `grips/real_distribution.py: distributions_mean_and_stddev()` — computes mean and
+  stddev across multiple distribution arrays (used for check 1).
+- `grips/real_distribution.py: plot_stddev_div_mean_heatmap()` — plots the coefficient
+  of variation heatmap shown in the paper.
+- `grips/real_distribution.py: get_pearson_correlation_coefficients()` — computes
+  Pearson correlation between two N(c'; d, c) arrays, one per cost c' (used for check 2).
+- `julia/src/cost_distributions.jl: get_pearson_correlation_coefficients()` — Julia version.
+
+---
+
+### Idea 10: Cost Distribution P(c') Estimation (paper §2.2, §3; QAOA_proxy_interface.py)
+
+**Plain English**: Beyond the analytical binomial formula in PaperProxy, the GRIPS
+team added advanced methods for estimating P(c') from graph instances (useful when
+the analytical formula is unavailable or we want instance-specific estimates).
+
+**Code** (in `grips/QAOA_proxy_interface.py`):
+- `CostDistribution` class — callable wrapper for P(c') supporting multiple backends:
+  `wang_landau` (discrete MCMC-based sampling), `moment_matching` with sub-types
+  `gaussian`, `beta`, or `edgeworth` expansion.
+- `estimate_P_for_graphs()` — estimates P(c') from a list of graph instances using
+  either Monte Carlo sampling + moment matching, or Wang-Landau sampling.
+- `_run_wang_landau()` — Wang-Landau MCMC sampler for estimating density of states.
+
+---
+
+## GRIPS Research Goals and Future Directions
+
+The following directions are mentioned in the paper (§7 Discussion) and represent
+active or potential research areas for the Sendai team:
+
+1. **Instance-specific N(c'; d, c)**: The paper only uses class-level distributions
+   (derived analytically from just n, m, and edge probability, not the specific graph).
+   Extending to per-instance distributions (e.g. by Monte Carlo sampling of
+   n(x; d, c) for a specific graph) could yield better parameters for individual
+   instances. The `get_homogeneous_distribution()` function already supports this
+   for small graphs.
+
+2. **New graph types**: The data_generation/ directory includes scripts for
+   Barabasi-Albert and Watts-Strogatz graphs in addition to Erdős-Rényi. The
+   analytical PaperProxy formulas apply specifically to Erdős-Rényi; other graph
+   families require either empirical distributions or new analytical derivations.
+
+3. **Triangle/Normal proxy vs Paper proxy**: The GRIPS triangle and normal proxies
+   are faster to evaluate than the paper's multinomial approach. The key research
+   question is: after fitting, do these proxies produce parameter schedules that
+   perform as well on real QAOA as the PaperProxy? `distribution_mean_squared_error()`
+   and `get_pearson_correlation_coefficients()` support this comparison.
+
+4. **Scaling to larger n and p**: The paper demonstrates p=20 on n=20 graphs using
+   linear ramp schedules. The Julia backend (`QAOA_proxy_multi`) supports batched
+   evaluation of many parameter sets simultaneously, enabling more thorough landscape
+   exploration. GPU acceleration in `cost_distributions.jl` enables computing
+   N(c'; d, c) for larger graphs.
+
+5. **Linear ramp schedules**: The paper restricts to linear ramps at high depth to
+   reduce the parameter space from 2p to 4 parameters. The schedule is:
+   γ_ℓ = γ_1 + (γ_f - γ_1) × ℓ/p, same for β. This avoids the curse of dimensionality
+   at large p.
+
+6. **Approximation ratio**: The standard evaluation metric. For MaxCut:
+   ApxRatio = ⟨C⟩ / c_opt, where c_opt is found by brute force. The `grips/solve_maxcut_exact.py`
+   module computes c_opt.
