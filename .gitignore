@@ -8,6 +8,9 @@ test.lp
 *.so
 qokit/fur/c/csim/src/*.o
 
+#results
+results/*.csv
+
 
 # Distribution / packaging
 .Python
@@ -34,6 +37,9 @@ MANIFEST
 #  before PyInstaller builds the exe, so as to inject date/other infos into it.
 *.manifest
 *.spec
+
+#documents 
+*.pdf
 
 # Installer logs
 pip-log.txt
@@ -179,3 +185,30 @@ PK_folder/monte_carlo.jl
 PK_folder/numerical_integrate2.jl
 
 julia/.CondaPkg
+examples/benchmark.ipynb
+examples/QAOA_iterative_interpolation_SK.ipynb
+examples/QAOA_LABS_circuit_generation.ipynb
+examples/QAOA_LABS_optimization.ipynb
+examples/QAOA_objective_for_general_Hamiltonian.ipynb
+examples/QAOA_portfolio_optimization.ipynb
+examples/QAOA_SK_Expectation_vs_P.ipynb
+examples/QOKit_general_simulation.ipynb
+examples/advanced/compare_maxcut_parameters.ipynb
+examples/advanced/generate_optimized_circuits_for_Np_experiments.ipynb
+grips_examples/Combinatorial_optimization_exercises.ipynb
+grips_examples/data_extractor_plotter.ipynb
+examples/benchmark.ipynb
+examples/QAOA_iterative_interpolation_SK.ipynb
+examples/QAOA_LABS_circuit_generation.ipynb
+examples/QAOA_LABS_optimization.ipynb
+examples/QAOA_objective_for_general_Hamiltonian.ipynb
+examples/QAOA_portfolio_optimization.ipynb
+examples/QAOA_SK_Expectation_vs_P.ipynb
+examples/QOKit_general_simulation.ipynb
+grips_examples/mse_and_normalization_tests.ipynb
+grips_examples/plot_proxy_heatmaps_Erdos_Renyi.ipynb
+grips_examples/QAOA_plots.ipynb
+grips_examples/Transferability_to_unseen_instances.ipynb
+updates.txt
+.gitattributes
+.gitignore
