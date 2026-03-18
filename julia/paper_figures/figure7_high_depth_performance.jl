@@ -61,11 +61,11 @@ function optimize_linear_ramp_proxy(
     n::Int, p::Int;
     grid_size::Int=8
 )
-    # Parameter ranges (in pi_units, since proxy uses pi_units)
-    # γ: typically small, [0, 0.3] in pi_units ≈ [0, ~1 radian]
+    # Parameter ranges (in pi_units, since proxy uses pi_units; QOKit convention)
+    # γ: [0, 0.6] in pi_units ≈ [0, ~2 radians]
     # β: [0, 0.5] in pi_units = [0, π/2 radians]
-    γ₁_range = range(0.01, 0.15, length=grid_size)
-    γ_f_range = range(0.05, 0.30, length=grid_size)
+    γ₁_range = range(0.02, 0.30, length=grid_size)
+    γ_f_range = range(0.10, 0.60, length=grid_size)
     β₁_range = range(0.10, 0.45, length=grid_size)
     β_f_range = range(0.01, 0.20, length=grid_size)
 

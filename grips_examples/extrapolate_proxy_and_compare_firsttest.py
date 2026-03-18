@@ -153,7 +153,7 @@ alternate_proxy = TriangleProxy(
 
 #%% Run QAOA with alternate proxy
 print("\nRunning QAOA with alternate proxy (but not tuned gamma/beta)...")
-gammas = np.linspace(0, np.pi, 10)  # Gamma values for QAOA
+gammas = np.linspace(0, 2 * np.pi, 10)  # Gamma values for QAOA (QOKit convention)
 betas = np.linspace(0, np.pi, 10)  # Beta values for QAOA
 alternate_triangle_results = QAOA_proxy(alternate_proxy, gammas, betas)
 print("alternate Proxy Results:", alternate_triangle_results)
@@ -195,7 +195,7 @@ print("Finished running QAOA with initial, unalternate proxy!")
 -using these to run QAOA and comparing expectations
 '''
 
-gamma_0 = np.array([0.1])
+gamma_0 = np.array([0.2])
 beta_0 = np.array([0.1])
 init_result = QAOA_proxy_optimize_gamma_beta(initial_proxy, gamma_0, beta_0, optimizer_method = 'Nelder-Mead', optimizer_options={'maxiter': 1})
 gamma_init = init_result["gamma"]
