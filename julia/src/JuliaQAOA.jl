@@ -25,6 +25,10 @@ include("triangle_proxy.jl")
 include("normal_proxy.jl")
 include("paper_proxy.jl")
 include("cost_distributions.jl")
+include("linear_ramp.jl")
+export linear_ramp, linear_ramp_matrix
+export cpu_compute_homodist, gpu_compute_homodist, allocate_homodist
+export cpu_multi_proxy_mse, gpu_multi_proxy_mse, sum_squared_error
 
 end # Module
 

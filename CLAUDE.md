@@ -481,3 +481,49 @@ Compute empirical N(c';d,c) from multiple graph instances of the same class,
 averaged together. This provides class-level smoothing similar to the analytical
 formula but works for any graph family. Combine with a consistent P(c') estimated
 from the same set of instances (e.g., via moment matching or Wang-Landau).
+
+---
+
+## Paper Figure Reproduction Scripts
+
+All scripts are in `julia/paper_figures/` with output in `julia/paper_figures/output/`.
+Full report: `julia/paper_figures/REPORT.md`. Each script uses CairoMakie for plotting
+and the JuliaQAOA module for proxy computations. Configuration constants at the top of
+each script make it easy to change graph type, size, proxy, etc.
+
+### Shared Infrastructure
+
+- **`julia/paper_figures/common.jl`**: ER graph generation (`erdos_renyi_edges`),
+  MaxCut cost computation (`maxcut_costs`), real QAOA statevector simulator
+  (`qaoa_statevector`, `qaoa_expectation`), and plotting utilities.
+
+- **`julia/src/linear_ramp.jl`** (added to JuliaQAOA module): General-purpose
+  linear ramp schedule API. `linear_ramp(γ₁, γ_f, β₁, β_f, p)` generates
+  parameter vectors; `linear_ramp_matrix(...)` generates batch parameter matrices
+  compatible with `QAOA_proxy_multi`.
+
+### Per-Figure Scripts
+
+- **`figure2_stddev_heatmap.jl`**: Stddev/mean heatmap of N(c';d,c) across graph
+  instances. Generates one heatmap per c' value. Configurable: graph params,
+  instances, which c' to plot.
+
+- **`figure3_pearson_correlation.jl`**: Pearson correlation between empirical and
+  proxy N(c';d,c). Main plot with P(c') overlay + insert heatmaps for selected c'.
+  Supports comparing multiple proxies on the same plot via `PROXY_CONFIGS`.
+
+- **`figure4_squared_overlap.jl`**: |⟨ψ_true|ψ_proxy⟩|² vs QAOA layer for linear
+  ramp schedules. Multiple (γ₁, γ_f) curves. Uses compressed proxy + state
+  reconstruction (q(x) = Q(c(x))).
+
+- **`figure5_objective_landscapes.jl`**: Side-by-side heatmaps of true vs proxy
+  objective function. Fixes all but last layer's parameters, sweeps on grid.
+  Uses `QAOA_proxy_multi` for batch proxy evaluation.
+
+- **`figure6_approx_ratio_comparison.jl`**: Box plots comparing parameter transfer
+  (from small source graphs) vs proxy heuristic on target graphs. Supports
+  multiple proxy types. Uses coordinate descent for source optimization.
+
+- **`figure7_high_depth_performance.jl`**: Box plots of approximation ratio vs
+  QAOA depth using linear ramp schedules optimized via proxy. Demonstrates
+  monotonic improvement with depth. Supports multiple proxy types.
