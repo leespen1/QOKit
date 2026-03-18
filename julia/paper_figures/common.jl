@@ -92,12 +92,14 @@ end
 """
     apply_phase_gate!(state, costs, γ)
 
-Apply the phase gate e^{-iγC} to the statevector in place.
-Each amplitude state[x+1] is multiplied by exp(-iγ·c(x)).
+Apply the phase gate e^{-iγC/2} to the statevector in place.
+Each amplitude state[x+1] is multiplied by exp(-iγ·c(x)/2).
+
+Convention: matches QOKit's `exp(-0.5j * gamma * hc_diag)`.
 """
 function apply_phase_gate!(state::Vector{ComplexF64}, costs::Vector{Float64}, γ::Real)
     @inbounds for x in eachindex(state)
-        state[x] *= cis(-γ * costs[x])
+        state[x] *= cis(-γ * costs[x] / 2)
     end
 end
 

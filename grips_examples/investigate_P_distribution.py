@@ -43,7 +43,7 @@ compute_averaged_distributions = False  # Average N and P across all seeds; requ
 generate_plots = True          # Set False for text-only output (no matplotlib)
 
 # Build gamma/beta grid once (shared across all seeds)
-gammas_1d = np.linspace(0, 1, num_gamma)  # in pi-units
+gammas_1d = np.linspace(0, 2, num_gamma)  # in pi-units (QOKit convention: phase gate is exp(-iγC/2))
 betas_1d = np.linspace(0, 0.5, num_beta)  # in pi-units
 gamma_mesh, beta_mesh = np.meshgrid(gammas_1d, betas_1d)
 gammas_flat = gamma_mesh.flatten().reshape(-1, 1)

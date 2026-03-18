@@ -45,13 +45,15 @@ end
 
 @testset "get_γ_factors" begin
     @testset showtiming=true "Agrees with manufactured solution" begin
+        # Convention: get_γ_factors computes exp(-iγc/2), so γ values are 2× the
+        # phase angle per unit cost. This matches QOKit's exp(-0.5j*gamma*hc_diag).
         n = 4
         @test get_γ_factors(0,       n, pi_units=true) == ones(n+1)
-        @test get_γ_factors(0.5,    n, pi_units=true) == [1, -1im, -1, 1im, 1]
-        @test get_γ_factors(1,     n, pi_units=true) == [1, -1, 1, -1, 1]
+        @test get_γ_factors(1.0,    n, pi_units=true) == [1, -1im, -1, 1im, 1]
+        @test get_γ_factors(2.0,     n, pi_units=true) == [1, -1, 1, -1, 1]
         @test get_γ_factors(0,       n, pi_units=false) == ones(n+1)
-        @test get_γ_factors(0.5*pi, n, pi_units=false) ≈ [1, -1im, -1, 1im, 1] atol=1e-15
-        @test get_γ_factors(pi,  n, pi_units=false) ≈ [1, -1, 1, -1, 1] atol=1e-15
+        @test get_γ_factors(1.0*pi, n, pi_units=false) ≈ [1, -1im, -1, 1im, 1] atol=1e-15
+        @test get_γ_factors(2*pi,  n, pi_units=false) ≈ [1, -1, 1, -1, 1] atol=1e-15
     end
 
     @testset showtiming=true "Multidimensional γ broadcasting consistent with scalar γ." begin
@@ -84,8 +86,8 @@ end
         N[2,:,:] .= [5 7
                      6 8]
 
-        # in units of pi
-        γs = [1]
+        # in units of pi (γ uses QOKit convention: phase gate is exp(-iγC/2))
+        γs = [2]
         βs = [3/4]
 
         manufactured_solution = [1+1im, 1+1im]

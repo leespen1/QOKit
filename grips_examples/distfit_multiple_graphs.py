@@ -209,7 +209,7 @@ def fit_multiple_graphs(num_graphs, num_nodes, edge_probability = 0.5, graph_typ
 
     #% Run QAOA with fitted proxy
     print("\nRunning QAOA with fitted proxy (but not tuned gamma/beta)...")
-    gammas = np.linspace(0, np.pi, 10)  # Gamma values for QAOA
+    gammas = np.linspace(0, 2 * np.pi, 10)  # Gamma values for QAOA (QOKit convention)
     betas = np.linspace(0, np.pi, 10)  # Beta values for QAOA
     fitted_triangle_results = QAOA_proxy(fitted_proxy, gammas, betas)
     # print("Fitted Proxy Results:", fitted_triangle_results)
@@ -244,7 +244,7 @@ def fit_multiple_graphs(num_graphs, num_nodes, edge_probability = 0.5, graph_typ
     -using these to run QAOA and comparing expectations
     '''
 
-    gamma_0 = np.array([0.1])
+    gamma_0 = np.array([0.2])
     beta_0 = np.array([0.1])
     init_result = QAOA_proxy_optimize_gamma_beta(initial_proxy, gamma_0, beta_0, optimizer_method = 'Nelder-Mead', optimizer_options={'maxiter': 1})
     gamma_init = init_result["gamma"]
@@ -423,7 +423,7 @@ def fit_multiple_graphs_normal(graphs, num_nodes, edge_probability, graph_type, 
     print(f"Fitted MSE (Normal): {fitted_mse}")
 
     # Optimize gamma and beta for both proxies
-    gamma_0 = np.array([0.1])
+    gamma_0 = np.array([0.2])
     beta_0 = np.array([0.1])
 
     init_result = QAOA_proxy_optimize_gamma_beta(initial_proxy, gamma_0, beta_0, optimizer_method='Nelder-Mead', optimizer_options={'maxiter': 1000})
@@ -495,7 +495,7 @@ def evaluate_paper_proxy(graphs, num_nodes, edge_probability, graph_type, ws_num
     )
 
     # Optimize gamma and beta for the paper proxy
-    gamma_0 = np.array([0.1])
+    gamma_0 = np.array([0.2])
     beta_0 = np.array([0.1])
     paper_result = QAOA_proxy_optimize_gamma_beta(
         paper_proxy, gamma_0, beta_0,
@@ -596,7 +596,7 @@ if __name__ == "__main__":
         )
         
         # Optimize gamma and beta for paper proxy
-        gamma_0 = np.array([0.1])
+        gamma_0 = np.array([0.2])
         beta_0 = np.array([0.1])
         paper_result = QAOA_proxy_optimize_gamma_beta(
             paper_proxy, gamma_0, beta_0, 

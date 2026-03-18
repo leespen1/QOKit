@@ -33,11 +33,12 @@ const β₁ = 0.45    # Starting β (in radians)
 const β_f = 0.05   # Final β
 
 # (γ₁, γ_f) pairs for different curves (paper uses several small-γ pairs)
+# Note: γ uses QOKit convention where phase gate is exp(-iγC/2)
 const GAMMA_PAIRS = [
-    (0.05, 0.15),
     (0.10, 0.30),
-    (0.15, 0.50),
-    (0.25, 0.70),
+    (0.20, 0.60),
+    (0.30, 1.00),
+    (0.50, 1.40),
 ]
 
 # Which proxy to use for the homogeneous approximation

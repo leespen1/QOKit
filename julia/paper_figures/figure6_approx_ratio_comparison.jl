@@ -61,8 +61,8 @@ function optimize_qaoa_random_restarts(
     best_βs = zeros(p)
 
     for _ in 1:n_restarts
-        # Random initial parameters in reasonable ranges
-        γs = rand(rng, p) .* 0.8
+        # Random initial parameters in reasonable ranges (QOKit convention)
+        γs = rand(rng, p) .* 1.6
         βs = rand(rng, p) .* (π/2)
 
         # Simple grid refinement around initial point
@@ -123,8 +123,8 @@ function optimize_proxy_grid(
     m = size(homodist, 1) - 1
 
     if p == 1
-        # Direct 2D grid search for p=1
-        γ_range = range(0.01, 0.8, length=grid_size)
+        # Direct 2D grid search for p=1 (QOKit convention)
+        γ_range = range(0.02, 1.6, length=grid_size)
         β_range = range(0.01, π/2 - 0.01, length=grid_size)
 
         # Build parameter matrices for batch evaluation
@@ -148,9 +148,9 @@ function optimize_proxy_grid(
         return [best_γ_pi * π], [best_β_pi * π], exps[best_idx]
 
     else
-        # For p>1, use random sampling in the proxy parameter space
+        # For p>1, use random sampling in the proxy parameter space (QOKit convention)
         K = grid_size^2
-        γ_matrix = rand(K, p) .* 0.8 ./ π  # In pi_units
+        γ_matrix = rand(K, p) .* 1.6 ./ π  # In pi_units
         β_matrix = rand(K, p) .* 0.5       # β ∈ [0, 0.5] in pi_units
 
         Qs = QAOA_proxy_multi(homodist, γ_matrix, β_matrix; pi_units=true)

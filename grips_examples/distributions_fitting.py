@@ -157,7 +157,7 @@ print("Finished comparing MSE loss function for initial and fitted parameters!")
 
 #%% Run QAOA with fitted proxy
 print("\nRunning QAOA with fitted proxy (but not tuned gamma/beta)...")
-gammas = np.linspace(0, np.pi, 10)  # Gamma values for QAOA
+gammas = np.linspace(0, 2 * np.pi, 10)  # Gamma values for QAOA (QOKit convention)
 betas = np.linspace(0, np.pi, 10)  # Beta values for QAOA
 fitted_triangle_results = QAOA_proxy(fitted_proxy, gammas, betas)
 print("Fitted Proxy Results:", fitted_triangle_results)
@@ -199,7 +199,7 @@ print("Finished running QAOA with initial, unfitted proxy!")
 -using these to run QAOA and comparing expectations
 '''
 
-gamma_0 = np.array([0.1])
+gamma_0 = np.array([0.2])
 beta_0 = np.array([0.1])
 init_result = QAOA_proxy_optimize_gamma_beta(initial_proxy, gamma_0, beta_0, optimizer_method = 'Nelder-Mead', optimizer_options={'maxiter': 1})
 gamma_init = init_result["gamma"]

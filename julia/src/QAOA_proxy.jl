@@ -33,12 +33,14 @@ end
 
 
 """
-Compute exp(-iγc) for c=0:m.
+Compute exp(-iγc/2) for c=0:m.
 
 For N-dimensional γ, return N+1-dimensional array, where first dimension
 corresponds to varying c, rest correspond to varying γ.
 
 By default, γ is given in units of pi.
+
+Convention: matches QOKit's `exp(-0.5j * gamma * hc_diag)`.
 
 m = number of constraints / number of edges / number of distinct costs minus one
 """
@@ -48,9 +50,9 @@ function get_γ_factors(γ, m::Integer; pi_units=true)
     # cu(range) converts to CUDA version *only if needed.*
     # cis(x) equals exp(im*x)
     if pi_units
-        return @. cispi((-1 * expanded_γ) * (0:m))
+        return @. cispi((-1 * expanded_γ / 2) * (0:m))
     else
-        return @. cis((-1 * expanded_γ) * (0:m))
+        return @. cis((-1 * expanded_γ / 2) * (0:m))
     end
 end
 
@@ -82,12 +84,12 @@ function QAOA_proxy_basic(
         for c_prime in 0:m
             if pi_units
                 Qℓ[1+c_prime] = sum(
-                    cospi(β)^(n-d) * (-1im*sinpi(β))^d * cispi(-γ*c) * Qprev[1+c] *N[1+c_prime, 1+d, 1+c]
+                    cospi(β)^(n-d) * (-1im*sinpi(β))^d * cispi(-γ*c/2) * Qprev[1+c] *N[1+c_prime, 1+d, 1+c]
                     for d in 0:n, c in 0:m
                 )
             else
                 Qℓ[1+c_prime] = sum(
-                    cos(β)^(n-d) * (-1im*sin(β))^d * cis(-γ*c) * Qprev[1+c] *N[1+c_prime, 1+d, 1+c]
+                    cos(β)^(n-d) * (-1im*sin(β))^d * cis(-γ*c/2) * Qprev[1+c] *N[1+c_prime, 1+d, 1+c]
                     for d in 0:n, c in 0:m
                 )
             end

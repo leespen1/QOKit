@@ -29,14 +29,14 @@ const P_DEPTH = 2            # Total QAOA depth (paper: 3)
 const GRID_SIZE = 20         # Grid resolution (paper: 30)
 const SEED = 42
 
-# Fixed parameters for layers 1 to P_DEPTH-1 (in radians)
+# Fixed parameters for layers 1 to P_DEPTH-1 (in radians, QOKit convention)
 # For p=2: fix γ₁, β₁; sweep γ₂, β₂
 # For p=3: fix γ₁, γ₂, β₁, β₂; sweep γ₃, β₃
-const FIXED_GAMMAS = [0.2]      # Length = P_DEPTH - 1
+const FIXED_GAMMAS = [0.4]      # Length = P_DEPTH - 1
 const FIXED_BETAS = [0.4]       # Length = P_DEPTH - 1
 
-# Sweep range for the last layer's parameters (radians)
-const GAMMA_RANGE = range(0.0, 1.0, length=GRID_SIZE)
+# Sweep range for the last layer's parameters (radians, QOKit convention)
+const GAMMA_RANGE = range(0.0, 2.0, length=GRID_SIZE)
 const BETA_RANGE = range(0.0, π/2, length=GRID_SIZE)
 
 # Proxies to compare

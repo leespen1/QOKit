@@ -262,7 +262,7 @@ def compute_amplitude_sum(
     for cost_2 in range(num_unique_costs):
         for distance in range(proxy.num_qubits + 1):
             beta_factor = (np.cos(beta) ** (proxy.num_qubits - distance)) * ((-1j * np.sin(beta)) ** distance)
-            gamma_factor = np.exp(-1j * gamma * cost_2)
+            gamma_factor = np.exp(-0.5j * gamma * cost_2)
             num_costs_at_distance = proxy.N_cost_distance_distribution(
                 cost_1, distance, cost_2
             )
@@ -275,7 +275,7 @@ def compute_amplitude_sum(
 @njit
 def compute_amplitude_sum_njit(
     proxy,
-    prev_amplitudes: np.ndarray, # Q_l(c) for each unique 
+    prev_amplitudes: np.ndarray, # Q_l(c) for each unique
     gamma: float, # QAOA parameter gamma, how long to apply cost hamiltonian
     beta: float,  # QAOA parameter beta, how long to apply mixer hamiltonian
     cost_1: int,  # c', the cost whose probability amplitude we want to compute
@@ -285,6 +285,8 @@ def compute_amplitude_sum_njit(
     Q_l(c) for each unique cost c after performing l "layers" of the QAOA
     homogenous proxy, and a particular cost c', return Q_l+1(c'), which is the
     amplitude of cost c' after the l+1-th layer of the QAOA homogeneous proxy.
+
+    Convention: uses exp(-iγc/2), matching QOKit's `exp(-0.5j * gamma * hc_diag)`.
 
     TODO: This function is not NJIT-compiled because the method
     proxy.N_cost_distribution is not necessarily NJIT-compiled.
@@ -298,7 +300,7 @@ def compute_amplitude_sum_njit(
     for cost_2 in range(num_unique_costs):
         for distance in range(proxy.num_qubits + 1):
             beta_factor = (np.cos(beta) ** (proxy.num_qubits - distance)) * ((-1j * np.sin(beta)) ** distance)
-            gamma_factor = np.exp(-1j * gamma * cost_2)
+            gamma_factor = np.exp(-0.5j * gamma * cost_2)
             num_costs_at_distance = proxy.N_cost_distance_distribution(
                 cost_1, distance, cost_2
             )
