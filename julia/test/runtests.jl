@@ -11,6 +11,9 @@ end
 @testset "Real Distribution" begin
     include("test_real_distribution.jl")
 end
+@testset "QAOA Simulation (analytical)" begin
+    include("test_qaoa_analytical.jl")
+end
 @testset "QAOA Simulation (vs QOKit Python)" begin
     include("test_qaoa_simulation.jl")
 end

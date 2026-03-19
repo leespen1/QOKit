@@ -36,69 +36,6 @@ function cpu_compute_homodist(proxy)
 end
 
 
-function gpu_compute_homodist(proxy)
-    # These three are 'vectors', but along different dimensions, for broadcasting to work
-    costs_prime = collect(0:proxy.num_constraints) |> CuArray
-    distances = reshape(collect(0:proxy.num_qubits), 1, :) |> CuArray
-    costs_unprime = reshape(costs_prime, 1, 1, :) |> CuArray
-    N(c_prime, d, c) = N_cost_distance_distribution(proxy, c_prime, d, c)
-    homodist = N.(costs_prime, distances, costs_unprime)
-    return homodist
-end
-
-"""
-- `proxies`: A vector of proxies 
-- `batch_size`: number of proxies to do in one kernel call to GPU (limit as
-needed to meet memory reguirements).
-
-Assumed that all proxies have some num_qubits and num_constraints
-
-Consier lowering precision in the future. I think 32-bit should be fine.
-"""
-function gpu_multi_proxy_mse(
-    proxies::AbstractVector{<: AbstractProxy},
-    sampled_homodist::AbstractArray{<: Real, 3};
-    batch_size::Integer=length(proxies),
-    normalize=true,
-    show_progress=false
-)
-    proxy = proxies[1] 
-
-    # Could make costs arrays of UInt16's to save space.
-    costs_prime = collect(0:proxy.num_constraints) |> CuArray
-    distances = reshape(collect(0:proxy.num_qubits), (1, :)) |> CuArray
-    costs_unprime = reshape(costs_prime, (1, 1, :)) |> CuArray
-    num_elements_in_homodist = (1+proxy.num_qubits)*(1+proxy.num_constraints)^2
-    mse_batches = Vector{Float64}[]
-    sampled_homodist_gpu = CuArray(sampled_homodist)
-
-    if normalize
-        sampled_homodist_volume = sum(sampled_homodist_gpu)
-        sampled_homodist_gpu ./= sampled_homodist_volume
-    end
-
-    @showprogress enabled=show_progress for (i, proxy_batch_gpu) in enumerate(Iterators.partition(proxies, batch_size))
-        proxy_batch_gpu_reshaped = reshape(proxy_batch_gpu, (1,1,1,:)) |> CuArray
-
-        homodists_gpu = N_cost_distance_distribution.(
-            proxy_batch_gpu_reshaped, costs_prime, distances, costs_unprime
-        )  
-
-        if normalize # Normalize each homodist
-            homodist_gpu_volumes = sum(homodists_gpu, dims=(1,2,3))
-            homodists_gpu ./= homodist_gpu_volumes # Vectorized, should divide each 3D slice
-        end
-
-        # TODO mse_batch_gpu computation could be reduced to one mapreduce call
-        homodists_gpu .-= sampled_homodist_gpu # sampled_homodist is 3D, this will be repeated over 4th dimension
-        mse_batch_gpu = mapreduce(x -> x*x, +, homodists_gpu, dims=(1,2,3)) # Reduce first 3 dims, leave 4th dim
-        mse_batch_gpu ./= num_elements_in_homodist
-
-        push!(mse_batches, Array(vec(mse_batch_gpu)))
-    end
-    return mse_vec = mse_batches |> Iterators.flatten |> collect
-end
-
 function cpu_multi_proxy_mse(
     proxies::AbstractVector{<: AbstractProxy},
     sampled_homodist::AbstractArray{<: Real, 3};

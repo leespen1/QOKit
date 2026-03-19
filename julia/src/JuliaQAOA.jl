@@ -2,21 +2,15 @@ module JuliaQAOA
 
 using Distributions: pdf, Normal, MvNormal, Binomial, Multinomial
 using StaticArrays: @SVector, @SMatrix, SVector
-using PythonCall: PyArray, pyconvert
 using LinearAlgebra: mul!
 using Base.Threads: @threads, nthreads, threadid
-using CUDA
 using ProgressMeter: @showprogress
 using InteractiveUtils
 using Statistics: mean, std, cor
-#using LoopVectorization: @turbo, vmap, vmapreduce, indices
 
 # Functions that will be made available when I call "using JuliaQAOA"
 export P_cost_distribution, N_cost_distribution, N_cost_distance_distribution
 export NormalProxy, PaperProxy, TriangleProxy, HardCodedTriangleProxy, IntuitiveTriangleProxy, OldTriangleProxy
-#export compute_amplitude_sum, QAOA_proxy, QAOA_proxy_expectation
-#export inverse_proxy_objective_function, QAOA_proxy_expectation
-
 
 include("utils.jl") # Has abstract type definitions! Include this first!
 include("QAOA_proxy.jl")
@@ -31,8 +25,21 @@ export cpu_compute_homodist, gpu_compute_homodist, allocate_homodist
 export cpu_multi_proxy_mse, gpu_multi_proxy_mse, sum_squared_error
 include("qaoa_simulation.jl")
 export maxcut_costs, apply_phase_gate!, apply_x_mixer!, qaoa_statevector, qaoa_expectation
-include("qaoa_simulation_gpu.jl")
+
+# GPU function stubs — implementations provided by package extensions
+# (JuliaQAOACUDAExt when CUDA is loaded, JuliaQAOAKernelAbstractionsExt when KernelAbstractions is loaded)
 export gpu_apply_phase_gate!, gpu_apply_x_mixer!, gpu_qaoa_statevector, gpu_qaoa_expectation, gpu_maxcut_costs
+export gpu_get_real_distribution_from_costs, gpu_get_homogeneous_distribution_from_costs_direct
+
+function gpu_compute_homodist end
+function gpu_multi_proxy_mse end
+function gpu_get_real_distribution_from_costs end
+function gpu_get_homogeneous_distribution_from_costs_direct end
+function gpu_apply_phase_gate! end
+function gpu_apply_x_mixer! end
+function gpu_qaoa_statevector end
+function gpu_qaoa_expectation end
+function gpu_maxcut_costs end
 
 end # Module
 

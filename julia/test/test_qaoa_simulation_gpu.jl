@@ -1,4 +1,5 @@
 using JuliaQAOA, Test
+using KernelAbstractions
 import Random: MersenneTwister
 
 # ─── GPU auto-detection ────────────────────────────────────────────────────
