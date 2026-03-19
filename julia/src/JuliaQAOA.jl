@@ -29,6 +29,10 @@ include("linear_ramp.jl")
 export linear_ramp, linear_ramp_matrix
 export cpu_compute_homodist, gpu_compute_homodist, allocate_homodist
 export cpu_multi_proxy_mse, gpu_multi_proxy_mse, sum_squared_error
+include("qaoa_simulation.jl")
+export maxcut_costs, apply_phase_gate!, apply_x_mixer!, qaoa_statevector, qaoa_expectation
+include("qaoa_simulation_gpu.jl")
+export gpu_apply_phase_gate!, gpu_apply_x_mixer!, gpu_qaoa_statevector, gpu_qaoa_expectation, gpu_maxcut_costs
 
 end # Module
 
