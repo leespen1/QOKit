@@ -179,3 +179,8 @@ PK_folder/monte_carlo.jl
 PK_folder/numerical_integrate2.jl
 
 julia/.CondaPkg
+
+data_generation/Nc_Distributions/Data_graphType=*
+data_generation/Nc_Distributions/HPC_Copy
+
+*.orig
