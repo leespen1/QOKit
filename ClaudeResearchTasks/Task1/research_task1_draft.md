@@ -1,0 +1,1 @@
+That was the initial Figure 2 run which partially failed on high c' values with all-NaN data. I already fixed that issue (added a skip check for all-NaN slices) and successfully re-ran all scripts in subsequent foreground calls. All 6 figure scripts completed successfully and produced correct output — no action needed.
