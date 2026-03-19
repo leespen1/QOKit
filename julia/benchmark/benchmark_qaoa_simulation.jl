@@ -4,6 +4,10 @@ Benchmark QAOA statevector simulation across three backends, both Float32 and Fl
   2. KA-CPU       — gpu_qaoa_expectation with plain Arrays (KernelAbstractions CPU backend)
   3. GPU          — gpu_qaoa_expectation with device arrays (auto-detected backend)
 
+CPU and KA-CPU are benchmarked up to n=20; beyond that, times are extrapolated
+using the O(2^n · n) scaling measured from the last two real data points.
+GPU is benchmarked for real at all n values up to n=28.
+
 Float64 GPU is skipped on backends that lack native support (oneAPI, Metal).
 
 Usage:
@@ -11,6 +15,7 @@ Usage:
 =#
 
 using JuliaQAOA
+using KernelAbstractions
 using BenchmarkTools
 using Printf
 import Random: MersenneTwister
@@ -68,7 +73,8 @@ gpu_has_f64 = gpu_name ∉ ("oneAPI", "Metal", "none")
 
 # ─── Configuration ───────────────────────────────────────────────────────────
 
-n_values = [8, 12, 16, 20, 24]
+n_values = [8, 12, 16, 20, 24, 28]
+max_cpu_n = 20       # CPU/KA-CPU are measured up to this n; beyond is extrapolated
 p = 4
 edge_prob = 0.5
 seed = 42
@@ -81,10 +87,11 @@ println("=" ^ 130)
 println("QAOA Statevector Simulation Benchmark")
 println("=" ^ 130)
 println("  p = $p layers, edge_prob = $edge_prob, seed = $seed")
+println("  CPU/KA-CPU measured up to n=$max_cpu_n; extrapolated (†) beyond via O(2^n·n) scaling")
 println("  KA-CPU threads: ", Threads.nthreads())
 println("  GPU backend: $gpu_name", gpu_has_f64 ? "" : gpu_name == "none" ? "" : " (Float32 only)")
 println("-" ^ 130)
-@printf("  %4s  %6s  │  %12s  %12s  │  %12s  %12s  │  %14s  %14s\n",
+@printf("  %4s  %6s  │  %14s  %14s  │  %14s  %14s  │  %14s  %14s\n",
         "n", "edges",
         "CPU f64", "CPU f32",
         "KA-CPU f64", "KA-CPU f32",
@@ -92,9 +99,35 @@ println("-" ^ 130)
         "$gpu_label f32")
 println("-" ^ 130)
 
-# ─── Helper ──────────────────────────────────────────────────────────────────
+# ─── Helpers ─────────────────────────────────────────────────────────────────
 
-fmt_ms(t) = @sprintf("%10.3f ms", t * 1000)
+function fmt_time(t; extrapolated=false)
+    suffix = extrapolated ? " †" : "  "
+    if t < 1.0
+        return @sprintf("%10.3f ms%s", t * 1000, suffix)
+    else
+        return @sprintf("%10.3f s %s", t, suffix)
+    end
+end
+
+"""
+Extrapolate a CPU time from n₀ to n₁ using the known O(2^n · n) scaling.
+The constant factor cancels: t(n₁)/t(n₀) = (2^n₁ · n₁) / (2^n₀ · n₀).
+"""
+function extrapolate_time(t_measured, n_measured, n_target)
+    return t_measured * (exp2(n_target) * n_target) / (exp2(n_measured) * n_measured)
+end
+
+function random_edges(n, seed, edge_prob)
+    rng = MersenneTwister(seed)
+    edges = Tuple{Int,Int}[]
+    for i in 0:(n-2), j in (i+1):(n-1)
+        if rand(rng) < edge_prob
+            push!(edges, (i, j))
+        end
+    end
+    return edges
+end
 
 # ─── JIT warmup (small n to trigger compilation without large allocations) ──
 
@@ -119,15 +152,11 @@ end
 
 # ─── Benchmark loop ──────────────────────────────────────────────────────────
 
+# Store the last measured CPU/KA-CPU times and n for extrapolation
+last_cpu = Dict{String, Tuple{Int, Float64}}()  # key → (n, time)
+
 for n in n_values
-    # Generate random graph
-    rng = MersenneTwister(seed)
-    edges = Tuple{Int,Int}[]
-    for i in 0:(n-2), j in (i+1):(n-1)
-        if rand(rng) < edge_prob
-            push!(edges, (i, j))
-        end
-    end
+    edges = random_edges(n, seed, edge_prob)
     num_edges = length(edges)
 
     # Random QAOA parameters
@@ -135,45 +164,62 @@ for n in n_values
     γs = rand(param_rng, p) .* 2π
     βs = rand(param_rng, p) .* 2π
 
+    is_cpu_measured = n <= max_cpu_n
+
     # Fewer samples for large problems where each run is slow
     bm_samples = n <= 16 ? 100 : 3
     bm_seconds = n <= 16 ? 5   : 1
 
-    # ── Cost arrays ────────────────────────────────────────────────────
-    costs_f64 = maxcut_costs(n, edges)
-    costs_f32 = Float32.(costs_f64)
+    # ── CPU and KA-CPU benchmarks ─────────────────────────────────────────
+    if is_cpu_measured
+        costs_f64 = maxcut_costs(n, edges)
+        costs_f32 = Float32.(costs_f64)
 
-    # ── 1. CPU benchmark (both precisions) ──────────────────────────────
-    t_cpu_f64 = @belapsed qaoa_expectation($costs_f64, $n, $γs, $βs) seconds=bm_seconds samples=bm_samples
-    t_cpu_f32 = @belapsed qaoa_expectation($costs_f32, $n, $γs, $βs) seconds=bm_seconds samples=bm_samples
+        t_cpu_f64 = @belapsed qaoa_expectation($costs_f64, $n, $γs, $βs) seconds=bm_seconds samples=bm_samples
+        t_cpu_f32 = @belapsed qaoa_expectation($costs_f32, $n, $γs, $βs) seconds=bm_seconds samples=bm_samples
+        t_ka_f64  = @belapsed gpu_qaoa_expectation($costs_f64, $n, $γs, $βs) seconds=bm_seconds samples=bm_samples
+        t_ka_f32  = @belapsed gpu_qaoa_expectation($costs_f32, $n, $γs, $βs) seconds=bm_seconds samples=bm_samples
 
-    # ── 2. KA-CPU benchmark (both precisions) ──────────────────────────
-    t_ka_f64 = @belapsed gpu_qaoa_expectation($costs_f64, $n, $γs, $βs) seconds=bm_seconds samples=bm_samples
-    t_ka_f32 = @belapsed gpu_qaoa_expectation($costs_f32, $n, $γs, $βs) seconds=bm_seconds samples=bm_samples
+        last_cpu["cpu_f64"] = (n, t_cpu_f64)
+        last_cpu["cpu_f32"] = (n, t_cpu_f32)
+        last_cpu["ka_f64"]  = (n, t_ka_f64)
+        last_cpu["ka_f32"]  = (n, t_ka_f32)
 
-    # ── 3. GPU benchmark (if available) ────────────────────────────────
-    t_gpu_f64_str = "—"
-    t_gpu_f32_str = "—"
+        cpu_f64_str = fmt_time(t_cpu_f64)
+        cpu_f32_str = fmt_time(t_cpu_f32)
+        ka_f64_str  = fmt_time(t_ka_f64)
+        ka_f32_str  = fmt_time(t_ka_f32)
+    else
+        # Extrapolate from last measured point
+        n0, t0 = last_cpu["cpu_f64"];  cpu_f64_str = fmt_time(extrapolate_time(t0, n0, n), extrapolated=true)
+        n0, t0 = last_cpu["cpu_f32"];  cpu_f32_str = fmt_time(extrapolate_time(t0, n0, n), extrapolated=true)
+        n0, t0 = last_cpu["ka_f64"];   ka_f64_str  = fmt_time(extrapolate_time(t0, n0, n), extrapolated=true)
+        n0, t0 = last_cpu["ka_f32"];   ka_f32_str  = fmt_time(extrapolate_time(t0, n0, n), extrapolated=true)
+    end
+
+    # ── GPU benchmark (always real, if available) ─────────────────────────
+    gpu_f64_str = "—"
+    gpu_f32_str = "—"
 
     if gpu_backend !== nothing
-        # Float32 (always supported)
-        gpu_costs_f32 = gpu_array_type(costs_f32)
+        gpu_costs_f32 = gpu_array_type(Float32.(maxcut_costs(n, edges)))
         t_gpu_f32 = @belapsed gpu_qaoa_expectation($gpu_costs_f32, $n, $γs, $βs) seconds=bm_seconds samples=bm_samples
-        t_gpu_f32_str = fmt_ms(t_gpu_f32)
+        gpu_f32_str = fmt_time(t_gpu_f32)
 
-        # Float64 (only on backends that support it)
         if gpu_has_f64
-            gpu_costs_f64 = gpu_array_type(costs_f64)
+            gpu_costs_f64 = gpu_array_type(Float64.(maxcut_costs(n, edges)))
             t_gpu_f64 = @belapsed gpu_qaoa_expectation($gpu_costs_f64, $n, $γs, $βs) seconds=bm_seconds samples=bm_samples
-            t_gpu_f64_str = fmt_ms(t_gpu_f64)
+            gpu_f64_str = fmt_time(t_gpu_f64)
         end
     end
 
-    @printf("  %4d  %6d  │  %12s  %12s  │  %12s  %12s  │  %14s  %14s\n",
+    @printf("  %4d  %6d  │  %14s  %14s  │  %14s  %14s  │  %14s  %14s\n",
             n, num_edges,
-            fmt_ms(t_cpu_f64), fmt_ms(t_cpu_f32),
-            fmt_ms(t_ka_f64), fmt_ms(t_ka_f32),
-            t_gpu_f64_str, t_gpu_f32_str)
+            cpu_f64_str, cpu_f32_str,
+            ka_f64_str, ka_f32_str,
+            gpu_f64_str, gpu_f32_str)
 end
 
 println("=" ^ 130)
+println("  † = extrapolated from n=$max_cpu_n using O(2^n · n) scaling")
+println()
