@@ -6,7 +6,8 @@ Compares:
   2. Julia KA-CPU     — gpu_qaoa_expectation with Arrays (KernelAbstractions CPU)
   3. Julia GPU        — gpu_qaoa_expectation on device (auto-detected)
   4. Python (C)       — QOKit C-compiled FUR backend
-  5. Python (pure)    — QOKit pure-Python FUR backend
+  5. Python (GPU)     — QOKit CUDA/Numba FUR backend
+  6. Python (pure)    — QOKit pure-Python FUR backend
 
 Usage:
     julia --project=. benchmark/benchmark_julia_vs_python.jl
@@ -121,10 +122,29 @@ gpu_T = gpu_has_f64 ? Float64 : Float32
 
 # ─── Configuration ─────────────────────────────────────────────────────────
 
-n_values = [8, 12, 16, 20]
+n_values = [8, 12, 16, 20, 24, 28]
+extrapolate_threshold = 0.25  # seconds; backends are extrapolated once they exceed this
 p = 4
 edge_prob = 0.5
 seed = 42
+
+# ─── Helpers ──────────────────────────────────────────────────────────────
+
+function fmt_time(t; extrapolated=false)
+    suffix = extrapolated ? " †" : "  "
+    if t < 1.0
+        return @sprintf("%10.3f ms%s", t * 1000, suffix)
+    else
+        return @sprintf("%10.3f s %s", t, suffix)
+    end
+end
+
+"""
+Extrapolate a CPU time from n₀ to n₁ using the known O(2^n · n) scaling.
+"""
+function extrapolate_time(t_measured, n_measured, n_target)
+    return t_measured * (exp2(n_target) * n_target) / (exp2(n_measured) * n_measured)
+end
 
 # ─── Print header ──────────────────────────────────────────────────────────
 
@@ -137,19 +157,22 @@ else
     "Jl GPU"
 end
 
-println("=" ^ 100)
+println("=" ^ 115)
 println("QAOA Statevector Simulation: Julia vs Python (all Float64)")
-println("=" ^ 100)
+println("=" ^ 115)
 println("  p = $p layers, edge_prob = $edge_prob, seed = $seed")
+println("  Backends extrapolated (†) via O(2^n·n) scaling once they exceed $(Int(extrapolate_threshold*1000)) ms")
 println("  Julia KA-CPU threads: ", Threads.nthreads())
 println("  Julia GPU backend: $gpu_name", !gpu_has_f64 && gpu_name != "none" ? " (Float32 — no native Float64)" : "")
 println("  Python backends: ", join(py_available, ", "), " (always Float64)")
-println("-" ^ 100)
+println("-" ^ 115)
 
-@printf("  %4s  %6s  │  %12s  %12s  %12s  │  %12s  %12s\n",
+@printf("  %4s  %6s  │  %14s  %14s  %14s  │  %14s  %14s  %14s\n",
         "n", "edges", "Jl CPU", "Jl KA-CPU", gpu_col,
-        has_py_c ? "Py C" : "Py C (—)", "Py pure")
-println("-" ^ 100)
+        has_py_c ? "Py C" : "Py C (—)",
+        has_py_gpu ? "Py GPU" : "Py GPU (—)",
+        "Py pure")
+println("-" ^ 115)
 
 # ─── JIT warmup (small n to trigger compilation without large allocations) ──
 
@@ -166,6 +189,38 @@ let
 end
 
 # ─── Benchmark loop ────────────────────────────────────────────────────────
+
+# Track last measured (n, time) per non-GPU backend for extrapolation
+last_measured = Dict{String, Tuple{Int, Float64}}()
+
+"""
+Measure or extrapolate a non-GPU backend.  Returns (time_seconds, is_extrapolated).
+If the backend already exceeded the threshold at a previous n, extrapolate from then.
+"""
+function measure_or_extrapolate!(key, last_measured, n, f; bm_seconds, bm_samples, threshold=extrapolate_threshold)
+    if haskey(last_measured, key)
+        n0, t0 = last_measured[key]
+        if t0 >= threshold
+            # Already exceeded threshold — extrapolate
+            return (extrapolate_time(t0, n0, n), true)
+        end
+    end
+    t = f(bm_seconds, bm_samples)
+    last_measured[key] = (n, t)
+    return (t, false)
+end
+
+function measure_or_extrapolate_py!(key, last_measured, n, terms, γs, βs, sim_name; py_repeats, threshold=extrapolate_threshold)
+    if haskey(last_measured, key)
+        n0, t0 = last_measured[key]
+        if t0 >= threshold
+            return (extrapolate_time(t0, n0, n), true)
+        end
+    end
+    t = time_python_expectation(n, terms, γs, βs, sim_name; repeats=py_repeats)
+    last_measured[key] = (n, t)
+    return (t, false)
+end
 
 for n in n_values
     # Generate random graph
@@ -192,38 +247,59 @@ for n in n_values
     bm_seconds = n <= 16 ? 5   : 1
     py_repeats = n <= 16 ? 5   : 3
 
+    cpu_costs = maxcut_costs(n, edges)
+
     # ── Julia CPU (Float64) ───────────────────────────────────────────
-    cpu_costs = maxcut_costs(n, edges)  # always Float64
-    t_jl_cpu = @belapsed qaoa_expectation($cpu_costs, $n, $γs, $βs) seconds=bm_seconds samples=bm_samples
+    t_jl_cpu, ext_cpu = measure_or_extrapolate!("jl_cpu", last_measured, n,
+        (s, samp) -> @belapsed(qaoa_expectation($cpu_costs, $n, $γs, $βs), seconds=s, samples=samp);
+        bm_seconds, bm_samples)
+    jl_cpu_str = fmt_time(t_jl_cpu; extrapolated=ext_cpu)
 
     # ── Julia KA-CPU (Float64) ────────────────────────────────────────
-    t_jl_ka = @belapsed gpu_qaoa_expectation($cpu_costs, $n, $γs, $βs) seconds=bm_seconds samples=bm_samples
+    t_jl_ka, ext_ka = measure_or_extrapolate!("jl_ka", last_measured, n,
+        (s, samp) -> @belapsed(gpu_qaoa_expectation($cpu_costs, $n, $γs, $βs), seconds=s, samples=samp);
+        bm_seconds, bm_samples)
+    jl_ka_str = fmt_time(t_jl_ka; extrapolated=ext_ka)
 
     # ── Julia GPU (Float64 if supported, else Float32) ────────────────
-    t_jl_gpu_str = "—"
+    jl_gpu_str = "—"
     if gpu_backend !== nothing
         gpu_costs = gpu_array_type(gpu_T.(cpu_costs))
-        t_jl_gpu = @belapsed gpu_qaoa_expectation($gpu_costs, $n, $γs, $βs) seconds=bm_seconds samples=bm_samples
-        t_jl_gpu_str = @sprintf("%10.3f ms", t_jl_gpu * 1000)
+        t_jl_gpu, ext_gpu = measure_or_extrapolate!("jl_gpu", last_measured, n,
+            (s, samp) -> @belapsed(gpu_qaoa_expectation($gpu_costs, $n, $γs, $βs), seconds=s, samples=samp);
+            bm_seconds, bm_samples)
+        jl_gpu_str = fmt_time(t_jl_gpu; extrapolated=ext_gpu)
     end
 
     # ── Python C backend (Float64) ────────────────────────────────────
-    t_py_c_str = "—"
+    py_c_str = "—"
     if has_py_c
-        t_py_c = time_python_expectation(n, terms, γs, βs, "c"; repeats=py_repeats)
-        t_py_c_str = @sprintf("%10.3f ms", t_py_c * 1000)
+        t_py_c, ext_py_c = measure_or_extrapolate_py!("py_c", last_measured, n, terms, γs, βs, "c";
+            py_repeats)
+        py_c_str = fmt_time(t_py_c; extrapolated=ext_py_c)
+    end
+
+    # ── Python GPU backend (Float64) ──────────────────────────────────
+    py_gpu_str = "—"
+    if has_py_gpu
+        t_py_gpu, ext_py_gpu = measure_or_extrapolate_py!("py_gpu", last_measured, n, terms, γs, βs, "gpu";
+            py_repeats)
+        py_gpu_str = fmt_time(t_py_gpu; extrapolated=ext_py_gpu)
     end
 
     # ── Python pure backend (Float64) ─────────────────────────────────
-    t_py_pure = time_python_expectation(n, terms, γs, βs, "python"; repeats=py_repeats)
+    t_py_pure, ext_py_pure = measure_or_extrapolate_py!("py_pure", last_measured, n, terms, γs, βs, "python";
+        py_repeats)
+    py_pure_str = fmt_time(t_py_pure; extrapolated=ext_py_pure)
 
-    @printf("  %4d  %6d  │  %10.3f ms  %10.3f ms  %12s  │  %12s  %10.3f ms\n",
+    @printf("  %4d  %6d  │  %14s  %14s  %14s  │  %14s  %14s  %14s\n",
             n, num_edges,
-            t_jl_cpu * 1000, t_jl_ka * 1000, t_jl_gpu_str,
-            t_py_c_str, t_py_pure * 1000)
+            jl_cpu_str, jl_ka_str, jl_gpu_str,
+            py_c_str, py_gpu_str, py_pure_str)
 end
 
-println("=" ^ 100)
+println("=" ^ 115)
+println("  † = extrapolated from last measured n using O(2^n·n) scaling")
 
 # ─── Correctness verification ──────────────────────────────────────────────
 

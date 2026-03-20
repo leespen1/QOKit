@@ -4,9 +4,7 @@ Benchmark QAOA statevector simulation across three backends, both Float32 and Fl
   2. KA-CPU       — gpu_qaoa_expectation with plain Arrays (KernelAbstractions CPU backend)
   3. GPU          — gpu_qaoa_expectation with device arrays (auto-detected backend)
 
-CPU and KA-CPU are benchmarked up to n=20; beyond that, times are extrapolated
-using the O(2^n · n) scaling measured from the last two real data points.
-GPU is benchmarked for real at all n values up to n=28.
+All backends are extrapolated using O(2^n · n) scaling once they exceed 250 ms.
 
 Float64 GPU is skipped on backends that lack native support (oneAPI, Metal).
 
@@ -74,7 +72,7 @@ gpu_has_f64 = gpu_name ∉ ("oneAPI", "Metal", "none")
 # ─── Configuration ───────────────────────────────────────────────────────────
 
 n_values = [8, 12, 16, 20, 24, 28]
-max_cpu_n = 20       # CPU/KA-CPU are measured up to this n; beyond is extrapolated
+extrapolate_threshold = 0.25  # seconds; backends are extrapolated once they exceed this
 p = 4
 edge_prob = 0.5
 seed = 42
@@ -87,7 +85,7 @@ println("=" ^ 130)
 println("QAOA Statevector Simulation Benchmark")
 println("=" ^ 130)
 println("  p = $p layers, edge_prob = $edge_prob, seed = $seed")
-println("  CPU/KA-CPU measured up to n=$max_cpu_n; extrapolated (†) beyond via O(2^n·n) scaling")
+println("  Backends extrapolated (†) via O(2^n·n) scaling once they exceed $(Int(extrapolate_threshold*1000)) ms")
 println("  KA-CPU threads: ", Threads.nthreads())
 println("  GPU backend: $gpu_name", gpu_has_f64 ? "" : gpu_name == "none" ? "" : " (Float32 only)")
 println("-" ^ 130)
@@ -152,8 +150,24 @@ end
 
 # ─── Benchmark loop ──────────────────────────────────────────────────────────
 
-# Store the last measured CPU/KA-CPU times and n for extrapolation
-last_cpu = Dict{String, Tuple{Int, Float64}}()  # key → (n, time)
+# Track last measured (n, time) per backend for extrapolation
+last_measured = Dict{String, Tuple{Int, Float64}}()
+
+"""
+Measure or extrapolate a backend.  Returns (time_seconds, is_extrapolated).
+If the backend already exceeded the threshold at a previous n, extrapolate from then.
+"""
+function measure_or_extrapolate!(key, last_measured, n, f; bm_seconds, bm_samples, threshold=extrapolate_threshold)
+    if haskey(last_measured, key)
+        n0, t0 = last_measured[key]
+        if t0 >= threshold
+            return (extrapolate_time(t0, n0, n), true)
+        end
+    end
+    t = f(bm_seconds, bm_samples)
+    last_measured[key] = (n, t)
+    return (t, false)
+end
 
 for n in n_values
     edges = random_edges(n, seed, edge_prob)
@@ -164,52 +178,52 @@ for n in n_values
     γs = rand(param_rng, p) .* 2π
     βs = rand(param_rng, p) .* 2π
 
-    is_cpu_measured = n <= max_cpu_n
-
     # Fewer samples for large problems where each run is slow
     bm_samples = n <= 16 ? 100 : 3
     bm_seconds = n <= 16 ? 5   : 1
 
-    # ── CPU and KA-CPU benchmarks ─────────────────────────────────────────
-    if is_cpu_measured
-        costs_f64 = maxcut_costs(n, edges)
-        costs_f32 = Float32.(costs_f64)
+    costs_f64 = maxcut_costs(n, edges)
+    costs_f32 = Float32.(costs_f64)
 
-        t_cpu_f64 = @belapsed qaoa_expectation($costs_f64, $n, $γs, $βs) seconds=bm_seconds samples=bm_samples
-        t_cpu_f32 = @belapsed qaoa_expectation($costs_f32, $n, $γs, $βs) seconds=bm_seconds samples=bm_samples
-        t_ka_f64  = @belapsed gpu_qaoa_expectation($costs_f64, $n, $γs, $βs) seconds=bm_seconds samples=bm_samples
-        t_ka_f32  = @belapsed gpu_qaoa_expectation($costs_f32, $n, $γs, $βs) seconds=bm_seconds samples=bm_samples
+    # ── CPU benchmarks ───────────────────────────────────────────────────
+    t_cpu_f64, ext = measure_or_extrapolate!("cpu_f64", last_measured, n,
+        (s, samp) -> @belapsed(qaoa_expectation($costs_f64, $n, $γs, $βs), seconds=s, samples=samp);
+        bm_seconds, bm_samples)
+    cpu_f64_str = fmt_time(t_cpu_f64; extrapolated=ext)
 
-        last_cpu["cpu_f64"] = (n, t_cpu_f64)
-        last_cpu["cpu_f32"] = (n, t_cpu_f32)
-        last_cpu["ka_f64"]  = (n, t_ka_f64)
-        last_cpu["ka_f32"]  = (n, t_ka_f32)
+    t_cpu_f32, ext = measure_or_extrapolate!("cpu_f32", last_measured, n,
+        (s, samp) -> @belapsed(qaoa_expectation($costs_f32, $n, $γs, $βs), seconds=s, samples=samp);
+        bm_seconds, bm_samples)
+    cpu_f32_str = fmt_time(t_cpu_f32; extrapolated=ext)
 
-        cpu_f64_str = fmt_time(t_cpu_f64)
-        cpu_f32_str = fmt_time(t_cpu_f32)
-        ka_f64_str  = fmt_time(t_ka_f64)
-        ka_f32_str  = fmt_time(t_ka_f32)
-    else
-        # Extrapolate from last measured point
-        n0, t0 = last_cpu["cpu_f64"];  cpu_f64_str = fmt_time(extrapolate_time(t0, n0, n), extrapolated=true)
-        n0, t0 = last_cpu["cpu_f32"];  cpu_f32_str = fmt_time(extrapolate_time(t0, n0, n), extrapolated=true)
-        n0, t0 = last_cpu["ka_f64"];   ka_f64_str  = fmt_time(extrapolate_time(t0, n0, n), extrapolated=true)
-        n0, t0 = last_cpu["ka_f32"];   ka_f32_str  = fmt_time(extrapolate_time(t0, n0, n), extrapolated=true)
-    end
+    # ── KA-CPU benchmarks ────────────────────────────────────────────────
+    t_ka_f64, ext = measure_or_extrapolate!("ka_f64", last_measured, n,
+        (s, samp) -> @belapsed(gpu_qaoa_expectation($costs_f64, $n, $γs, $βs), seconds=s, samples=samp);
+        bm_seconds, bm_samples)
+    ka_f64_str = fmt_time(t_ka_f64; extrapolated=ext)
 
-    # ── GPU benchmark (always real, if available) ─────────────────────────
+    t_ka_f32, ext = measure_or_extrapolate!("ka_f32", last_measured, n,
+        (s, samp) -> @belapsed(gpu_qaoa_expectation($costs_f32, $n, $γs, $βs), seconds=s, samples=samp);
+        bm_seconds, bm_samples)
+    ka_f32_str = fmt_time(t_ka_f32; extrapolated=ext)
+
+    # ── GPU benchmarks (if available) ────────────────────────────────────
     gpu_f64_str = "—"
     gpu_f32_str = "—"
 
     if gpu_backend !== nothing
-        gpu_costs_f32 = gpu_array_type(Float32.(maxcut_costs(n, edges)))
-        t_gpu_f32 = @belapsed gpu_qaoa_expectation($gpu_costs_f32, $n, $γs, $βs) seconds=bm_seconds samples=bm_samples
-        gpu_f32_str = fmt_time(t_gpu_f32)
+        gpu_costs_f32 = gpu_array_type(Float32.(costs_f64))
+        t_gpu_f32, ext = measure_or_extrapolate!("gpu_f32", last_measured, n,
+            (s, samp) -> @belapsed(gpu_qaoa_expectation($gpu_costs_f32, $n, $γs, $βs), seconds=s, samples=samp);
+            bm_seconds, bm_samples)
+        gpu_f32_str = fmt_time(t_gpu_f32; extrapolated=ext)
 
         if gpu_has_f64
-            gpu_costs_f64 = gpu_array_type(Float64.(maxcut_costs(n, edges)))
-            t_gpu_f64 = @belapsed gpu_qaoa_expectation($gpu_costs_f64, $n, $γs, $βs) seconds=bm_seconds samples=bm_samples
-            gpu_f64_str = fmt_time(t_gpu_f64)
+            gpu_costs_f64 = gpu_array_type(costs_f64)
+            t_gpu_f64, ext = measure_or_extrapolate!("gpu_f64", last_measured, n,
+                (s, samp) -> @belapsed(gpu_qaoa_expectation($gpu_costs_f64, $n, $γs, $βs), seconds=s, samples=samp);
+                bm_seconds, bm_samples)
+            gpu_f64_str = fmt_time(t_gpu_f64; extrapolated=ext)
         end
     end
 
@@ -221,5 +235,5 @@ for n in n_values
 end
 
 println("=" ^ 130)
-println("  † = extrapolated from n=$max_cpu_n using O(2^n · n) scaling")
+println("  † = extrapolated from last measured n using O(2^n·n) scaling")
 println()
