@@ -26,9 +26,9 @@ using Printf
 #==============================================================================#
 
 # Graph parameters
-const N_QUBITS = 6
-const P_EDGE = 0.5
-const NUM_INSTANCES = 3
+const N_QUBITS = 10
+const P_EDGE = 1/3
+const NUM_INSTANCES = 10
 const SEED = 42
 
 # Which proxy types to compare? Each entry is (label, proxy_constructor)
@@ -39,7 +39,7 @@ PROXY_CONFIGS = [
 ]
 
 # Which c' values to show as insert heatmaps (paper uses c'=7, c'=13)
-const INSERT_COST_PRIMES = [3, 5]  # Adjust for small n
+const INSERT_COST_PRIMES = [7, 13]  # Paper uses c'=7 and c'=13
 
 #==============================================================================#
 #                          COMPUTATION                                          #

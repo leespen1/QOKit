@@ -20,9 +20,9 @@ include("common.jl")
 #==============================================================================#
 
 # Graph parameters — change these to explore different graph families
-const N_QUBITS = 6           # Number of vertices (paper: 10)
-const P_EDGE = 0.5           # Edge probability (paper: 1/3)
-const NUM_INSTANCES = 3      # Number of graph instances (paper: 10)
+const N_QUBITS = 10          # Number of vertices
+const P_EDGE = 1/3           # Edge probability
+const NUM_INSTANCES = 10     # Number of graph instances
 const SEED = 42              # Random seed for reproducibility
 
 # Which c' values to plot? Set to :all to save all, or a vector like [7]

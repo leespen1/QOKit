@@ -28,10 +28,10 @@ using Statistics: mean
 #                          CONFIGURATION                                        #
 #==============================================================================#
 
-const N_QUBITS = 8
+const N_QUBITS = 20
 const P_EDGE = 0.5
-const NUM_INSTANCES = 3
-const P_VALUES = [2, 4, 6]       # Depths (paper: [4, 8, 12, 16, 20])
+const NUM_INSTANCES = 10
+const P_VALUES = [4, 8, 12, 16, 20]
 const SEED = 42
 
 # Grid resolution for proxy optimization over (γ₁, γ_f, β₁, β_f) space
@@ -149,8 +149,8 @@ for (label, constructor) in PROXY_CONFIGS
             γs_rad = γs .* π
             βs_rad = βs .* π
 
-            # Evaluate via real QAOA
-            real_exp = qaoa_expectation(inst.costs, N_QUBITS, γs_rad, βs_rad)
+            # Evaluate via real QAOA (GPU for large N_QUBITS)
+            real_exp = qaoa_expectation_device(inst.costs, N_QUBITS, γs_rad, βs_rad)
             ratio = real_exp / optimal_costs[i]
             push!(ratios, ratio)
 
