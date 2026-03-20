@@ -9,21 +9,17 @@ Provides:
 =#
 
 using Pkg
-Pkg.activate(joinpath(@__DIR__, ".."))
-include(joinpath(@__DIR__, "..", "find_python.jl"))
-
-using JuliaQAOA
-using CairoMakie
-using Random
-using LinearAlgebra
 
 #==============================================================================#
 #                          GPU Backend Selection                                #
 #==============================================================================#
+# Load GPU packages BEFORE switching projects, so they are resolved from
+# whichever environment is active at startup (e.g. the global env).
+# Julia's extension system activates JuliaQAOACUDAExt / JuliaQAOAKernelAbstractionsExt
+# when JuliaQAOA is loaded below, because CUDA/KA are already in the session.
+#
 # Try CUDA first, then AMDGPU. Require Float64 support (rules out Intel iGPU
 # and Apple Metal). Falls back to CPU if no suitable GPU is found.
-# KernelAbstractions is loaded alongside whichever GPU backend activates, which
-# triggers JuliaQAOAKernelAbstractionsExt and makes gpu_qaoa_* available.
 
 const USE_GPU, _GPU_BACKEND = let
     result = (false, :none)
@@ -37,11 +33,14 @@ const USE_GPU, _GPU_BACKEND = let
                 _ = sum(Array(test))   # Array() syncs and validates Float64 round-trip
                 @info "GPU backend: CUDA (Float64)"
                 result = (true, :cuda)
-            catch
-                @info "CUDA device found but Float64 not supported; trying AMDGPU..."
+            catch e
+                @info "CUDA device found but Float64 not supported; trying AMDGPU..." exception=e
             end
+        else
+            @info "CUDA loaded but not functional; trying AMDGPU..."
         end
-    catch
+    catch e
+        @info "Could not load CUDA: $(sprint(showerror, e)); trying AMDGPU..."
     end
 
     # --- Try AMDGPU (if CUDA unavailable or Float64-incapable) ---
@@ -54,17 +53,28 @@ const USE_GPU, _GPU_BACKEND = let
                     _ = sum(Array(test))
                     @info "GPU backend: AMDGPU (Float64)"
                     result = (true, :amdgpu)
-                catch
-                    @info "AMDGPU device found but Float64 not supported; using CPU"
+                catch e
+                    @info "AMDGPU device found but Float64 not supported; using CPU" exception=e
                 end
+            else
+                @info "AMDGPU loaded but not functional; using CPU"
             end
-        catch
+        catch e
+            @info "Could not load AMDGPU: $(sprint(showerror, e)); using CPU"
         end
     end
 
     !result[1] && @info "No GPU with Float64 support found; using CPU"
     result
 end
+
+Pkg.activate(joinpath(@__DIR__, ".."))
+include(joinpath(@__DIR__, "..", "find_python.jl"))
+
+using JuliaQAOA
+using CairoMakie
+using Random
+using LinearAlgebra
 
 """Transfer a CPU Float64 vector to the active GPU array type, or return as-is for CPU."""
 function _to_gpu(v::Vector{Float64})
