@@ -43,6 +43,29 @@ black --check .
 
 # Format code
 black .
+
+# --- Julia (JuliaQAOA) ---
+
+# Run Julia tests (from julia/ directory)
+cd julia && julia --project -e 'using Pkg; Pkg.test()'
+
+# Run Julia tests with GPU extensions
+cd julia && julia --project -e 'using CUDA, KernelAbstractions; using Pkg; Pkg.test()'
+
+# Run a specific Julia test file
+cd julia && julia --project test/test_QAOA.jl
+
+# Run Julia benchmarks
+cd julia && julia --project=benchmark benchmark/benchmark_QAOA.jl
+
+# Run paper figure scripts
+cd julia && julia --project=paper_figures paper_figures/figure3_pearson_correlation.jl
+
+# Start Julia REPL with JuliaQAOA loaded
+cd julia && julia --project -e 'using JuliaQAOA'
+
+# Start Julia REPL with GPU support
+cd julia && julia --project -e 'using CUDA, KernelAbstractions, JuliaQAOA'
 ```
 
 ## Architecture
@@ -80,11 +103,91 @@ grips/QAOA_proxy_interface.py - Proxy algorithm entry point
 grips/real_distribution.py  - Statistical distribution computation
 grips/sendai_opt.py        - Parameter optimization (fit_proxy_to_real)
 qokit/fur/__init__.py      - Simulator backend selection
+
+julia/src/JuliaQAOA.jl     - Julia module root (exports all public API)
+  ├── QAOA_proxy.jl         - Proxy algorithm (basic/single/multi + expectation)
+  ├── qaoa_simulation.jl    - Real statevector QAOA simulation
+  ├── cost_distributions.jl - Distribution computation (multithreaded)
+  ├── paper_proxy.jl / triangle_proxy.jl / normal_proxy.jl
+  ├── linear_ramp.jl        - Linear ramp schedule generation
+  └── utils.jl              - AbstractProxy type, CPU homodist/MSE helpers
+julia/ext/                  - GPU extensions (auto-loaded via weak dependencies)
+  ├── JuliaQAOAKernelAbstractionsExt.jl - Portable GPU (CUDA/AMDGPU/oneAPI)
+  ├── JuliaQAOACUDAExt.jl              - CUDA-specific kernels
+  ├── batched_furx_ka.jl               - Shared-memory butterfly (portable)
+  └── batched_furx_cuda.jl             - Warp-shuffle butterfly (CUDA-only)
 ```
 
-### Julia Backend
+### Julia Backend (JuliaQAOA Module)
 
-Julia implementations in `julia/src/` provide high-performance alternatives. Configure with `USE_JULIA=True` in proxy files. Setup via `grips/setup_juliacall.py`.
+The `julia/` directory contains a full Julia package (`JuliaQAOA`) that provides
+high-performance implementations of both the proxy algorithm and real statevector
+QAOA simulation, with optional GPU acceleration. This is now a standalone Julia
+package, not just a backend for the Python code (though it can still be called from
+Python via `USE_JULIA=True` in proxy files; setup via `grips/setup_juliacall.py`).
+
+**Source files** (`julia/src/`):
+- `JuliaQAOA.jl` — Module root; exports all public API; manages GPU extensions via weak dependencies
+- `QAOA_proxy.jl` — Proxy algorithm with three implementations:
+  - `QAOA_proxy_basic()` — Reference triple-loop (readable, slow)
+  - `QAOA_proxy_single()` — BLAS mat-vec for one parameter set
+  - `QAOA_proxy_multi()` — BLAS mat-mat for K parameter sets simultaneously (workhorse for grid sweeps)
+  - `expectation()` — Compute ⟨C⟩ from proxy amplitudes (vector or matrix overload)
+  - `get_β_factors()` / `get_γ_factors()` — Precompute cos/sin and exp factors with broadcasting
+- `qaoa_simulation.jl` — Real statevector QAOA simulation:
+  - `maxcut_costs(n, edges)` — Compute cost for all 2^n bitstrings
+  - `apply_phase_gate!(state, costs, γ)` — In-place phase rotation
+  - `apply_x_mixer!(state, β, n)` — In-place FUR X-mixer (qubit-by-qubit)
+  - `qaoa_statevector(costs, n, γs, βs)` — Full simulation, optional intermediate states
+  - `qaoa_expectation(costs, n, γs, βs)` — Expected cost value
+- `cost_distributions.jl` — Distribution computation (multithreaded via `@threads`):
+  - `get_real_distribution_from_costs()` — O(2^(2n)) n(x;d,c) computation
+  - `get_homogeneous_distribution_from_costs()` — Average n(x;d,c) by cost class
+  - `get_homogeneous_distribution_from_costs_direct()` — Memory-efficient direct version
+  - `get_pearson_correlation_coefficients()` — Per-cost Pearson correlations
+  - Utilities: `pad_to_shape`, `average_distributions`, `stddev_distributions`
+- `paper_proxy.jl`, `triangle_proxy.jl`, `normal_proxy.jl` — Julia proxy implementations
+  (see Proxy Classes section above for details)
+- `linear_ramp.jl` — Linear ramp schedules:
+  - `linear_ramp(γ₁, γ_f, β₁, β_f, p)` — Single parameter set
+  - `linear_ramp_matrix(...)` — Batch K parameter sets for `QAOA_proxy_multi`
+- `utils.jl` — `AbstractProxy` base type, `cpu_compute_homodist()`, `cpu_multi_proxy_mse()`
+
+**GPU Extensions** (`julia/ext/`):
+GPU support is provided via Julia's weak dependency / extension system. Loading
+`CUDA` or `KernelAbstractions` automatically activates the corresponding extension.
+
+- `JuliaQAOAKernelAbstractionsExt` — Portable GPU kernels (works with CUDA, AMDGPU, oneAPI):
+  - `gpu_qaoa_statevector()` / `gpu_qaoa_expectation()` — GPU statevector simulation
+  - `gpu_qaoa_statevector_batched()` / `gpu_qaoa_expectation_batched()` — Shared-memory
+    butterfly X-mixer, groups up to 11 qubits per kernel launch (reduces launches from
+    n to ceil(n/group_size))
+  - `gpu_apply_phase_gate!()`, `gpu_apply_x_mixer!()`, `gpu_apply_x_mixer_batched!()`
+  - `gpu_maxcut_costs()` — Compute costs on GPU
+- `JuliaQAOACUDAExt` — CUDA-specific implementations:
+  - `gpu_get_real_distribution_from_costs()` — GPU kernel for n(x;d,c), one thread per (x,y) pair
+  - `gpu_get_homogeneous_distribution_from_costs_direct()` — GPU with privatized global memory
+  - `gpu_compute_homodist()` / `gpu_multi_proxy_mse()` — GPU proxy evaluation and MSE
+  - `gpu_apply_x_mixer_warp!()` — Warp-shuffle X-mixer for NQ≤6 qubits (avoids shared
+    memory overhead, uses CUDA's native shuffle hardware)
+- `batched_furx_ka.jl` — Shared-memory butterfly kernel (KernelAbstractions, portable)
+- `batched_furx_cuda.jl` — Warp-shuffle butterfly kernel (CUDA-only, fastest for small groups)
+
+**Tests** (`julia/test/`):
+- `test_QAOA.jl` — Core proxy algorithm: `_expand`, factor functions, basic/single/multi, expectation
+- `test_qaoa_analytical.jl` — Proxy correctness against analytical solutions
+- `test_qaoa_simulation.jl` — Real QAOA vs Python QOKit (via PythonCall)
+- `test_qaoa_simulation_gpu.jl` — GPU statevector vs CPU equivalents
+- `test_gpu_distribution_generation.jl` — GPU distribution functions vs CPU
+- `test_cost_distribution.jl` — Distribution statistics and correlation functions
+
+**Benchmarks** (`julia/benchmark/`):
+- `benchmark_QAOA.jl` — Proxy basic/single/multi with varying (n, m, p) and parameter counts
+- `benchmark_qaoa_simulation.jl` — Statevector simulation benchmarks
+- `benchmark_qaoa_proxy_algorithm.jl` — Proxy algorithm performance
+- `benchmark_cost_distributions.jl` — Distribution computation benchmarks
+- `benchmark_julia_vs_python.jl` — Julia vs Python performance comparison
+- `benchmark_gpu.jl` (root level) — GPU proxy evaluation and batch MSE computation
 
 ## Code Style
 
@@ -494,8 +597,9 @@ each script make it easy to change graph type, size, proxy, etc.
 ### Shared Infrastructure
 
 - **`julia/paper_figures/common.jl`**: ER graph generation (`erdos_renyi_edges`),
-  MaxCut cost computation (`maxcut_costs`), real QAOA statevector simulator
-  (`qaoa_statevector`, `qaoa_expectation`), and plotting utilities.
+  MaxCut optimal cost (`maxcut_optimal`), instance generation helpers, and plotting
+  utilities. Real QAOA simulation (`qaoa_statevector`, `qaoa_expectation`) and
+  `maxcut_costs` are now in the JuliaQAOA module (`julia/src/qaoa_simulation.jl`).
 
 - **`julia/src/linear_ramp.jl`** (added to JuliaQAOA module): General-purpose
   linear ramp schedule API. `linear_ramp(γ₁, γ_f, β₁, β_f, p)` generates
