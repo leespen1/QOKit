@@ -25,12 +25,12 @@ using Statistics: median, mean
 #                          CONFIGURATION                                        #
 #==============================================================================#
 
-const N_SOURCE = 6           # Source graph size (paper: 9)
-const N_TARGET = 8           # Target graph size (paper: 20)
+const N_SOURCE = 9
+const N_TARGET = 20
 const P_EDGE = 0.5
-const NUM_SOURCE_INSTANCES = 3   # (paper: 10)
-const NUM_TARGET_INSTANCES = 3   # (paper: 10)
-const P_VALUES = [1, 2]         # Depths to test (paper: [1, 2, 3])
+const NUM_SOURCE_INSTANCES = 10
+const NUM_TARGET_INSTANCES = 10
+const P_VALUES = [1, 2, 3]
 const SEED = 42
 
 # Number of random restarts for QAOA optimization on source graphs
@@ -201,9 +201,9 @@ for (p_idx, p) in enumerate(P_VALUES)
     println("  Median γs: $median_γs")
     println("  Median βs: $median_βs")
 
-    # Evaluate transfer parameters on target graphs
+    # Evaluate transfer parameters on target graphs (GPU for large N_TARGET)
     transfer_ratios = map(enumerate(target_instances)) do (i, inst)
-        exp_val = qaoa_expectation(inst.costs, N_TARGET, median_γs, median_βs)
+        exp_val = qaoa_expectation_device(inst.costs, N_TARGET, median_γs, median_βs)
         exp_val / target_optimal[i]
     end
     all_results[p]["Transfer"] = transfer_ratios
@@ -223,8 +223,8 @@ for (p_idx, p) in enumerate(P_VALUES)
                 homodist, P_vals, N_TARGET, p; grid_size=30
             )
 
-            # Evaluate on real QAOA
-            real_exp = qaoa_expectation(inst.costs, N_TARGET, best_γs, best_βs)
+            # Evaluate on real QAOA (GPU for large N_TARGET)
+            real_exp = qaoa_expectation_device(inst.costs, N_TARGET, best_γs, best_βs)
             real_exp / target_optimal[i]
         end
         all_results[p][label] = proxy_ratios

@@ -22,9 +22,9 @@ include("common.jl")
 #                          CONFIGURATION                                        #
 #==============================================================================#
 
-const N_QUBITS = 6
+const N_QUBITS = 8
 const P_EDGE = 0.5
-const P_DEPTH = 8            # QAOA depth (paper: 20)
+const P_DEPTH = 20
 const SEED = 42
 
 # Linear ramp parameters: β₁ and β_f are shared across curves.
@@ -145,10 +145,8 @@ overlap_curves = map(GAMMA_PAIRS) do (γ1, γf)
     # Generate linear ramp parameters (in radians, not pi_units)
     γs, βs = linear_ramp(γ1, γf, β₁, β_f, P_DEPTH; pi_units=false)
 
-    # Real QAOA: evolve statevector layer by layer
-    real_states = qaoa_statevector(inst.costs, N_QUBITS, γs, βs; return_intermediates=true)
-    # Prepend initial state (uniform superposition)
-    pushfirst!(real_states, fill(ComplexF64(1.0 / sqrt(1 << N_QUBITS)), 1 << N_QUBITS))
+    # Real QAOA: evolve statevector layer by layer (GPU if available)
+    real_states = qaoa_statevector_intermediates_device(inst.costs, N_QUBITS, γs, βs)
 
     # Proxy: evolve via compressed proxy, reconstruct full states
     proxy_states = proxy_statevector_from_compressed(

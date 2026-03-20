@@ -23,17 +23,17 @@ include("common.jl")
 #                          CONFIGURATION                                        #
 #==============================================================================#
 
-const N_QUBITS = 6
+const N_QUBITS = 8
 const P_EDGE = 0.5
-const P_DEPTH = 2            # Total QAOA depth (paper: 3)
-const GRID_SIZE = 20         # Grid resolution (paper: 30)
+const P_DEPTH = 3
+const GRID_SIZE = 30
 const SEED = 42
 
 # Fixed parameters for layers 1 to P_DEPTH-1 (in radians, QOKit convention)
 # For p=2: fix γ₁, β₁; sweep γ₂, β₂
 # For p=3: fix γ₁, γ₂, β₁, β₂; sweep γ₃, β₃
-const FIXED_GAMMAS = [0.4]      # Length = P_DEPTH - 1
-const FIXED_BETAS = [0.4]       # Length = P_DEPTH - 1
+const FIXED_GAMMAS = [0.4, 0.4]  # Length = P_DEPTH - 1
+const FIXED_BETAS  = [0.4, 0.4]  # Length = P_DEPTH - 1
 
 # Sweep range for the last layer's parameters (radians, QOKit convention)
 const GAMMA_RANGE = range(0.0, 2.0, length=GRID_SIZE)
@@ -64,7 +64,7 @@ for (i, γ_last) in enumerate(GAMMA_RANGE)
     for (j, β_last) in enumerate(BETA_RANGE)
         γs = vcat(FIXED_GAMMAS, γ_last)
         βs = vcat(FIXED_BETAS, β_last)
-        true_landscape[i, j] = qaoa_expectation(inst.costs, N_QUBITS, γs, βs)
+        true_landscape[i, j] = qaoa_expectation_device(inst.costs, N_QUBITS, γs, βs)
     end
 end
 println("  True landscape range: [$(minimum(true_landscape)), $(maximum(true_landscape))]")
