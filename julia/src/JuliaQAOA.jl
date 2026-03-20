@@ -29,6 +29,8 @@ export maxcut_costs, apply_phase_gate!, apply_x_mixer!, qaoa_statevector, qaoa_e
 # GPU function stubs — implementations provided by package extensions
 # (JuliaQAOACUDAExt when CUDA is loaded, JuliaQAOAKernelAbstractionsExt when KernelAbstractions is loaded)
 export gpu_apply_phase_gate!, gpu_apply_x_mixer!, gpu_qaoa_statevector, gpu_qaoa_expectation, gpu_maxcut_costs
+export gpu_apply_x_mixer_batched!, gpu_qaoa_statevector_batched, gpu_qaoa_expectation_batched
+export gpu_apply_x_mixer_warp!
 export gpu_get_real_distribution_from_costs, gpu_get_homogeneous_distribution_from_costs_direct
 
 function gpu_compute_homodist end
@@ -40,6 +42,10 @@ function gpu_apply_x_mixer! end
 function gpu_qaoa_statevector end
 function gpu_qaoa_expectation end
 function gpu_maxcut_costs end
+function gpu_apply_x_mixer_batched! end
+function gpu_qaoa_statevector_batched end
+function gpu_qaoa_expectation_batched end
+function gpu_apply_x_mixer_warp! end
 
 end # Module
 

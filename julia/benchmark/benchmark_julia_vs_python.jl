@@ -157,22 +157,32 @@ else
     "Jl GPU"
 end
 
-println("=" ^ 115)
+batched_col = if gpu_name == "none"
+    "Jl Batched (—)"
+elseif !gpu_has_f64
+    "Jl Batched f32"
+else
+    "Jl Batched"
+end
+
+TABLE_WIDTH = 130
+
+println("=" ^ TABLE_WIDTH)
 println("QAOA Statevector Simulation: Julia vs Python (all Float64)")
-println("=" ^ 115)
+println("=" ^ TABLE_WIDTH)
 println("  p = $p layers, edge_prob = $edge_prob, seed = $seed")
 println("  Backends extrapolated (†) via O(2^n·n) scaling once they exceed $(Int(extrapolate_threshold*1000)) ms")
 println("  Julia KA-CPU threads: ", Threads.nthreads())
 println("  Julia GPU backend: $gpu_name", !gpu_has_f64 && gpu_name != "none" ? " (Float32 — no native Float64)" : "")
 println("  Python backends: ", join(py_available, ", "), " (always Float64)")
-println("-" ^ 115)
+println("-" ^ TABLE_WIDTH)
 
-@printf("  %4s  %6s  │  %14s  %14s  %14s  │  %14s  %14s  %14s\n",
-        "n", "edges", "Jl CPU", "Jl KA-CPU", gpu_col,
+@printf("  %4s  %6s  │  %14s  %14s  %14s  %14s  │  %14s  %14s  %14s\n",
+        "n", "edges", "Jl CPU", "Jl KA-CPU", gpu_col, batched_col,
         has_py_c ? "Py C" : "Py C (—)",
         has_py_gpu ? "Py GPU" : "Py GPU (—)",
         "Py pure")
-println("-" ^ 115)
+println("-" ^ TABLE_WIDTH)
 
 # ─── JIT warmup (small n to trigger compilation without large allocations) ──
 
@@ -185,6 +195,7 @@ let
     if gpu_backend !== nothing
         gpu_warmup = gpu_array_type(gpu_T.(warmup_costs))
         gpu_qaoa_expectation(gpu_warmup, 4, warmup_γ, warmup_β)
+        gpu_qaoa_expectation_batched(gpu_warmup, 4, warmup_γ, warmup_β; group_size=2)
     end
 end
 
@@ -263,12 +274,18 @@ for n in n_values
 
     # ── Julia GPU (Float64 if supported, else Float32) ────────────────
     jl_gpu_str = "—"
+    jl_bat_str = "—"
     if gpu_backend !== nothing
         gpu_costs = gpu_array_type(gpu_T.(cpu_costs))
         t_jl_gpu, ext_gpu = measure_or_extrapolate!("jl_gpu", last_measured, n,
             (s, samp) -> @belapsed(gpu_qaoa_expectation($gpu_costs, $n, $γs, $βs), seconds=s, samples=samp);
             bm_seconds, bm_samples)
         jl_gpu_str = fmt_time(t_jl_gpu; extrapolated=ext_gpu)
+
+        t_jl_bat, ext_bat = measure_or_extrapolate!("jl_bat", last_measured, n,
+            (s, samp) -> @belapsed(gpu_qaoa_expectation_batched($gpu_costs, $n, $γs, $βs), seconds=s, samples=samp);
+            bm_seconds, bm_samples)
+        jl_bat_str = fmt_time(t_jl_bat; extrapolated=ext_bat)
     end
 
     # ── Python C backend (Float64) ────────────────────────────────────
@@ -297,13 +314,13 @@ for n in n_values
         py_repeats)
     py_pure_str = fmt_time(t_py_pure; extrapolated=ext_py_pure)
 
-    @printf("  %4d  %6d  │  %14s  %14s  %14s  │  %14s  %14s  %14s\n",
+    @printf("  %4d  %6d  │  %14s  %14s  %14s  %14s  │  %14s  %14s  %14s\n",
             n, num_edges,
-            jl_cpu_str, jl_ka_str, jl_gpu_str,
+            jl_cpu_str, jl_ka_str, jl_gpu_str, jl_bat_str,
             py_c_str, py_gpu_str, py_pure_str)
 end
 
-println("=" ^ 115)
+println("=" ^ TABLE_WIDTH)
 println("  † = extrapolated from last measured n using O(2^n·n) scaling")
 
 # ─── Correctness verification ──────────────────────────────────────────────
