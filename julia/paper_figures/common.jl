@@ -9,6 +9,13 @@ Provides:
 =#
 
 using Pkg
+Pkg.activate(joinpath(@__DIR__,))
+include(joinpath(@__DIR__, "..", "find_python.jl"))
+
+using JuliaQAOA
+using CairoMakie
+using Random
+using LinearAlgebra
 
 #==============================================================================#
 #                          GPU Backend Selection                                #

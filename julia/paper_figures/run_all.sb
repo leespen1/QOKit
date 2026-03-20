@@ -12,6 +12,7 @@
 #SBATCH --export=NONE
 
 module purge
+module load CUDA/12.6
 
 # juliaup installs julia here (set by .bashrc, but --export=NONE clears it)
 export PATH=/mnt/home/leespen1/.juliaup/bin:${PATH}
