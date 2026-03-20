@@ -163,8 +163,8 @@ cython_debug/
 .idea
 .vscode/settings.json
 
-# Julia Manifest
-julia/Manifest.toml
+# Julia Manifests (all subdirectories)
+julia/**/Manifest.toml
 
 # Data and Images
 *.npz
