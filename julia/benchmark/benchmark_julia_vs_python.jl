@@ -282,9 +282,14 @@ for n in n_values
     # ── Python GPU backend (Float64) ──────────────────────────────────
     py_gpu_str = "—"
     if has_py_gpu
-        t_py_gpu, ext_py_gpu = measure_or_extrapolate_py!("py_gpu", last_measured, n, terms, γs, βs, "gpu";
-            py_repeats)
-        py_gpu_str = fmt_time(t_py_gpu; extrapolated=ext_py_gpu)
+        try
+            t_py_gpu, ext_py_gpu = measure_or_extrapolate_py!("py_gpu", last_measured, n, terms, γs, βs, "gpu";
+                py_repeats)
+            py_gpu_str = fmt_time(t_py_gpu; extrapolated=ext_py_gpu)
+        catch e
+            @warn "Python GPU backend failed, skipping for remaining sizes" exception=(e, catch_backtrace())
+            has_py_gpu = false
+        end
     end
 
     # ── Python pure backend (Float64) ─────────────────────────────────
