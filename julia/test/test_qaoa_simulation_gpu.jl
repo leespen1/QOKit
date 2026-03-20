@@ -230,6 +230,90 @@ end
     end
 end
 
+@testset "KA batched X-mixer on CPU backend (Float64)" begin
+    for seed in 0:4
+        edges = random_edges(10, seed)
+        p = 3
+        param_rng = MersenneTwister(seed + 100)
+        γs = rand(param_rng, p) .* 2π
+        βs = rand(param_rng, p) .* 2π
+
+        costs = maxcut_costs(10, edges)
+        cpu_exp = qaoa_expectation(costs, 10, γs, βs)
+
+        for gs in [2, 5, 10]
+            bat_exp = gpu_qaoa_expectation_batched(costs, 10, γs, βs; group_size=gs)
+            @test bat_exp ≈ cpu_exp atol=1e-10
+        end
+    end
+end
+
+@testset "KA batched X-mixer on CPU backend (Float32)" begin
+    for seed in 0:4
+        edges = random_edges(10, seed)
+        p = 3
+        param_rng = MersenneTwister(seed + 100)
+        γs = rand(param_rng, p) .* 2π
+        βs = rand(param_rng, p) .* 2π
+
+        costs32 = Float32.(maxcut_costs(10, edges))
+        cpu_exp = qaoa_expectation(costs32, 10, γs, βs)
+
+        for gs in [2, 5, 10]
+            bat_exp = gpu_qaoa_expectation_batched(costs32, 10, γs, βs; group_size=gs)
+            @test bat_exp ≈ cpu_exp atol=1e-4
+        end
+    end
+end
+
+@testset "GPU batched QAOA matches CPU ($gpu_name Float64)" begin
+    if gpu_backend === nothing || gpu_float_type != Float64
+        @warn "Skipping Float64 GPU batched test (backend: $gpu_name)"
+        return
+    end
+
+    for seed in 0:4
+        edges = random_edges(10, seed)
+        p = 3
+        param_rng = MersenneTwister(seed + 100)
+        γs = rand(param_rng, p) .* 2π
+        βs = rand(param_rng, p) .* 2π
+
+        cpu_costs = maxcut_costs(10, edges)
+        cpu_exp = qaoa_expectation(cpu_costs, 10, γs, βs)
+
+        gpu_costs = gpu_array_type(cpu_costs)
+        for gs in [2, 5, 10]
+            gpu_exp = gpu_qaoa_expectation_batched(gpu_costs, 10, γs, βs; group_size=gs)
+            @test gpu_exp ≈ cpu_exp atol=1e-10
+        end
+    end
+end
+
+@testset "GPU batched QAOA ($gpu_name Float32)" begin
+    if gpu_backend === nothing
+        @warn "No GPU available, skipping"
+        return
+    end
+
+    for seed in 0:4
+        edges = random_edges(10, seed)
+        p = 3
+        param_rng = MersenneTwister(seed + 100)
+        γs = rand(param_rng, p) .* 2π
+        βs = rand(param_rng, p) .* 2π
+
+        costs_f32 = Float32.(maxcut_costs(10, edges))
+        cpu_exp = qaoa_expectation(costs_f32, 10, γs, βs)
+
+        gpu_costs = gpu_array_type(costs_f32)
+        for gs in [2, 5, 10]
+            gpu_exp = gpu_qaoa_expectation_batched(gpu_costs, 10, γs, βs; group_size=gs)
+            @test gpu_exp ≈ cpu_exp atol=1e-4
+        end
+    end
+end
+
 @testset "KA kernels on CPU backend (Float32)" begin
     for seed in 0:4
         edges = random_edges(10, seed)

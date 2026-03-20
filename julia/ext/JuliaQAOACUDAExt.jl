@@ -230,4 +230,9 @@ function _homogeneous_distribution_kernel_priv!(
 end
 
 
+# ─── Warp-shuffle X-mixer ────────────────────────────────────────────────────
+
+include("batched_furx_cuda.jl")
+
+
 end # module

@@ -1,7 +1,7 @@
 module JuliaQAOAKernelAbstractionsExt
 
 using KernelAbstractions: KernelAbstractions, @kernel, @index, @Const,
-    get_backend, synchronize
+    @localmem, @synchronize, get_backend, synchronize
 using JuliaQAOA
 
 
@@ -183,6 +183,65 @@ function JuliaQAOA.gpu_maxcut_costs(n::Int, edges::Vector{Tuple{Int,Int}};
     synchronize(backend)
 
     return costs_gpu
+end
+
+
+# ─── Batched shared-memory X-mixer ─────────────────────────────────────────
+
+include("batched_furx_ka.jl")
+
+
+# ─── Batched QAOA (uses batched mixer, everything else identical) ──────────
+
+"""
+    gpu_qaoa_statevector_batched(costs_gpu, n, γs, βs; group_size=10)
+
+Like `gpu_qaoa_statevector` but uses the batched shared-memory X-mixer.
+"""
+function JuliaQAOA.gpu_qaoa_statevector_batched(
+    costs_gpu::AbstractVector{<:Real}, n::Int,
+    γs::AbstractVector{<:Real}, βs::AbstractVector{<:Real};
+    group_size::Int=10
+)
+    @assert length(γs) == length(βs) "γs and βs must have the same length"
+    p = length(γs)
+    num_bitstrings = 1 << n
+
+    backend = get_backend(costs_gpu)
+    T = eltype(costs_gpu)
+    CT = Complex{T}
+
+    state = KernelAbstractions.allocate(backend, CT, num_bitstrings)
+    fill!(state, CT(1 / sqrt(T(num_bitstrings))))
+
+    for ℓ in 1:p
+        JuliaQAOA.gpu_apply_phase_gate!(state, costs_gpu, T(γs[ℓ]))
+        JuliaQAOA.gpu_apply_x_mixer_batched!(state, T(βs[ℓ]), n; group_size)
+    end
+
+    return state
+end
+
+
+"""
+    gpu_qaoa_expectation_batched(costs_gpu, n, γs, βs; group_size=10)
+
+Like `gpu_qaoa_expectation` but uses the batched shared-memory X-mixer.
+"""
+function JuliaQAOA.gpu_qaoa_expectation_batched(
+    costs_gpu::AbstractVector{<:Real}, n::Int,
+    γs::AbstractVector{<:Real}, βs::AbstractVector{<:Real};
+    group_size::Int=10
+)
+    state = JuliaQAOA.gpu_qaoa_statevector_batched(costs_gpu, n, γs, βs; group_size)
+    backend = get_backend(state)
+    T = real(eltype(state))
+
+    out = KernelAbstractions.allocate(backend, T, length(state))
+    _weighted_prob_kernel!(backend)(out, state, costs_gpu, ndrange=length(state))
+    synchronize(backend)
+
+    return T(sum(out))
 end
 
 

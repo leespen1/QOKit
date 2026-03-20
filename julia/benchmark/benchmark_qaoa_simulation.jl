@@ -1,8 +1,9 @@
 #=
-Benchmark QAOA statevector simulation across three backends, both Float32 and Float64:
-  1. CPU          — qaoa_expectation (pure Julia FUR, Float64 only)
-  2. KA-CPU       — gpu_qaoa_expectation with plain Arrays (KernelAbstractions CPU backend)
-  3. GPU          — gpu_qaoa_expectation with device arrays (auto-detected backend)
+Benchmark QAOA statevector simulation across backends, both Float32 and Float64:
+  1. CPU            — qaoa_expectation (pure Julia FUR)
+  2. KA-CPU         — gpu_qaoa_expectation with plain Arrays (KernelAbstractions CPU)
+  3. GPU            — gpu_qaoa_expectation with device arrays (per-qubit kernel)
+  4. GPU-batched    — gpu_qaoa_expectation_batched (shared-memory batched kernel)
 
 All backends are extrapolated using O(2^n · n) scaling once they exceed 250 ms.
 
@@ -80,22 +81,27 @@ seed = 42
 # ─── Print header ────────────────────────────────────────────────────────────
 
 gpu_label = gpu_name == "none" ? "GPU (—)" : "GPU ($gpu_name)"
+batched_label = gpu_name == "none" ? "Batched (—)" : "Batched ($gpu_name)"
 
-println("=" ^ 130)
+TABLE_WIDTH = 180
+
+println("=" ^ TABLE_WIDTH)
 println("QAOA Statevector Simulation Benchmark")
-println("=" ^ 130)
+println("=" ^ TABLE_WIDTH)
 println("  p = $p layers, edge_prob = $edge_prob, seed = $seed")
 println("  Backends extrapolated (†) via O(2^n·n) scaling once they exceed $(Int(extrapolate_threshold*1000)) ms")
 println("  KA-CPU threads: ", Threads.nthreads())
 println("  GPU backend: $gpu_name", gpu_has_f64 ? "" : gpu_name == "none" ? "" : " (Float32 only)")
-println("-" ^ 130)
-@printf("  %4s  %6s  │  %14s  %14s  │  %14s  %14s  │  %14s  %14s\n",
+println("-" ^ TABLE_WIDTH)
+@printf("  %4s  %6s  │  %14s  %14s  │  %14s  %14s  │  %14s  %14s  │  %14s  %14s\n",
         "n", "edges",
         "CPU f64", "CPU f32",
         "KA-CPU f64", "KA-CPU f32",
         gpu_has_f64 ? "$gpu_label f64" : "$gpu_label f64 —",
-        "$gpu_label f32")
-println("-" ^ 130)
+        "$gpu_label f32",
+        gpu_has_f64 ? "$batched_label f64" : "$batched_label f64 —",
+        "$batched_label f32")
+println("-" ^ TABLE_WIDTH)
 
 # ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -141,9 +147,11 @@ let
     if gpu_backend !== nothing
         gpu_warmup_f32 = gpu_array_type(warmup_costs_f32)
         gpu_qaoa_expectation(gpu_warmup_f32, 4, warmup_γ, warmup_β)
+        gpu_qaoa_expectation_batched(gpu_warmup_f32, 4, warmup_γ, warmup_β; group_size=2)
         if gpu_has_f64
             gpu_warmup_f64 = gpu_array_type(warmup_costs_f64)
             gpu_qaoa_expectation(gpu_warmup_f64, 4, warmup_γ, warmup_β)
+            gpu_qaoa_expectation_batched(gpu_warmup_f64, 4, warmup_γ, warmup_β; group_size=2)
         end
     end
 end
@@ -210,6 +218,8 @@ for n in n_values
     # ── GPU benchmarks (if available) ────────────────────────────────────
     gpu_f64_str = "—"
     gpu_f32_str = "—"
+    bat_f64_str = "—"
+    bat_f32_str = "—"
 
     if gpu_backend !== nothing
         gpu_costs_f32 = gpu_array_type(Float32.(costs_f64))
@@ -218,22 +228,33 @@ for n in n_values
             bm_seconds, bm_samples)
         gpu_f32_str = fmt_time(t_gpu_f32; extrapolated=ext)
 
+        t_bat_f32, ext = measure_or_extrapolate!("bat_f32", last_measured, n,
+            (s, samp) -> @belapsed(gpu_qaoa_expectation_batched($gpu_costs_f32, $n, $γs, $βs), seconds=s, samples=samp);
+            bm_seconds, bm_samples)
+        bat_f32_str = fmt_time(t_bat_f32; extrapolated=ext)
+
         if gpu_has_f64
             gpu_costs_f64 = gpu_array_type(costs_f64)
             t_gpu_f64, ext = measure_or_extrapolate!("gpu_f64", last_measured, n,
                 (s, samp) -> @belapsed(gpu_qaoa_expectation($gpu_costs_f64, $n, $γs, $βs), seconds=s, samples=samp);
                 bm_seconds, bm_samples)
             gpu_f64_str = fmt_time(t_gpu_f64; extrapolated=ext)
+
+            t_bat_f64, ext = measure_or_extrapolate!("bat_f64", last_measured, n,
+                (s, samp) -> @belapsed(gpu_qaoa_expectation_batched($gpu_costs_f64, $n, $γs, $βs), seconds=s, samples=samp);
+                bm_seconds, bm_samples)
+            bat_f64_str = fmt_time(t_bat_f64; extrapolated=ext)
         end
     end
 
-    @printf("  %4d  %6d  │  %14s  %14s  │  %14s  %14s  │  %14s  %14s\n",
+    @printf("  %4d  %6d  │  %14s  %14s  │  %14s  %14s  │  %14s  %14s  │  %14s  %14s\n",
             n, num_edges,
             cpu_f64_str, cpu_f32_str,
             ka_f64_str, ka_f32_str,
-            gpu_f64_str, gpu_f32_str)
+            gpu_f64_str, gpu_f32_str,
+            bat_f64_str, bat_f32_str)
 end
 
-println("=" ^ 130)
+println("=" ^ TABLE_WIDTH)
 println("  † = extrapolated from last measured n using O(2^n·n) scaling")
 println()
