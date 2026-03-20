@@ -58,8 +58,17 @@ cd julia && julia --project test/test_QAOA.jl
 # Run Julia benchmarks
 cd julia && julia --project=benchmark benchmark/benchmark_QAOA.jl
 
-# Run paper figure scripts
+# Run all paper figure scripts (sequentially, one Julia process per figure)
+cd julia && bash paper_figures/run_all.sh
+
+# Run a specific subset of paper figures (e.g. figures 6 and 7 only)
+cd julia && bash paper_figures/run_all.sh 6 7
+
+# Run a single paper figure script
 cd julia && julia --project=paper_figures paper_figures/figure3_pearson_correlation.jl
+
+# Submit all paper figures as a Slurm job on MSU HPC
+cd julia && sbatch paper_figures/run_all.sb
 
 # Start Julia REPL with JuliaQAOA loaded
 cd julia && julia --project -e 'using JuliaQAOA'
@@ -594,12 +603,33 @@ Full report: `julia/paper_figures/REPORT.md`. Each script uses CairoMakie for pl
 and the JuliaQAOA module for proxy computations. Configuration constants at the top of
 each script make it easy to change graph type, size, proxy, etc.
 
+### Running the Figures
+
+**`run_all.sh`**: Bash script that runs all six figure scripts as separate Julia
+processes (required because each defines module-level `const`s). Accepts optional
+figure numbers for a subset: `bash run_all.sh 6 7`. Continues past failures and
+reports which figures failed at the end. Respects `JULIA_NUM_THREADS` env var.
+
+**`run_all.sb`**: Slurm job script for MSU HPC. Targets `general-short` partition
+(4-hour limit), requests one A100 GPU (`--gpus=a100:1`) and 8 CPU cores. Sets up
+the juliaup PATH and unsets `LD_LIBRARY_PATH`. Submit with `sbatch run_all.sb` from
+the `paper_figures/` directory (or adjust the `FIGURES_DIR` path inside).
+
 ### Shared Infrastructure
 
 - **`julia/paper_figures/common.jl`**: ER graph generation (`erdos_renyi_edges`),
   MaxCut optimal cost (`maxcut_optimal`), instance generation helpers, and plotting
   utilities. Real QAOA simulation (`qaoa_statevector`, `qaoa_expectation`) and
   `maxcut_costs` are now in the JuliaQAOA module (`julia/src/qaoa_simulation.jl`).
+  Also contains GPU backend selection (see below) and device-aware wrappers
+  `qaoa_expectation_device` / `qaoa_statevector_intermediates_device`.
+
+- **GPU backend selection** (`common.jl`): Tries CUDA first, then AMDGPU; requires
+  Float64 support (rules out Intel iGPU/Apple Metal); silently falls back to CPU.
+  Sets `USE_GPU::Bool` and `_GPU_BACKEND::Symbol` (`:cuda`, `:amdgpu`, or `:none`).
+  `_to_gpu(v)` dispatches to `CuArray` or `ROCArray` accordingly. Loading either
+  GPU package alongside JuliaQAOA activates `JuliaQAOAKernelAbstractionsExt`,
+  making `gpu_qaoa_expectation` and `gpu_apply_*` available.
 
 - **`julia/src/linear_ramp.jl`** (added to JuliaQAOA module): General-purpose
   linear ramp schedule API. `linear_ramp(γ₁, γ_f, β₁, β_f, p)` generates
