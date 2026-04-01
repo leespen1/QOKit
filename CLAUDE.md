@@ -661,3 +661,25 @@ the `paper_figures/` directory (or adjust the `FIGURES_DIR` path inside).
 - **`figure7_high_depth_performance.jl`**: Box plots of approximation ratio vs
   QAOA depth using linear ramp schedules optimized via proxy. Demonstrates
   monotonic improvement with depth. Supports multiple proxy types.
+
+---
+
+## Research Logging System
+
+All experimental results and open research questions are tracked in `research_log/`.
+Paper target: **IEEE Quantum Week** — QAOA parameter-setting heuristics for
+non-Erdos-Renyi graphs.
+
+**Before running an experiment:** Read `research_log/index.md` to check novelty.
+Read `research_log/next_steps.md` for the highest-priority open question.
+
+**After completing an experiment:**
+1. Create entry in `research_log/entries/YYYY-MM-DD_topic.md` (template in `research_log/README.md`)
+2. Append row to `research_log/index.md`
+3. Update `research_log/next_steps.md` — mark DONE, add new questions
+
+**Operating modes:**
+- **Active** (default): Propose top P0 item to user, wait for approval.
+- **Autonomous** (user says "autonomous" or "overnight"): Pick top P0, execute,
+  log, move to next. On errors or ambiguity, make a reasonable assumption or skip
+  to the next P0. Only stop when P0 is empty or critically stuck.
