@@ -27,7 +27,7 @@ println("Time taken to compute N: $(t2-t1)")
 
 # Collect heatmap data
 t1 = time()
-Qf = QAOA_proxy_multi(N, γs, βs) |> last
+Qf = QAOA_proxy_multi(N, γs, βs; pi_units=true) |> last
 t2 = time()
 println("Time taken to run QAOA proxy: $(t2-t1)")
 

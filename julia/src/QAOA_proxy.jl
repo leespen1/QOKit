@@ -21,7 +21,7 @@ By default, β is given in units of pi.
 
 n = problem size / number of nodes / number of qubits
 """
-function get_β_factors(β, n::Integer; pi_units=true)
+function get_β_factors(β, n::Integer; pi_units=false)
     @assert eltype(β) <: Real "β values must be real!"
     expanded_β = _expand(β)
     sinβ = pi_units ? sinpi.(expanded_β) : sin.(expanded_β)
@@ -44,7 +44,7 @@ Convention: matches QOKit's `exp(-0.5j * gamma * hc_diag)`.
 
 m = number of constraints / number of edges / number of distinct costs minus one
 """
-function get_γ_factors(γ, m::Integer; pi_units=true)
+function get_γ_factors(γ, m::Integer; pi_units=false)
     @assert eltype(γ) <: Real "γ values must be real!"
     expanded_γ = _expand(γ)
     # cu(range) converts to CUDA version *only if needed.*
@@ -65,9 +65,9 @@ function QAOA_proxy_basic(
         N::AbstractArray{<: Real, 3},
         γs::AbstractVector{<: Real},
         βs::AbstractVector{<: Real}, 
-        ; pi_units=true,
+        ; pi_units=false,
     )
-    @assert length(βs) == length(γs) "βs and γs must both have the same length (p)." 
+    @assert length(βs) == length(γs) "βs and γs must both have the same length (p)."
     @assert size(N, 1) == size(N, 3) "1st and 3rd dimensions of homogeneous distribution must be the same length (1+m)."
     m = size(N, 1) - 1
     n = size(N, 2) - 1
@@ -107,9 +107,9 @@ function QAOA_proxy_single(
         N::AbstractArray{<: Real, 3},
         γs::AbstractVector{<: Real},
         βs::AbstractVector{<: Real}, 
-        ; pi_units::Bool=true, blas::Bool=true
+        ; pi_units::Bool=false, blas::Bool=true
     )
-    @assert length(βs) == length(γs) "βs and γs must both have the same length (p)." 
+    @assert length(βs) == length(γs) "βs and γs must both have the same length (p)."
     @assert size(N, 1) == size(N, 3) "1st and 3rd dimensions of homogeneous distribution must be the same length (1+m)."
     m = size(N, 1) - 1
     n = size(N, 2) - 1
@@ -118,7 +118,7 @@ function QAOA_proxy_single(
     γ_factors = get_γ_factors(γs, m, pi_units=pi_units)
     β_factors = get_β_factors(βs, n, pi_units=pi_units)
     # Reshape N into matrix, second dim is multi-index of (d,c)
-    M = reshape(N, 1+m, :) 
+    M = reshape(N, 1+m, :)
 
     # Q₀
     Q0 = similar(N, complex(eltype(N)), 1+m)
@@ -154,9 +154,9 @@ function QAOA_proxy_multi(
         N::AbstractArray{<: Real, 3},
         γs::AbstractVecOrMat{<: Real},
         βs::AbstractVecOrMat{<: Real}, 
-        ; pi_units::Bool=true, blas::Bool=true
+        ; pi_units::Bool=false, blas::Bool=true
     )
-    @assert size(βs) == size(γs) "βs and γs must both have the same dimensions." 
+    @assert size(βs) == size(γs) "βs and γs must both have the same dimensions."
     @assert size(N, 1) == size(N, 3) "1st and 3rd dimensions of homogeneous distribution must be the same length (1+m)."
     m = size(N, 1) - 1
     n = size(N, 2) - 1
