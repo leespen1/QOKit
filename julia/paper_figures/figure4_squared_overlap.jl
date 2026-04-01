@@ -142,8 +142,8 @@ homodist = cpu_compute_homodist(proxy)
 # For each (γ₁, γ_f) pair, compute overlaps at each layer
 println("Computing overlaps for $(length(GAMMA_PAIRS)) parameter curves...")
 overlap_curves = map(GAMMA_PAIRS) do (γ1, γf)
-    # Generate linear ramp parameters (in radians, not pi_units)
-    γs, βs = linear_ramp(γ1, γf, β₁, β_f, P_DEPTH; pi_units=false)
+    # Generate linear ramp parameters (in radians)
+    γs, βs = linear_ramp(γ1, γf, β₁, β_f, P_DEPTH)
 
     # Real QAOA: evolve statevector layer by layer (GPU if available)
     real_states = qaoa_statevector_intermediates_device(inst.costs, N_QUBITS, γs, βs)
