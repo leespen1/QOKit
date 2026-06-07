@@ -18,9 +18,10 @@ parameter-setting heuristics for non-Erdos-Renyi graphs.
 user, wait for approval before executing.
 
 **Autonomous mode** (user says "autonomous" or "overnight"): Pick top P0 item,
-execute, log, move to next. On errors or moderate ambiguity, make a reasonable
-assumption and proceed, or skip and move to the next P0 item. Log any skipped
-items or assumptions in the entry. Only stop when P0 is empty or there is a
+execute, log, move to next. When P0 is empty, proceed to P1 items, then P2.
+On errors or moderate ambiguity, make a reasonable assumption and proceed, or
+skip and move to the next item. Log any skipped items or assumptions in the
+entry. Only stop when all priority levels are empty or there is a
 critical/unrecoverable issue.
 
 ## Entry Template

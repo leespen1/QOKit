@@ -22,6 +22,7 @@
 export hamming_distance
 export get_real_distribution_from_costs, get_homogeneous_distribution_from_costs
 export get_homogeneous_distribution_from_costs_direct
+export get_homogeneous_distribution_from_costs_sampled
 export pad_to_shape, pad_to_match, pad_and_stack
 export average_distributions, stddev_distributions, distributions_mean_and_stddev
 export distribution_array_to_dict, get_pearson_correlation_coefficients
@@ -246,6 +247,115 @@ function get_homogeneous_distribution_from_costs_direct(
     @inbounds for cost_idx in 1:cost_axis_size
         if num_cost_occurrences[cost_idx] > 0
             homogeneous_distribution[cost_idx, :, :] ./= num_cost_occurrences[cost_idx]
+        end
+    end
+
+    return homogeneous_distribution
+end
+
+
+"""
+    get_homogeneous_distribution_from_costs_sampled(
+        costs, num_edges, num_vertices, samples_per_cost;
+        max_num_edges=0, rng=Random.default_rng()
+    ) -> Array{Float64, 3}
+
+Estimate N(c'; d, c) by sampling bitstrings from each cost class.
+
+Instead of iterating over all 2^n bitstrings x (O(2^(2n)) total), this function
+samples `samples_per_cost` bitstrings from each cost class c' and computes their
+n(x; d, c) by iterating over all y. Total cost: O(S × (m+1) × 2^n).
+
+# Arguments
+- `costs`: 1D array of costs for each bitstring (length 2^num_vertices)
+- `num_edges`: Number of edges in the graph
+- `num_vertices`: Number of vertices in the graph
+- `samples_per_cost`: Number of bitstrings to sample per cost class.
+  If a cost class has fewer bitstrings, all are used (exact for that class).
+- `max_num_edges=0`: Optional, allocate extra space for compatibility
+- `rng`: Random number generator for reproducibility
+
+# Returns
+- 3D array of shape (num_costs, num_distances, num_costs) representing N(c'; d, c)
+"""
+function get_homogeneous_distribution_from_costs_sampled(
+    costs::AbstractVector{<:Real},
+    num_edges::Integer,
+    num_vertices::Integer,
+    samples_per_cost::Integer;
+    max_num_edges::Integer=0,
+    rng::AbstractRNG=Random.default_rng()
+)::Array{Float64, 3}
+
+    num_bitstrings = 2^num_vertices
+    num_distances = num_vertices + 1
+    num_costs = num_edges + 1
+    cost_axis_size = max(num_costs, max_num_edges + 1)
+
+    @assert length(costs) == num_bitstrings "Length of costs must equal 2^num_vertices"
+
+    # Group bitstrings by cost class
+    cost_groups = [Int[] for _ in 1:cost_axis_size]
+    @inbounds for x in 0:(num_bitstrings - 1)
+        c = Int(costs[x + 1])
+        if c + 1 <= cost_axis_size
+            push!(cost_groups[c + 1], x)
+        end
+    end
+
+    # For each cost class, select samples (or all if fewer than samples_per_cost)
+    sampled_bitstrings = Vector{Vector{Int}}(undef, cost_axis_size)
+    for c_idx in 1:cost_axis_size
+        group = cost_groups[c_idx]
+        if length(group) <= samples_per_cost
+            sampled_bitstrings[c_idx] = group  # use all
+        else
+            sampled_bitstrings[c_idx] = group[randperm(rng, length(group))[1:samples_per_cost]]
+        end
+    end
+
+    # Allocate per-thread accumulators
+    nt = nthreads()
+    thread_accumulators = [zeros(Float64, cost_axis_size, num_distances, cost_axis_size) for _ in 1:nt]
+    thread_counts = [zeros(Int, cost_axis_size) for _ in 1:nt]
+
+    # Build flat work list: (cost_class_index, bitstring_x)
+    work_items = Tuple{Int, Int}[]
+    for c_idx in 1:cost_axis_size
+        for x in sampled_bitstrings[c_idx]
+            push!(work_items, (c_idx, x))
+        end
+    end
+
+    # Main computation: for each sampled x, sweep all y
+    @inbounds @threads :static for wi in 1:length(work_items)
+        tid = threadid()
+        local_acc = thread_accumulators[tid]
+        local_cnt = thread_counts[tid]
+        c_idx, x = work_items[wi]
+
+        for y in 0:(num_bitstrings - 1)
+            d = hamming_distance(x, y) + 1  # +1 for 1-indexing
+            cost_y = Int(costs[y + 1]) + 1   # +1 for 1-indexing
+            if cost_y <= cost_axis_size
+                local_acc[c_idx, d, cost_y] += 1.0
+            end
+        end
+        local_cnt[c_idx] += 1
+    end
+
+    # Reduce thread-local accumulators
+    homogeneous_distribution = thread_accumulators[1]
+    sample_counts = thread_counts[1]
+    for t in 2:nt
+        homogeneous_distribution .+= thread_accumulators[t]
+        sample_counts .+= thread_counts[t]
+    end
+
+    # Normalize by number of samples per cost class (not total bitstrings)
+    @inbounds for cost_idx in 1:cost_axis_size
+        if sample_counts[cost_idx] > 0
+            homogeneous_distribution[cost_idx, :, :] ./= sample_counts[cost_idx]
         end
     end
 

@@ -551,48 +551,51 @@ for Erdős-Rényi graphs, where the analytical formula is available and accurate
 
 ## Current Research Directions
 
-Based on the P(c') investigation findings, the following directions have been
-identified for improving on the paper's results. **Spencer is currently focusing
-on direction 2.**
+### What Is Prior Art (Not Novel)
 
-### Direction 1: Better Fitted Proxy Shapes
+- **Parameter transfer** from small source graphs to larger target graphs is
+  well-established in the QAOA literature.
+- **The PaperProxy** (analytical multinomial N(c';d,c) for ER graphs) is from
+  Sud et al. — it is the baseline, not our contribution.
+- **Transfer + local refinement** is a known technique. Earlier experiments here
+  found it effective, but it is not a new result worth building a paper around.
 
-Fit TriangleProxy or NormalProxy to N(c';d,c) data averaged over *many* graph
-instances (not just one). Multi-instance averaging provides the same regularization
-benefit as the analytical formula. The fitted proxy could then be paired with the
-analytical Binomial P(c') for consistency. This leverages the speed advantage of
-TriangleProxy while potentially matching PaperProxy's accuracy.
+### Novel Research Contributions (Paper Focus)
 
-### Direction 2: Non-Erdős-Rényi Graph Families (Current Focus)
+The paper should focus on these new contributions:
 
-**This is the most promising direction.** PaperProxy's analytical formula is derived
-specifically for Erdős-Rényi random graphs. For other graph families (Barabási-Albert,
-Watts-Strogatz, real-world networks), no analytical formula exists, so the PaperProxy
-cannot be used at all. This makes fitted proxies (TriangleProxy, NormalProxy) the
-*only* option for these graph types. The data_generation/ directory already includes
-scripts for generating Barabási-Albert and Watts-Strogatz graphs. The key question
-is whether fitted proxies can achieve good approximation ratios on these non-ER
-graph families where PaperProxy is unavailable.
+#### Contribution 1: Sampling-Based Homodist Estimation (Primary)
 
-### Direction 3: Higher Depth with Linear Ramp Schedules
+Computing N(c';d,c) exactly is O(2^(2n)), and the analytical formula only exists
+for ER graphs. A **sampling-based estimator** (Monte Carlo, importance sampling,
+MCMC) would make homodist computation tractable at large n for *any* graph family.
+This is the key scalability contribution: it enables the proxy heuristic to work
+on graph types and sizes where neither brute-force homodist nor analytical formulas
+are available.
 
-The P(c') investigation used p=1. At higher depths (p=5, 10, 20), the proxy
-landscape becomes more structured and the gap between proxy and real QAOA may
-change. Linear ramp schedules (4 parameters: γ_1, γ_f, β_1, β_f) reduce the
-search space and are already supported by the proxy infrastructure.
+#### Contribution 2: Alternative Proxy Shapes (TriangleProxy, NormalProxy)
 
-### Direction 4: Hybrid Proxy Warmstart + Local Refinement
+The TriangleProxy and NormalProxy approximate N(c';d,c) with simpler functional
+forms that are faster to evaluate and have tunable parameters. The research question
+is whether these fitted proxies, when paired with a *consistent* P(c'), can produce
+competitive QAOA parameters for non-ER graph families where PaperProxy is unavailable.
 
-Use the proxy to find a good starting point (γ*, β*), then run a few iterations of
-real QAOA optimization (COBYLA/BFGS) starting from that point. This combines the
-proxy's cheap global search with real QAOA's accuracy for local refinement.
+#### Contribution 3: N/P Consistency Principle
 
-### Direction 5: Multi-Instance Averaged Homodist
+Our experiments discovered that the proxy's N(c';d,c) and P(c') must come from the
+same underlying model to work well. Mixing (e.g., empirical N + analytical P, or
+fitted N + binomial P) produces catastrophic results. This is a new insight with
+practical implications for anyone building proxy-based QAOA parameter heuristics.
 
-Compute empirical N(c';d,c) from multiple graph instances of the same class,
-averaged together. This provides class-level smoothing similar to the analytical
-formula but works for any graph family. Combine with a consistent P(c') estimated
-from the same set of instances (e.g., via moment matching or Wang-Landau).
+### Supporting Directions
+
+- **Multi-instance averaged homodist**: Averaging empirical N(c';d,c) over many
+  graph instances provides regularization analogous to the analytical formula.
+  Useful as ground truth for proxy fitting and as a standalone method.
+- **Non-ER graph families**: BA, WS, and real-world networks are the target
+  applications. PaperProxy cannot be used here, making our contributions essential.
+- **Higher depth with linear ramps**: Testing at p=5,10,20 with ramp schedules.
+  Already partially explored; mainly needed for paper completeness.
 
 ---
 
@@ -681,5 +684,6 @@ Read `research_log/next_steps.md` for the highest-priority open question.
 **Operating modes:**
 - **Active** (default): Propose top P0 item to user, wait for approval.
 - **Autonomous** (user says "autonomous" or "overnight"): Pick top P0, execute,
-  log, move to next. On errors or ambiguity, make a reasonable assumption or skip
-  to the next P0. Only stop when P0 is empty or critically stuck.
+  log, move to next. When P0 is empty, proceed to P1 items, then P2. On errors
+  or ambiguity, make a reasonable assumption or skip to the next item. Only stop
+  when all priority levels are empty or critically stuck.

@@ -7,10 +7,11 @@ using Base.Threads: @threads, nthreads, threadid
 using ProgressMeter: @showprogress
 using InteractiveUtils
 using Statistics: mean, std, cor
+using Random: AbstractRNG, randperm
 
 # Functions that will be made available when I call "using JuliaQAOA"
 export P_cost_distribution, N_cost_distribution, N_cost_distance_distribution
-export NormalProxy, PaperProxy, TriangleProxy, HardCodedTriangleProxy, IntuitiveTriangleProxy, OldTriangleProxy
+export NormalProxy, PaperProxy, TriangleProxy, HardCodedTriangleProxy, IntuitiveTriangleProxy, OldTriangleProxy, GaussianProxy
 
 include("utils.jl") # Has abstract type definitions! Include this first!
 include("QAOA_proxy.jl")
@@ -18,6 +19,7 @@ export _expand, get_β_factors, get_γ_factors, QAOA_proxy_basic, QAOA_proxy_sin
 include("triangle_proxy.jl")
 include("normal_proxy.jl")
 include("paper_proxy.jl")
+include("gaussian_proxy.jl")
 include("cost_distributions.jl")
 include("linear_ramp.jl")
 export linear_ramp, linear_ramp_matrix
