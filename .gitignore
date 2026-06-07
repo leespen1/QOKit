@@ -185,6 +185,7 @@ PK_folder/monte_carlo.jl
 PK_folder/numerical_integrate2.jl
 
 julia/.CondaPkg
+
 examples/benchmark.ipynb
 examples/QAOA_iterative_interpolation_SK.ipynb
 examples/QAOA_LABS_circuit_generation.ipynb
@@ -211,4 +212,7 @@ grips_examples/QAOA_plots.ipynb
 grips_examples/Transferability_to_unseen_instances.ipynb
 updates.txt
 .gitattributes
-.gitignore
+
+data_generation/Nc_Distributions/Data_graphType=*
+data_generation/Nc_Distributions/HPC_Copy
+*.orig
