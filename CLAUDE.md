@@ -18,6 +18,23 @@ researchers.
 `using DrWatson; @quickactivate "JuliaQAOA"` and reference directories via
 `projectdir()`, `datadir()`, `plotsdir()`, `papersdir()`, `scriptsdir()`.
 
+**The paper (`papers/OverleafPaper/`)**: The LaTeX source, figures, and bib for
+the parameter-setting paper live here as a **separate, nested git repository**
+(remote `git@github.com:leespen1/QAOA_ParameterSettingResearchPaper.git`, branch
+`main`; the directory is named "OverleafPaper" but is GitHub-backed). It is *not*
+a submodule and is intentionally untracked by this repo, so a fresh clone of
+QOKit will not contain it. When you need the paper's text — drafts, the
+work/methods write-ups (`final_report.tex`, `after_final_report.tex`,
+`work_statement.tex`, etc.), references, or figures — look there first. If the
+directory is absent, clone it:
+
+```bash
+git clone git@github.com:leespen1/QAOA_ParameterSettingResearchPaper.git papers/OverleafPaper
+```
+
+Edit and commit the paper *inside* that directory against its own remote; QOKit
+does not track its contents.
+
 **Virtual Environment**: The Python virtual environment should be created in a
 subdirectory of `python/`, namely `python/qokitvenv`. **This is a change**: it
 previously lived at the repo-external `../qokitvenv`. If you still have that old
