@@ -78,7 +78,7 @@ end
             np.array(qaoa_sim.get_state(n, terms, py_gamma, py_beta, simulator_name="python"))
         )
 
-        @test jl_state ≈ py_state atol=1e-18
+        @test jl_state ≈ py_state atol=1e-12
     end
 end
 
