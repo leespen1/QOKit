@@ -1,0 +1,45 @@
+name: Run Julia tests (JuliaQAOA)
+
+on:
+  push:
+    branches: [ "main", "**" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  test:
+    name: Julia ${{ matrix.version }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        version:
+          - "1.10"   # LTS
+          - "1"      # current stable release
+    steps:
+      - uses: actions/checkout@v4
+
+      # --- Python QOKit, so test_qaoa_simulation.jl can compare against it ---
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install Python QOKit (python-only backend)
+        run: |
+          python -m pip install --upgrade pip
+          # python-only avoids the C build; the Julia simulator is still
+          # validated against QOKit's reference Python FUR backend.
+          QOKIT_PYTHON_ONLY=1 pip install -e python
+          # Point PythonCall at this interpreter (where qokit is now installed)
+          # and disable CondaPkg so it doesn't bootstrap a separate Python.
+          echo "JULIA_PYTHONCALL_EXE=$(python -c 'import sys; print(sys.executable)')" >> "$GITHUB_ENV"
+          echo "JULIA_CONDAPKG_BACKEND=Null" >> "$GITHUB_ENV"
+
+      # --- Julia ---
+      - uses: julia-actions/setup-julia@v2
+        with:
+          version: ${{ matrix.version }}
+      - uses: julia-actions/cache@v2
+      # The JuliaQAOA package lives at the repo root (DrWatson project layout).
+      - uses: julia-actions/julia-buildpkg@v1
+      - uses: julia-actions/julia-runtest@v1

@@ -6,7 +6,7 @@ test.lp
 
 # C extensions
 *.so
-qokit/fur/c/csim/src/*.o
+python/qokit/fur/c/csim/src/*.o
 
 #results
 results/*.csv
@@ -169,8 +169,10 @@ cython_debug/
 .idea
 .vscode/settings.json
 
-# Julia Manifests (all subdirectories)
-julia/**/Manifest.toml
+# Julia Manifests (root and all subdirectories)
+Manifest.toml
+Manifest-*.toml
+**/Manifest.toml
 
 # Data and Images
 *.npz
@@ -179,41 +181,34 @@ julia/**/Manifest.toml
 *.png
 *.csv
 
-PK_folder/julia_ex.py
-PK_folder/monte_carlo.jl
+data/PK_folder/julia_ex.py
+data/PK_folder/monte_carlo.jl
 .gitignore
-PK_folder/numerical_integrate2.jl
+data/PK_folder/numerical_integrate2.jl
 
-julia/.CondaPkg
+# Julia PythonCall/CondaPkg scratch (anywhere)
+.CondaPkg/
 
-examples/benchmark.ipynb
-examples/QAOA_iterative_interpolation_SK.ipynb
-examples/QAOA_LABS_circuit_generation.ipynb
-examples/QAOA_LABS_optimization.ipynb
-examples/QAOA_objective_for_general_Hamiltonian.ipynb
-examples/QAOA_portfolio_optimization.ipynb
-examples/QAOA_SK_Expectation_vs_P.ipynb
-examples/QOKit_general_simulation.ipynb
-examples/advanced/compare_maxcut_parameters.ipynb
-examples/advanced/generate_optimized_circuits_for_Np_experiments.ipynb
-grips_examples/Combinatorial_optimization_exercises.ipynb
-grips_examples/data_extractor_plotter.ipynb
-examples/benchmark.ipynb
-examples/QAOA_iterative_interpolation_SK.ipynb
-examples/QAOA_LABS_circuit_generation.ipynb
-examples/QAOA_LABS_optimization.ipynb
-examples/QAOA_objective_for_general_Hamiltonian.ipynb
-examples/QAOA_portfolio_optimization.ipynb
-examples/QAOA_SK_Expectation_vs_P.ipynb
-examples/QOKit_general_simulation.ipynb
-grips_examples/mse_and_normalization_tests.ipynb
-grips_examples/plot_proxy_heatmaps_Erdos_Renyi.ipynb
-grips_examples/QAOA_plots.ipynb
-grips_examples/Transferability_to_unseen_instances.ipynb
+python/examples/benchmark.ipynb
+python/examples/QAOA_iterative_interpolation_SK.ipynb
+python/examples/QAOA_LABS_circuit_generation.ipynb
+python/examples/QAOA_LABS_optimization.ipynb
+python/examples/QAOA_objective_for_general_Hamiltonian.ipynb
+python/examples/QAOA_portfolio_optimization.ipynb
+python/examples/QAOA_SK_Expectation_vs_P.ipynb
+python/examples/QOKit_general_simulation.ipynb
+python/examples/advanced/compare_maxcut_parameters.ipynb
+python/examples/advanced/generate_optimized_circuits_for_Np_experiments.ipynb
+python/grips_examples/Combinatorial_optimization_exercises.ipynb
+python/grips_examples/data_extractor_plotter.ipynb
+python/grips_examples/mse_and_normalization_tests.ipynb
+python/grips_examples/plot_proxy_heatmaps_Erdos_Renyi.ipynb
+python/grips_examples/QAOA_plots.ipynb
+python/grips_examples/Transferability_to_unseen_instances.ipynb
 updates.txt
 .gitattributes
 
-data_generation/Nc_Distributions/Data_graphType=*
-data_generation/Nc_Distributions/HPC_Copy
+data/data_generation/Nc_Distributions/Data_graphType=*
+data/data_generation/Nc_Distributions/HPC_Copy
 *.orig
 .claude/

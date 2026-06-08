@@ -8,5 +8,7 @@ repos:
         # pre-commit's default_language_version, see
         # https://pre-commit.com/#top_level-default_language_version
         #language_version: python3.9
-        exclude: ^(scripts/|jupyter/|assets|.github/workflows/)
+        # All Python code now lives under python/.
+        files: ^python/
+        exclude: ^python/(jupyter/|assets)
         args: ["--target-version", "py38", "--target-version", "py39"]

@@ -4,77 +4,91 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-QOKit (Quantum Optimization Toolkit) is a Python library for simulating and
-benchmarking the Quantum Approximate Optimization Algorithm (QAOA). The `grips/`
-directory contains G-RIPS 2024 Sendai research on improving QAOA
-parameter-setting heuristics based on the paper "Parameter-setting heuristic for
-the quantum alternating operator ansatz." The users of Claude Code in this
-project are the Sendai researchers.
+QOKit (Quantum Optimization Toolkit) began as a Python library for simulating and
+benchmarking the Quantum Approximate Optimization Algorithm (QAOA). It has since
+been restructured to be **Julia-first**: the repo root is now the `JuliaQAOA`
+package, laid out as a [DrWatson.jl](https://juliadynamics.github.io/DrWatson.jl)
+project (`src/`, `test/`, `ext/`, plus `scripts/`, `data/`, `plots/`, `papers/`,
+`notebooks/`). **All Python code now lives under `python/`** (`python/qokit/`, the
+G-RIPS research code in `python/grips/`, tests in `python/tests/` and
+`python/grips_tests/`). The users of Claude Code in this project are the Sendai
+researchers.
 
-**Branches**: Main branch is `grips` (stable). Active development on `gpu` branch.
+**DrWatson layout**: Julia scripts activate the project with
+`using DrWatson; @quickactivate "JuliaQAOA"` and reference directories via
+`projectdir()`, `datadir()`, `plotsdir()`, `papersdir()`, `scriptsdir()`.
 
-**Virtual Environment**: At least on Spencer's computer, a virtual environment
-(for the python portion of the project) is provided in `../qokitvenv`, which has
-the necessary python packages installed.
+**Virtual Environment**: The Python virtual environment should be created in a
+subdirectory of `python/`, namely `python/qokitvenv`. **This is a change**: it
+previously lived at the repo-external `../qokitvenv`. If you still have that old
+venv, recreate it under `python/` (`python -m venv python/qokitvenv` then
+`pip install -e python`). `find_python.jl` auto-detects `python/qokitvenv` for
+PythonCall, and the `python/grips` ↔ Julia bridge activates the repo-root Julia
+project automatically.
 
 ## Common Commands
 
+All commands below run from the repo root.
+
 ```bash
+# --- Python (in python/) ---
+
+# Create the Python virtualenv inside python/ (one-time)
+python -m venv python/qokitvenv && source python/qokitvenv/bin/activate
+
 # Install (development mode)
-pip install -e .
+pip install -e python
 
 # Install with GPU support (CUDA 12.x)
-pip install -e .[GPU-CUDA12]
+pip install -e 'python[GPU-CUDA12]'
 
 # Python-only install (if C compilation fails)
-QOKIT_PYTHON_ONLY=1 pip install -e .
+QOKIT_PYTHON_ONLY=1 pip install -e python
 
 # Run all tests with coverage
-pytest --cov=qokit --cov-fail-under=75 -rs tests
+pytest --cov=qokit --cov-fail-under=75 -rs python/tests
 
 # Run a single test file
-pytest tests/test_qaoa_objective_maxcut.py
+pytest python/tests/test_qaoa_objective_maxcut.py
 
 # Run GRIPS-specific tests
-pytest grips_tests/
+pytest python/grips_tests/
 
-# Check formatting
-black --check .
+# Check / apply formatting (config in python/pyproject.toml)
+black --check python
+black python
 
-# Format code
-black .
+# --- Julia (JuliaQAOA, at the repo root) ---
 
-# --- Julia (JuliaQAOA) ---
-
-# Run Julia tests (from julia/ directory)
-cd julia && julia --project -e 'using Pkg; Pkg.test()'
+# Run Julia tests
+julia --project -e 'using Pkg; Pkg.test()'
 
 # Run Julia tests with GPU extensions
-cd julia && julia --project -e 'using CUDA, KernelAbstractions; using Pkg; Pkg.test()'
+julia --project -e 'using CUDA, KernelAbstractions; using Pkg; Pkg.test()'
 
 # Run a specific Julia test file
-cd julia && julia --project test/test_QAOA.jl
+julia --project test/test_QAOA.jl
 
 # Run Julia benchmarks
-cd julia && julia --project=benchmark benchmark/benchmark_QAOA.jl
+julia --project scripts/benchmark/benchmark_QAOA.jl
 
 # Run all paper figure scripts (sequentially, one Julia process per figure)
-cd julia && bash paper_figures/run_all.sh
+bash scripts/paper_figures/run_all.sh
 
 # Run a specific subset of paper figures (e.g. figures 6 and 7 only)
-cd julia && bash paper_figures/run_all.sh 6 7
+bash scripts/paper_figures/run_all.sh 6 7
 
-# Run a single paper figure script
-cd julia && julia --project=paper_figures paper_figures/figure3_pearson_correlation.jl
+# Run a single paper figure script (output PNGs land in plots/)
+julia --project scripts/paper_figures/figure3_pearson_correlation.jl
 
 # Submit all paper figures as a Slurm job on MSU HPC
-cd julia && sbatch paper_figures/run_all.sb
+sbatch scripts/paper_figures/run_all.sb
 
 # Start Julia REPL with JuliaQAOA loaded
-cd julia && julia --project -e 'using JuliaQAOA'
+julia --project -e 'using JuliaQAOA'
 
 # Start Julia REPL with GPU support
-cd julia && julia --project -e 'using CUDA, KernelAbstractions, JuliaQAOA'
+julia --project -e 'using CUDA, KernelAbstractions, JuliaQAOA'
 ```
 
 ## Architecture
@@ -82,9 +96,9 @@ cd julia && julia --project -e 'using CUDA, KernelAbstractions, JuliaQAOA'
 ### Simulation Pipeline
 
 The core QAOA simulation uses Fast Unitary Rotation (FUR) algorithm with multiple backends:
-- **GPU (CUDA + Numba)**: Fastest, requires `cupy` - `qokit/fur/nbcuda/`
-- **C-compiled**: Fast CPU - `qokit/fur/c/`
-- **Python fallback**: Reference implementation - `qokit/fur/python/`
+- **GPU (CUDA + Numba)**: Fastest, requires `cupy` - `python/qokit/fur/nbcuda/`
+- **C-compiled**: Fast CPU - `python/qokit/fur/c/`
+- **Python fallback**: Reference implementation - `python/qokit/fur/python/`
 
 `qokit.fur.choose_simulator()` auto-selects the fastest available backend.
 
@@ -92,35 +106,35 @@ The core QAOA simulation uses Fast Unitary Rotation (FUR) algorithm with multipl
 
 The proxy system approximates QAOA state evolution without full quantum simulation:
 
-1. **Real Distribution** (`grips/real_distribution.py`): Computes `n(x; d, c)` - count of bitstrings at Hamming distance `d` with cost `c` from bitstring `x`
+1. **Real Distribution** (`python/grips/real_distribution.py`): Computes `n(x; d, c)` - count of bitstrings at Hamming distance `d` with cost `c` from bitstring `x`
 
 2. **Homogeneous Distribution**: Cost-averaged `N(c'; d, c)` enables parameter prediction across graph instances
 
-3. **Proxy Classes** (all in `grips/`):
+3. **Proxy Classes** (all in `python/grips/`):
    - `PaperProxy` (`paper_proxy.py`): Original paper's binomial/multinomial approach
    - `NormalProxy` (`normal_proxy.py`): Multivariate normal approximation
    - `TriangleProxy` (`triangle_proxy.py`): GRIPS contribution - simplified triangle distribution
 
-4. **Interface** (`grips/QAOA_proxy_interface.py`): Unified proxy API with Python (Numba JIT) and Julia backends
+4. **Interface** (`python/grips/QAOA_proxy_interface.py`): Unified proxy API with Python (Numba JIT) and Julia backends
 
 ### Key Module Relationships
 
 ```
-grips/QAOA_simulator.py     - Main simulation interface (QAOA_run, get_simulator)
-grips/QAOA_proxy_interface.py - Proxy algorithm entry point
+python/grips/QAOA_simulator.py     - Main simulation interface (QAOA_run, get_simulator)
+python/grips/QAOA_proxy_interface.py - Proxy algorithm entry point
   └── paper_proxy.py / normal_proxy.py / triangle_proxy.py
-grips/real_distribution.py  - Statistical distribution computation
-grips/sendai_opt.py        - Parameter optimization (fit_proxy_to_real)
-qokit/fur/__init__.py      - Simulator backend selection
+python/grips/real_distribution.py  - Statistical distribution computation
+python/grips/sendai_opt.py        - Parameter optimization (fit_proxy_to_real)
+python/qokit/fur/__init__.py      - Simulator backend selection
 
-julia/src/JuliaQAOA.jl     - Julia module root (exports all public API)
+src/JuliaQAOA.jl     - Julia module root (exports all public API)
   ├── QAOA_proxy.jl         - Proxy algorithm (basic/single/multi + expectation)
   ├── qaoa_simulation.jl    - Real statevector QAOA simulation
   ├── cost_distributions.jl - Distribution computation (multithreaded)
   ├── paper_proxy.jl / triangle_proxy.jl / normal_proxy.jl
   ├── linear_ramp.jl        - Linear ramp schedule generation
   └── utils.jl              - AbstractProxy type, CPU homodist/MSE helpers
-julia/ext/                  - GPU extensions (auto-loaded via weak dependencies)
+ext/                  - GPU extensions (auto-loaded via weak dependencies)
   ├── JuliaQAOAKernelAbstractionsExt.jl - Portable GPU (CUDA/AMDGPU/oneAPI)
   ├── JuliaQAOACUDAExt.jl              - CUDA-specific kernels
   ├── batched_furx_ka.jl               - Shared-memory butterfly (portable)
@@ -129,13 +143,13 @@ julia/ext/                  - GPU extensions (auto-loaded via weak dependencies)
 
 ### Julia Backend (JuliaQAOA Module)
 
-The `julia/` directory contains a full Julia package (`JuliaQAOA`) that provides
+The repo root is a full Julia package (`JuliaQAOA`) that provides
 high-performance implementations of both the proxy algorithm and real statevector
-QAOA simulation, with optional GPU acceleration. This is now a standalone Julia
-package, not just a backend for the Python code (though it can still be called from
-Python via `USE_JULIA=True` in proxy files; setup via `grips/setup_juliacall.py`).
+QAOA simulation, with optional GPU acceleration. It is the primary package here,
+not just a backend for the Python code (though it can still be called from
+Python via `USE_JULIA=True` in proxy files; setup via `python/grips/setup_juliacall.py`).
 
-**Source files** (`julia/src/`):
+**Source files** (`src/`):
 - `JuliaQAOA.jl` — Module root; exports all public API; manages GPU extensions via weak dependencies
 - `QAOA_proxy.jl` — Proxy algorithm with three implementations:
   - `QAOA_proxy_basic()` — Reference triple-loop (readable, slow)
@@ -162,7 +176,7 @@ Python via `USE_JULIA=True` in proxy files; setup via `grips/setup_juliacall.py`
   - `linear_ramp_matrix(...)` — Batch K parameter sets for `QAOA_proxy_multi`
 - `utils.jl` — `AbstractProxy` base type, `cpu_compute_homodist()`, `cpu_multi_proxy_mse()`
 
-**GPU Extensions** (`julia/ext/`):
+**GPU Extensions** (`ext/`):
 GPU support is provided via Julia's weak dependency / extension system. Loading
 `CUDA` or `KernelAbstractions` automatically activates the corresponding extension.
 
@@ -182,7 +196,7 @@ GPU support is provided via Julia's weak dependency / extension system. Loading
 - `batched_furx_ka.jl` — Shared-memory butterfly kernel (KernelAbstractions, portable)
 - `batched_furx_cuda.jl` — Warp-shuffle butterfly kernel (CUDA-only, fastest for small groups)
 
-**Tests** (`julia/test/`):
+**Tests** (`test/`):
 - `test_QAOA.jl` — Core proxy algorithm: `_expand`, factor functions, basic/single/multi, expectation
 - `test_qaoa_analytical.jl` — Proxy correctness against analytical solutions
 - `test_qaoa_simulation.jl` — Real QAOA vs Python QOKit (via PythonCall)
@@ -190,7 +204,7 @@ GPU support is provided via Julia's weak dependency / extension system. Loading
 - `test_gpu_distribution_generation.jl` — GPU distribution functions vs CPU
 - `test_cost_distribution.jl` — Distribution statistics and correlation functions
 
-**Benchmarks** (`julia/benchmark/`):
+**Benchmarks** (`scripts/benchmark/`):
 - `benchmark_QAOA.jl` — Proxy basic/single/multi with varying (n, m, p) and parameter counts
 - `benchmark_qaoa_simulation.jl` — Statevector simulation benchmarks
 - `benchmark_qaoa_proxy_algorithm.jl` — Proxy algorithm performance
@@ -220,7 +234,7 @@ GPU support is provided via Julia's weak dependency / extension system. Loading
 
 The paper "A Parameter Setting Heuristic for the Quantum Alternating Operator
 Ansatz" (Sud, Hadfield, Rieffel, Tubman, Hogg) is the theoretical foundation for
-the `grips/` code. The full LaTeX source is in
+the `python/grips/` code. The full LaTeX source is in
 `References/ParameterSettingHeuristicLatexSource/main.tex`. Below is a plain-English
 summary of the paper's key ideas, each linked to the specific functions that implement
 them.
@@ -258,14 +272,14 @@ mixing operator matrix element (which depends only on Hamming distance d(x,y)) a
 the phase factor (which depends only on cost c(y)).
 
 **Code**:
-- `grips/real_distribution.py: get_real_distribution()` — computes n(x; d, c) for
+- `python/grips/real_distribution.py: get_real_distribution()` — computes n(x; d, c) for
   every bitstring x in a graph, as a 3D array indexed by `[x, d, c]`. This is the
   *exact* distribution, computed by brute force in O(2^(2n)) time.
-- `grips/real_distribution.py: get_real_distribution_from_costs()` — the core Numba
+- `python/grips/real_distribution.py: get_real_distribution_from_costs()` — the core Numba
   JIT-compiled loop. Takes a pre-computed cost array and fills the 3D array.
-- `julia/src/cost_distributions.jl: get_real_distribution_from_costs()` — Julia
+- `src/cost_distributions.jl: get_real_distribution_from_costs()` — Julia
   equivalent, with multithreading (`@threads`) for speedup.
-- `julia/src/cost_distributions.jl: gpu_get_real_distribution_from_costs()` — GPU
+- `src/cost_distributions.jl: gpu_get_real_distribution_from_costs()` — GPU
   (CUDA) version using a kernel where each thread handles one (x, y) pair.
 
 ---
@@ -283,15 +297,15 @@ There are two ways to compute N(c'; d, c):
 
 **Method A — Empirical averaging** (exact for given instances, O(2^(2n))):
 Average n(x; d, c) over all bitstrings x with the same cost. Expensive but exact.
-- `grips/real_distribution.py: get_homogeneous_distribution()` — top-level function
+- `python/grips/real_distribution.py: get_homogeneous_distribution()` — top-level function
   accepting a single graph or list of graphs; returns the averaged N(c'; d, c).
-- `grips/real_distribution.py: get_homogeneous_distribution_from_costs()` — low-level
+- `python/grips/real_distribution.py: get_homogeneous_distribution_from_costs()` — low-level
   Numba JIT loop that does the averaging given a pre-computed real distribution.
-- `julia/src/cost_distributions.jl: get_homogeneous_distribution_from_costs()` — Julia
+- `src/cost_distributions.jl: get_homogeneous_distribution_from_costs()` — Julia
   multithreaded version.
-- `julia/src/cost_distributions.jl: get_homogeneous_distribution_from_costs_direct()` —
+- `src/cost_distributions.jl: get_homogeneous_distribution_from_costs_direct()` —
   more memory-efficient Julia version that skips storing the full n(x; d, c).
-- `julia/src/cost_distributions.jl: gpu_get_homogeneous_distribution_from_costs_direct()` —
+- `src/cost_distributions.jl: gpu_get_homogeneous_distribution_from_costs_direct()` —
   GPU version using privatized global memory to reduce atomic contention.
 
 **Method B — Analytical formula** (class-level only, O(poly(n)), paper §3):
@@ -309,7 +323,7 @@ Each proxy class implements three methods:
 - `N_cost_distribution(c')` — expected number of bitstrings with cost c' (= 2^n × P(c'))
 - `N_cost_distance_distribution(c', d, c)` — the key N(c'; d, c) value
 
-**PaperProxy** (`grips/paper_proxy.py`, `julia/src/paper_proxy.jl`):
+**PaperProxy** (`python/grips/paper_proxy.py`, `src/paper_proxy.jl`):
 - Directly implements the paper's analytical formula (paper §3.1, Eq. 11-16) for
   MaxCut on Erdős-Rényi graphs.
 - `P_cost_distribution`: Binomial distribution (paper Eq. 11).
@@ -319,7 +333,7 @@ Each proxy class implements three methods:
   `prob_edge` (edge probability p_e, default 0.5).
 - This is the "ground truth" analytical proxy from the paper; no fitting required.
 
-**TriangleProxy** (`grips/triangle_proxy.py`, `julia/src/triangle_proxy.jl`):
+**TriangleProxy** (`python/grips/triangle_proxy.py`, `src/triangle_proxy.jl`):
 - **GRIPS contribution**: Approximates N(c'; d, c) as a "prism" shape: for each fixed
   distance d, the distribution over costs c is a triangle (piecewise linear function
   with one peak). The peak location slides linearly from c' (at d=0) to m/2 (at
@@ -331,7 +345,7 @@ Each proxy class implements three methods:
 - `TriangleProxy` is Numba `@jitclass` compiled for maximum speed.
 - Parameters must be fit to real N(c'; d, c) data using `sendai_opt.fit_proxy_to_real()`.
 
-**NormalProxy** (`grips/normal_proxy.py`, `julia/src/normal_proxy.jl`):
+**NormalProxy** (`python/grips/normal_proxy.py`, `src/normal_proxy.jl`):
 - **GRIPS contribution**: Approximates N(c'; d, c) as a 2D multivariate normal
   distribution over (cost c, distance d).
 - The covariance matrix is constructed from 3 parameters: `cost_mean`, `cov_1`,
@@ -352,18 +366,18 @@ work with a vector of `m+1` complex amplitudes (one per unique cost). Time compl
 O(n × m² × p) vs O(2^n × p) for full simulation.
 
 **Code**:
-- `grips/QAOA_proxy_interface.py: QAOA_proxy()` — dispatcher that routes to the
+- `python/grips/QAOA_proxy_interface.py: QAOA_proxy()` — dispatcher that routes to the
   appropriate backend (Numba JIT, Python, or Julia) based on proxy type.
-- `grips/QAOA_proxy_interface.py: compute_amplitude_sum()` — computes one step of the
+- `python/grips/QAOA_proxy_interface.py: compute_amplitude_sum()` — computes one step of the
   inner loop (one new Q_l(c') value). Implements the triple sum over d and c.
-- `grips/QAOA_proxy_interface.py: compute_amplitude_sum_njit()` — Numba JIT version.
-- `grips/QAOA_proxy_interface.py: QAOA_proxy_njit()` — full Numba JIT proxy run.
-- `julia/src/QAOA_proxy.jl: QAOA_proxy_basic()` — readable Julia reference implementation.
-- `julia/src/QAOA_proxy.jl: QAOA_proxy_single()` — faster Julia version using BLAS
+- `python/grips/QAOA_proxy_interface.py: compute_amplitude_sum_njit()` — Numba JIT version.
+- `python/grips/QAOA_proxy_interface.py: QAOA_proxy_njit()` — full Numba JIT proxy run.
+- `src/QAOA_proxy.jl: QAOA_proxy_basic()` — readable Julia reference implementation.
+- `src/QAOA_proxy.jl: QAOA_proxy_single()` — faster Julia version using BLAS
   matrix-vector multiplication (reshapes the sum into a mat-vec product).
-- `julia/src/QAOA_proxy.jl: QAOA_proxy_multi()` — batch Julia version for evaluating
+- `src/QAOA_proxy.jl: QAOA_proxy_multi()` — batch Julia version for evaluating
   multiple (γ, β) parameter sets simultaneously via BLAS matrix-matrix multiplication.
-- `julia/src/QAOA_proxy.jl: get_β_factors()` / `get_γ_factors()` — helper functions
+- `src/QAOA_proxy.jl: get_β_factors()` / `get_γ_factors()` — helper functions
   that precompute the cos/sin and exp factors for all distances/costs at once.
 
 ---
@@ -379,12 +393,12 @@ This is the "homogeneous parameter objective function" — the quantity we maxim
 when optimizing γ and β. It replaces the expensive exact quantum expectation value.
 
 **Code**:
-- `grips/QAOA_proxy_interface.py: QAOA_proxy_expectation()` — computes this sum given
+- `python/grips/QAOA_proxy_interface.py: QAOA_proxy_expectation()` — computes this sum given
   the final proxy amplitudes. Dispatches to Numba or Julia versions.
-- `grips/QAOA_proxy_interface.py: QAOA_proxy_expectation_njit()` — Numba JIT version.
-- `grips/QAOA_proxy_interface.py: QAOA_proxy_expectation_from_gamma_beta()` —
+- `python/grips/QAOA_proxy_interface.py: QAOA_proxy_expectation_njit()` — Numba JIT version.
+- `python/grips/QAOA_proxy_interface.py: QAOA_proxy_expectation_from_gamma_beta()` —
   convenience function that runs the proxy and returns the expectation in one call.
-- `julia/src/QAOA_proxy.jl: expectation()` — Julia version. Has two overloads: one
+- `src/QAOA_proxy.jl: expectation()` — Julia version. Has two overloads: one
   for a single state vector Q, and one for a matrix Q where each column is a state
   (used with `QAOA_proxy_multi`).
 
@@ -403,11 +417,11 @@ Key insight: each proxy evaluation is O(n × m² × p) instead of O(2^n × p), s
 high-depth optimization (e.g. p=20) becomes tractable on a laptop.
 
 **Code**:
-- `grips/QAOA_proxy_interface.py: QAOA_proxy_optimize_gamma_beta()` — main
+- `python/grips/QAOA_proxy_interface.py: QAOA_proxy_optimize_gamma_beta()` — main
   optimization loop. Takes a proxy, initial parameters, and an optimizer method
   (default COBYLA). Returns optimized γ, β, and diagnostics. Dispatches to Numba or
   Julia backends.
-- `grips/QAOA_proxy_interface.py: inverse_proxy_objective_function()` — wraps the
+- `python/grips/QAOA_proxy_interface.py: inverse_proxy_objective_function()` — wraps the
   proxy evaluation as a minimization objective (negates because scipy minimizes).
 
 ---
@@ -420,15 +434,15 @@ This is done by minimizing MSE between the proxy's predicted N(c'; d, c) and the
 real averaged N(c'; d, c) computed from actual graph instances.
 
 **Code**:
-- `grips/sendai_opt.py: fit_proxy_to_real()` — main fitting function. Uses "smart
+- `python/grips/sendai_opt.py: fit_proxy_to_real()` — main fitting function. Uses "smart
   random search": perturb randomly, reuse helpful perturbations, shrink step sizes
   after consecutive failures. Optional grid search for initial parameters.
-- `grips/real_distribution.py: distribution_mean_squared_error()` — computes MSE
+- `python/grips/real_distribution.py: distribution_mean_squared_error()` — computes MSE
   between a proxy's predicted N(c'; d, c) and a real distribution array.
-- `grips/real_distribution.py: get_homogeneous_distribution_from_proxy()` — evaluates
+- `python/grips/real_distribution.py: get_homogeneous_distribution_from_proxy()` — evaluates
   a proxy's N(c'; d, c) for all cost/distance/cost combinations, returning a 3D array
   for comparison with the real distribution.
-- `grips/real_distribution.py: normalize_homodist_slices()` — normalizes each N(c'; :, :)
+- `python/grips/real_distribution.py: normalize_homodist_slices()` — normalizes each N(c'; :, :)
   slice independently (useful for fair comparison across proxies with different scales).
 
 ---
@@ -444,13 +458,13 @@ real averaged N(c'; d, c) computed from actual graph instances.
    across p layers (especially for small γ values and linear ramp schedules).
 
 **Code**:
-- `grips/real_distribution.py: distributions_mean_and_stddev()` — computes mean and
+- `python/grips/real_distribution.py: distributions_mean_and_stddev()` — computes mean and
   stddev across multiple distribution arrays (used for check 1).
-- `grips/real_distribution.py: plot_stddev_div_mean_heatmap()` — plots the coefficient
+- `python/grips/real_distribution.py: plot_stddev_div_mean_heatmap()` — plots the coefficient
   of variation heatmap shown in the paper.
-- `grips/real_distribution.py: get_pearson_correlation_coefficients()` — computes
+- `python/grips/real_distribution.py: get_pearson_correlation_coefficients()` — computes
   Pearson correlation between two N(c'; d, c) arrays, one per cost c' (used for check 2).
-- `julia/src/cost_distributions.jl: get_pearson_correlation_coefficients()` — Julia version.
+- `src/cost_distributions.jl: get_pearson_correlation_coefficients()` — Julia version.
 
 ---
 
@@ -460,7 +474,7 @@ real averaged N(c'; d, c) computed from actual graph instances.
 team added advanced methods for estimating P(c') from graph instances (useful when
 the analytical formula is unavailable or we want instance-specific estimates).
 
-**Code** (in `grips/QAOA_proxy_interface.py`):
+**Code** (in `python/grips/QAOA_proxy_interface.py`):
 - `CostDistribution` class — callable wrapper for P(c') supporting multiple backends:
   `wang_landau` (discrete MCMC-based sampling), `moment_matching` with sub-types
   `gaussian`, `beta`, or `edgeworth` expansion.
@@ -482,7 +496,7 @@ active or potential research areas for the Sendai team:
    instances. The `get_homogeneous_distribution()` function already supports this
    for small graphs.
 
-2. **New graph types**: The data_generation/ directory includes scripts for
+2. **New graph types**: The data/data_generation/ directory includes scripts for
    Barabasi-Albert and Watts-Strogatz graphs in addition to Erdős-Rényi. The
    analytical PaperProxy formulas apply specifically to Erdős-Rényi; other graph
    families require either empirical distributions or new analytical derivations.
@@ -505,14 +519,14 @@ active or potential research areas for the Sendai team:
    at large p.
 
 6. **Approximation ratio**: The standard evaluation metric. For MaxCut:
-   ApxRatio = ⟨C⟩ / c_opt, where c_opt is found by brute force. The `grips/solve_maxcut_exact.py`
+   ApxRatio = ⟨C⟩ / c_opt, where c_opt is found by brute force. The `python/grips/solve_maxcut_exact.py`
    module computes c_opt.
 
 ---
 
 ## Experimental Findings: P(c') Investigation
 
-The script `grips_examples/investigate_P_distribution.py` tested whether replacing
+The script `python/grips_examples/investigate_P_distribution.py` tested whether replacing
 the paper's analytical P(c') = Binomial(m, 0.5) with the real empirical P(c') from
 specific graph instances improves QAOA proxy parameter setting.
 
@@ -569,7 +583,7 @@ TriangleProxy while potentially matching PaperProxy's accuracy.
 specifically for Erdős-Rényi random graphs. For other graph families (Barabási-Albert,
 Watts-Strogatz, real-world networks), no analytical formula exists, so the PaperProxy
 cannot be used at all. This makes fitted proxies (TriangleProxy, NormalProxy) the
-*only* option for these graph types. The data_generation/ directory already includes
+*only* option for these graph types. The data/data_generation/ directory already includes
 scripts for generating Barabási-Albert and Watts-Strogatz graphs. The key question
 is whether fitted proxies can achieve good approximation ratios on these non-ER
 graph families where PaperProxy is unavailable.
@@ -598,8 +612,8 @@ from the same set of instances (e.g., via moment matching or Wang-Landau).
 
 ## Paper Figure Reproduction Scripts
 
-All scripts are in `julia/paper_figures/` with output in `julia/paper_figures/output/`.
-Full report: `julia/paper_figures/REPORT.md`. Each script uses CairoMakie for plotting
+All scripts are in `scripts/paper_figures/` with output in `scripts/paper_figures/output/`.
+Full report: `scripts/paper_figures/REPORT.md`. Each script uses CairoMakie for plotting
 and the JuliaQAOA module for proxy computations. Configuration constants at the top of
 each script make it easy to change graph type, size, proxy, etc.
 
@@ -617,10 +631,10 @@ the `paper_figures/` directory (or adjust the `FIGURES_DIR` path inside).
 
 ### Shared Infrastructure
 
-- **`julia/paper_figures/common.jl`**: ER graph generation (`erdos_renyi_edges`),
+- **`scripts/paper_figures/common.jl`**: ER graph generation (`erdos_renyi_edges`),
   MaxCut optimal cost (`maxcut_optimal`), instance generation helpers, and plotting
   utilities. Real QAOA simulation (`qaoa_statevector`, `qaoa_expectation`) and
-  `maxcut_costs` are now in the JuliaQAOA module (`julia/src/qaoa_simulation.jl`).
+  `maxcut_costs` are now in the JuliaQAOA module (`src/qaoa_simulation.jl`).
   Also contains GPU backend selection (see below) and device-aware wrappers
   `qaoa_expectation_device` / `qaoa_statevector_intermediates_device`.
 
@@ -631,7 +645,7 @@ the `paper_figures/` directory (or adjust the `FIGURES_DIR` path inside).
   GPU package alongside JuliaQAOA activates `JuliaQAOAKernelAbstractionsExt`,
   making `gpu_qaoa_expectation` and `gpu_apply_*` available.
 
-- **`julia/src/linear_ramp.jl`** (added to JuliaQAOA module): General-purpose
+- **`src/linear_ramp.jl`** (added to JuliaQAOA module): General-purpose
   linear ramp schedule API. `linear_ramp(γ₁, γ_f, β₁, β_f, p)` generates
   parameter vectors; `linear_ramp_matrix(...)` generates batch parameter matrices
   compatible with `QAOA_proxy_multi`.

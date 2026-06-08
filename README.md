@@ -1,68 +1,78 @@
-# Quantum Optimization Toolkit
+# QOKit — Julia-first QAOA toolkit (G-RIPS Sendai)
 
-![Tests](https://github.com/jpmorganchase/QOKit/actions/workflows/qokit-package.yml/badge.svg)
+![Julia tests](https://github.com/jpmorganchase/QOKit/actions/workflows/julia-test.yml/badge.svg)
+![Python tests](https://github.com/jpmorganchase/QOKit/actions/workflows/qokit-package.yml/badge.svg)
 [![arXiv](https://img.shields.io/badge/arXiv-2309.04841-b31b1b.svg?style=plastic)](https://arxiv.org/abs/2309.04841)
-[![PyPi version](https://badgen.net/pypi/v/qokit)](https://pypi.org/project/qokit/)
-[![PyPI download month](https://img.shields.io/pypi/dm/qokit.svg)](https://pypi.org/project/qokit/)
-[![PyPI pyversions](https://img.shields.io/pypi/pyversions/qokit.svg)](https://pypi.org/project/qokit/)
-[![PyPI license](https://img.shields.io/pypi/l/qokit.svg)](https://pypi.org/project/qokit/)
 
-This repository contains fast CPU and GPU simulators for benchmarking the Quantum Approximate Optimization Algorithm, as well as scripts for generating matching quantum circuits for execution on hardware. See the [examples](./examples) folder for a demo of this package and check out the [blog post](https://www.jpmorgan.com/technology/technology-blog/quantum-optimization-research) describing the simulators.
+This repository began as the Python **Quantum Optimization Toolkit** (QOKit) and
+has been restructured to be **Julia-first**. The repo root is now the
+[`JuliaQAOA`](src/JuliaQAOA.jl) package, laid out as a
+[DrWatson.jl](https://juliadynamics.github.io/DrWatson.jl/stable/) scientific
+project. The original Python QOKit library and the G-RIPS research code now live
+under [`python/`](python/).
 
-### Install
+## Layout
 
-Creating a virtual environment is recommended before installing.
 ```
-python -m venv qokitvenv
-source qokitvenv/bin/activate
+.                      JuliaQAOA package + DrWatson project
+├── src/  ext/  test/  Julia package (module, GPU extensions, tests)
+├── scripts/           Julia scripts: paper_figures/, benchmark/, examples/
+├── plots/             Figure output (DrWatson plotsdir())
+├── data/              Datasets and data-generation scripts
+├── papers/            Paper sources (OverleafPaper/, References/)
+├── notebooks/         Julia notebooks
+├── research_log/      Experiment log (IEEE Quantum Week paper)
+└── python/            All Python code (QOKit + grips), with its own README
+    ├── qokit/  grips/  tests/  grips_tests/  grips_examples/
+    ├── pyproject.toml  setup.py
+    └── qokitvenv/      Python virtualenv lives here (gitignored)
+```
+
+## Julia quickstart
+
+This is a DrWatson project. From the repo root:
+
+```julia
+using DrWatson
+@quickactivate "JuliaQAOA"   # activates this project; sets projectdir(), datadir(), plotsdir(), ...
+using JuliaQAOA
+```
+
+Run the tests, benchmarks, and paper figures (all from the repo root):
+
+```bash
+julia --project -e 'using Pkg; Pkg.test()'                 # full test suite
+julia --project scripts/benchmark/benchmark_QAOA.jl        # a benchmark
+bash  scripts/paper_figures/run_all.sh                     # all paper figures -> plots/
+```
+
+GPU acceleration loads automatically when a GPU package is available in your
+environment: `using CUDA, JuliaQAOA` activates the CUDA/KernelAbstractions
+extensions. See [`CLAUDE.md`](CLAUDE.md) for the full command reference and
+architecture notes.
+
+## Python package
+
+All Python code is under [`python/`](python/) and retains its own
+[README](python/README.md). Create the virtualenv **inside `python/`** and
+install in development mode from the repo root:
+
+```bash
+python -m venv python/qokitvenv
+source python/qokitvenv/bin/activate
 pip install -U pip
+pip install -e python              # add 'python[GPU-CUDA12]' for GPU, or
+                                   # QOKIT_PYTHON_ONLY=1 to skip the C build
+pytest python/tests                # run the QOKit test suite
 ```
 
-Install requires `python>=3.9` and `pip >= 23`. It is recommended to update your pip using `pip install --upgrade pip` before install.
+The Python ↔ Julia bridge (`USE_JULIA=True` in `python/grips/`) activates the
+repo-root `JuliaQAOA` project automatically via `juliacall`.
 
-```
-git clone https://github.com/nkohen/QOKit.git
-cd QOKit/
-git checkout -b grips origin/grips
-pip install -e .
-```
+## Cite
 
-Note that if you encounter an error including a message such as 
-  error: [Errno 2] No such file or directory: 'make'
-you are missing the make command in your environment, and should run something like 
-  sudo apt update
-  sudo apt install build-essential
+For the simulators and other software tools, please cite:
 
-We also recommend installing `nbstripout` to strip the output of Jupyter
-notebooks when uploading to github. You can do this by activating `qokitvenv`,
-changing directories to `QOKit`, and then running
-```
-nbstripout --install
-```
-
-If you want to use the data (pre-computed gamma and beta values for QAOA on random graphs, etc), then activate `qokitvenv` and running
-```
-python -m QAOAKit.build_tables
-```
-
-
-Some optional parts of the package require additional dependencies. 
-- GPU simulation: `pip install -e .[GPU-CUDA12]`
-- Generating LP files to solve LABS using commercial IP solvers (`qokit/classical_methods` and `examples/advanced/classical_solvers_for_LABS/`): `pip install -e .[solvers]`
-
-Please note that the GPU dependency is specified for CUDA 12x. For other versions of CUDA, please follow cupy installation instructions.
-
-If compilation fails, try installing just the Python version using `QOKIT_PYTHON_ONLY=1 pip install -e .`.
-
-Installation can be verified by running tests using `pytest`.
-
-#### MaxCut
-
-For MaxCut, the datasets in `qokit/assets/maxcut_datasets` must be inflated
-
-### Cite
-
-For the simulators and other software tools, please cite
 ```
 @inproceedings{Lykov2023,
   series = {SC-W 2023},
@@ -75,17 +85,5 @@ For the simulators and other software tools, please cite
   year = {2023},
   month = nov,
   collection = {SC-W 2023}
-}
-```
-
-For LABS data, please cite
-```
-@article{https://doi.org/10.48550/arxiv.2308.02342,
-  doi = {10.48550/ARXIV.2308.02342},
-  url = {https://arxiv.org/abs/2308.02342},
-  author = {Shaydulin,  Ruslan and Li,  Changhao and Chakrabarti,  Shouvanik and DeCross,  Matthew and Herman,  Dylan and Kumar,  Niraj and Larson,  Jeffrey and Lykov,  Danylo and Minssen,  Pierre and Sun,  Yue and Alexeev,  Yuri and Dreiling,  Joan M. and Gaebler,  John P. and Gatterman,  Thomas M. and Gerber,  Justin A. and Gilmore,  Kevin and Gresh,  Dan and Hewitt,  Nathan and Horst,  Chandler V. and Hu,  Shaohan and Johansen,  Jacob and Matheny,  Mitchell and Mengle,  Tanner and Mills,  Michael and Moses,  Steven A. and Neyenhuis,  Brian and Siegfried,  Peter and Yalovetzky,  Romina and Pistoia,  Marco},
-  keywords = {Quantum Physics (quant-ph),  Statistical Mechanics (cond-mat.stat-mech),  Emerging Technologies (cs.ET),  FOS: Physical sciences,  FOS: Physical sciences,  FOS: Computer and information sciences,  FOS: Computer and information sciences},
-  title = {Evidence of Scaling Advantage for the Quantum Approximate Optimization Algorithm on a Classically Intractable Problem},
-  howpublished = {Preprint at https://arxiv.org/abs/2308.02342},
 }
 ```
