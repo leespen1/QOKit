@@ -140,8 +140,10 @@ function get_homogeneous_distribution_from_costs(
     end
 
     # Allocate one accumulator per thread to avoid write contention
-    # (multiple bitstrings can share the same cost)
-    nt = nthreads()
+    # (multiple bitstrings can share the same cost). Size by maxthreadid() so
+    # the threadid()-indexed lookup is valid for any thread the loop runs on,
+    # including interactive-pool threads whose ids exceed nthreads().
+    nt = maxthreadid()
     thread_accumulators = [zeros(Float64, cost_axis_size, num_distances, cost_axis_size) for _ in 1:nt]
 
     # Sum n(x; d, c) over all x with same cost c', using thread-local accumulators
@@ -218,8 +220,10 @@ function get_homogeneous_distribution_from_costs_direct(
     end
 
     # Allocate one accumulator per thread to avoid write contention
-    # (multiple x values can share the same cost_x)
-    nt = nthreads()
+    # (multiple x values can share the same cost_x). Size by maxthreadid() so
+    # the threadid()-indexed lookup is valid for any thread the loop runs on,
+    # including interactive-pool threads whose ids exceed nthreads().
+    nt = maxthreadid()
     thread_accumulators = [zeros(Float64, cost_axis_size, num_distances, cost_axis_size) for _ in 1:nt]
 
     # Main computation: for each pair (x, y), accumulate to N(c(x); d(x,y), c(y))

@@ -3,7 +3,7 @@ module JuliaQAOA
 using Distributions: pdf, Normal, MvNormal, Binomial, Multinomial
 using StaticArrays: @SVector, @SMatrix, SVector
 using LinearAlgebra: mul!
-using Base.Threads: @threads, nthreads, threadid
+using Base.Threads: @threads, nthreads, threadid, maxthreadid
 using ProgressMeter: @showprogress
 using InteractiveUtils
 using Statistics: mean, std, cor
