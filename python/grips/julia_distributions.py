@@ -25,6 +25,7 @@ def _init_julia():
         os.environ["JULIA_NUM_THREADS"] = "auto"
 
     from juliacall import Main as jl
+
     _jl = jl
 
     grips_dir = os.path.dirname(os.path.abspath(__file__))
@@ -32,7 +33,8 @@ def _init_julia():
     # two levels up (python/grips -> python -> repo root).
     julia_project_dir = os.path.normpath(os.path.join(grips_dir, "..", ".."))
 
-    jl.seval(f'''
+    jl.seval(
+        f"""
     using Pkg
     Pkg.activate("{julia_project_dir}")
     try
@@ -44,7 +46,8 @@ def _init_julia():
         using JuliaQAOA
         using CUDA
     end
-    ''')
+    """
+    )
 
     _julia_initialized = True
     return _jl
@@ -56,13 +59,7 @@ def has_cuda_gpu() -> bool:
     return bool(jl.seval("CUDA.has_cuda_gpu()"))
 
 
-def get_homogeneous_distribution(
-    costs: np.ndarray,
-    num_edges: int,
-    num_vertices: int,
-    use_gpu: bool = False,
-    max_num_edges: int = 0
-) -> np.ndarray:
+def get_homogeneous_distribution(costs: np.ndarray, num_edges: int, num_vertices: int, use_gpu: bool = False, max_num_edges: int = 0) -> np.ndarray:
     """
     Compute the homogeneous distribution N(c'; d, c) from costs using Julia.
 
@@ -88,16 +85,12 @@ def get_homogeneous_distribution(
 
     if use_gpu and has_cuda_gpu():
         # Use GPU version
-        N_dist_julia = jl.gpu_get_homogeneous_distribution_from_costs_direct(
-            costs_float, num_edges, num_vertices, max_num_edges=max_num_edges
-        )
+        N_dist_julia = jl.gpu_get_homogeneous_distribution_from_costs_direct(costs_float, num_edges, num_vertices, max_num_edges=max_num_edges)
         # Convert CuArray to Array, then to numpy
         N_dist = np.array(jl.Array(N_dist_julia))
     else:
         # Use CPU version
-        N_dist_julia = jl.get_homogeneous_distribution_from_costs_direct(
-            costs_float, num_edges, num_vertices, max_num_edges=max_num_edges
-        )
+        N_dist_julia = jl.get_homogeneous_distribution_from_costs_direct(costs_float, num_edges, num_vertices, max_num_edges=max_num_edges)
         N_dist = np.array(N_dist_julia)
 
     # Julia arrays are column-major, numpy is row-major
@@ -109,13 +102,7 @@ def get_homogeneous_distribution(
     return N_dist
 
 
-def get_real_distribution(
-    costs: np.ndarray,
-    num_edges: int,
-    num_vertices: int,
-    use_gpu: bool = False,
-    max_num_edges: int = 0
-) -> np.ndarray:
+def get_real_distribution(costs: np.ndarray, num_edges: int, num_vertices: int, use_gpu: bool = False, max_num_edges: int = 0) -> np.ndarray:
     """
     Compute the real distribution n(x; d, c) from costs using Julia.
 
@@ -140,16 +127,12 @@ def get_real_distribution(
 
     if use_gpu and has_cuda_gpu():
         # Use GPU version
-        n_dist_julia = jl.gpu_get_real_distribution_from_costs(
-            costs_float, num_edges, num_vertices, max_num_edges=max_num_edges
-        )
+        n_dist_julia = jl.gpu_get_real_distribution_from_costs(costs_float, num_edges, num_vertices, max_num_edges=max_num_edges)
         # Convert CuArray to Array, then to numpy
         n_dist = np.array(jl.Array(n_dist_julia))
     else:
         # Use CPU version
-        n_dist_julia = jl.get_real_distribution_from_costs(
-            costs_float, num_edges, num_vertices, max_num_edges=max_num_edges
-        )
+        n_dist_julia = jl.get_real_distribution_from_costs(costs_float, num_edges, num_vertices, max_num_edges=max_num_edges)
         n_dist = np.array(n_dist_julia)
 
     return n_dist
@@ -180,7 +163,7 @@ class HomogeneousDistributionAccumulator:
         """
         self.max_num_edges = max_num_edges
         self._sum = None  # Running sum of distributions
-        self._count = 0   # Number of distributions added
+        self._count = 0  # Number of distributions added
         self._shape = None
 
     def add(self, costs: np.ndarray, num_edges: int, num_vertices: int, use_gpu: bool = False):
@@ -194,11 +177,7 @@ class HomogeneousDistributionAccumulator:
             use_gpu: Whether to use GPU acceleration
         """
         # Compute distribution for this graph
-        N_dist = get_homogeneous_distribution(
-            costs, num_edges, num_vertices,
-            use_gpu=use_gpu,
-            max_num_edges=self.max_num_edges
-        )
+        N_dist = get_homogeneous_distribution(costs, num_edges, num_vertices, use_gpu=use_gpu, max_num_edges=self.max_num_edges)
 
         if self._sum is None:
             # First distribution - initialize

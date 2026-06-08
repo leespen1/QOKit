@@ -4,15 +4,16 @@ import numpy as np
 
 
 triangle_spec = [
-    ('num_constraints', int64),
-    ('num_qubits', int64),
-    ('h_tweak_sub', float64),
-    ('hc_tweak_add', float64),
-    ('l_tweak_mul', float64),
-    ('r_tweak_mul', float64),
-    ('h_peak', float64),
-    ('center_at_h_peak', float64),
+    ("num_constraints", int64),
+    ("num_qubits", int64),
+    ("h_tweak_sub", float64),
+    ("hc_tweak_add", float64),
+    ("l_tweak_mul", float64),
+    ("r_tweak_mul", float64),
+    ("h_peak", float64),
+    ("center_at_h_peak", float64),
 ]
+
 
 @jitclass(triangle_spec)
 class TriangleProxy:
@@ -32,25 +33,24 @@ class TriangleProxy:
         proxy = TriangleProxy(M, N, h_tweak_sub, hc_tweak_add, l_tweak_mul, r_tweak_mul)
 
     """
-    def __init__(self, num_constraints: int, num_qubits: int,
-        h_tweak_sub: float = 0, hc_tweak_add: float = 0, l_tweak_mul: float = 1,
-        r_tweak_mul: float = 1):
+
+    def __init__(self, num_constraints: int, num_qubits: int, h_tweak_sub: float = 0, hc_tweak_add: float = 0, l_tweak_mul: float = 1, r_tweak_mul: float = 1):
 
         self.num_constraints = num_constraints
         self.num_qubits = num_qubits
-        self.h_tweak_sub = h_tweak_sub # Shifts the peak of the pyramid down (Default 0)
-        self.hc_tweak_add = hc_tweak_add # Moves the cost_2 of the peak to the right (Default 0)
-        self.l_tweak_mul = l_tweak_mul # Defines the (inverse of the) slope of the left side of the pyramid (Default 1)
-        self.r_tweak_mul = r_tweak_mul # Defines the (inverse of the) slope of the right side of the pyramid (Default 1)
+        self.h_tweak_sub = h_tweak_sub  # Shifts the peak of the pyramid down (Default 0)
+        self.hc_tweak_add = hc_tweak_add  # Moves the cost_2 of the peak to the right (Default 0)
+        self.l_tweak_mul = l_tweak_mul  # Defines the (inverse of the) slope of the left side of the pyramid (Default 1)
+        self.r_tweak_mul = r_tweak_mul  # Defines the (inverse of the) slope of the right side of the pyramid (Default 1)
         # Approximate the peak value of the paper's multinomial distribution (roughly)
         assert num_qubits >= 4, "num_qubits must be at least 4"
         h_peak = (1 << (num_qubits - 4)) - h_tweak_sub
         if h_peak < 0.0:
             print("WARNING: h_peak is negative, setting to 0")
-        self.h_peak = max(h_peak, 0.0)  
+        self.h_peak = max(h_peak, 0.0)
         self.center_at_h_peak = num_constraints / 2 + hc_tweak_add
 
-    #this is to simplify the opt in Sednai opt 
+    # this is to simplify the opt in Sednai opt
     def set_params(self, params):
         """
         Sets the base parameters and immediately updates the derived parameters.
@@ -61,11 +61,10 @@ class TriangleProxy:
         self.l_tweak_mul = params[2]
         self.r_tweak_mul = params[3]
 
-        # This logic was missing and caused the previous issues. 
+        # This logic was missing and caused the previous issues.
         h_peak = (1 << (self.num_qubits - 4)) - self.h_tweak_sub
         self.h_peak = max(h_peak, 0.0)
         self.center_at_h_peak = self.num_constraints / 2 + self.hc_tweak_add
-
 
     # P(c') from paper
     def P_cost_distribution(self, cost: int) -> float:
@@ -77,9 +76,8 @@ class TriangleProxy:
             normalization = (self.num_constraints + 2) ** 2 / 4
         else:
             normalization = (self.num_constraints + 1) * (self.num_constraints + 3) / 4
-        
-        return min(cost + 1, self.num_constraints + 1 - cost) / normalization
 
+        return min(cost + 1, self.num_constraints + 1 - cost) / normalization
 
     # N(c') from paper
     def N_cost_distribution(self, cost: int) -> float:
@@ -102,10 +100,12 @@ class TriangleProxy:
 
         return triangle_value(cost_2, left, right, h_at_cost_2)
 
+
 hard_coded_triangle_spec = [
-    ('num_constraints', int64),
-    ('num_qubits', int64),
+    ("num_constraints", int64),
+    ("num_qubits", int64),
 ]
+
 
 @jitclass(hard_coded_triangle_spec)
 class HardCodedTriangleProxy:
@@ -115,10 +115,10 @@ class HardCodedTriangleProxy:
     This class is now obselete, because the same result can be achieved using
     the parameterized triangle proxy with the default parameters.
     """
+
     def __init__(self, num_constraints, num_qubits):
         self.num_constraints = num_constraints
         self.num_qubits = num_qubits
-
 
     def P_cost_distribution(self, cost: int) -> float:
         """
@@ -132,9 +132,8 @@ class HardCodedTriangleProxy:
             normalization = (self.num_constraints + 2) ** 2 / 4
         else:
             normalization = (self.num_constraints + 1) * (self.num_constraints + 3) / 4
-        
-        return min(cost + 1, self.num_constraints + 1 - cost) / normalization
 
+        return min(cost + 1, self.num_constraints + 1 - cost) / normalization
 
     def N_cost_distribution(self, cost: int) -> float:
         """
@@ -164,7 +163,6 @@ class HardCodedTriangleProxy:
         right = center + reflected_distance + 1
 
         return triangle_value(cost_2, left, right, h_at_cost_2)
-
 
 
 @njit

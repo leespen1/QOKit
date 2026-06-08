@@ -11,6 +11,7 @@ from numba import njit
 from grips.QAOA_simulator import QAOA_run, get_simulator
 import matplotlib.pyplot as plt
 
+
 def get_homogeneous_distribution(graphs, max_number_of_edges=0, simulator_name="auto"):
     """
     Given a graph (or graphs), compute the real distribution n(x; d, c) (as a 3D array),
@@ -22,43 +23,33 @@ def get_homogeneous_distribution(graphs, max_number_of_edges=0, simulator_name="
 
     "The better that N(c'; d, c) estimates the average of n(x; d, c) over all
     c(x) = c', and the less n(x; d, c) deviates over all x with c(x) = c', the
-    better N(c'; d, c) should estimate n(x; d, c) for all x with c(x) = c'" 
+    better N(c'; d, c) should estimate n(x; d, c) for all x with c(x) = c'"
     """
     if isinstance(graphs, nx.Graph):
-        graph = graphs 
+        graph = graphs
         costs = get_costs(graph, simulator_name)
         num_edges = graph.number_of_edges()
         num_vertices = graph.number_of_nodes()
-        real_distribution = get_real_distribution_from_costs(
-            costs, num_edges, num_vertices, max_number_of_edges
-        )
-        homodist =  get_homogeneous_distribution_from_costs(
-            costs, real_distribution, max_number_of_edges
-        )
+        real_distribution = get_real_distribution_from_costs(costs, num_edges, num_vertices, max_number_of_edges)
+        homodist = get_homogeneous_distribution_from_costs(costs, real_distribution, max_number_of_edges)
     elif isinstance(graphs, list) and all(isinstance(G, nx.Graph) for G in graphs):
-        max_number_of_edges = max(max_number_of_edges,
-                                  max(G.number_of_edges() for G in graphs))
+        max_number_of_edges = max(max_number_of_edges, max(G.number_of_edges() for G in graphs))
         num_vertices = graphs[0].number_of_nodes()
         assert all(G.number_of_nodes() == num_vertices for G in graphs), "All graphs must have the same number of vertices."
-        max_number_of_costs = 1+max_number_of_edges
-        num_distances = 1+num_vertices
+        max_number_of_costs = 1 + max_number_of_edges
+        num_distances = 1 + num_vertices
         homodist = np.zeros((max_number_of_costs, num_distances, max_number_of_costs))
         for graph in graphs:
             costs = get_costs(graph, simulator_name)
             num_edges = graph.number_of_edges()
             num_vertices = graph.number_of_nodes()
-            real_distribution = get_real_distribution_from_costs(
-                costs, num_edges, num_vertices, max_number_of_edges
-            )
-            homodist += get_homogeneous_distribution_from_costs(
-                costs, real_distribution, max_number_of_edges
-            )
-        homodist /= len(graphs) # Take the average
+            real_distribution = get_real_distribution_from_costs(costs, num_edges, num_vertices, max_number_of_edges)
+            homodist += get_homogeneous_distribution_from_costs(costs, real_distribution, max_number_of_edges)
+        homodist /= len(graphs)  # Take the average
     else:
         raise TypeError("graphs must be an nx.Graph or a list of nx.Graphs.")
 
     return homodist
-
 
 
 def get_real_distribution(graph):
@@ -71,7 +62,7 @@ def get_real_distribution(graph):
     The distribution is implemented as an 3D array:
     - Index 1 chooses the bitstring, e.g. 000, 001, 010, 011, etc
     - Index 2 chooses the Hamming distance, e.g. 0, 1, 2, ..., num_qubits
-    - Index 3 chooses the cost, e.g. 0, 1, 2, ... 
+    - Index 3 chooses the cost, e.g. 0, 1, 2, ...
 
     This function is for taking a particular graph, and obtaining the real
     distribution n(x; d, c) from the paper. That is, the number of bitstrings
@@ -99,7 +90,6 @@ def get_costs(graph, simulator_name="auto"):
     return costs
 
 
-
 @njit
 def get_real_distribution_from_costs(costs, num_edges, num_vertices, max_num_edges=0):
     """
@@ -113,7 +103,7 @@ def get_real_distribution_from_costs(costs, num_edges, num_vertices, max_num_edg
     The distribution is implemented as an 3D array:
     - Index 1 chooses the bitstring, e.g. 000, 001, 010, 011, etc
     - Index 2 chooses the Hamming distance, e.g. 0, 1, 2, ..., num_qubits
-    - Index 3 chooses the cost, e.g. 0, 1, 2, ... 
+    - Index 3 chooses the cost, e.g. 0, 1, 2, ...
 
     This file is for taking a particular graph, and obtaining the real distribution
     n(x; d, c) from the paper. That is, the number of bitstrings with cost c that
@@ -123,25 +113,23 @@ def get_real_distribution_from_costs(costs, num_edges, num_vertices, max_num_edg
     compatibility across multiple graphs)
     """
 
-    num_bitstrings = 2 ** num_vertices
+    num_bitstrings = 2**num_vertices
     num_distances = 1 + num_vertices
     num_costs = 1 + num_edges
-    cost_axis_size = max(num_costs, 1+max_num_edges)
-
+    cost_axis_size = max(num_costs, 1 + max_num_edges)
 
     assert len(costs.shape) == 1, "costs must be a vector"
     assert len(costs) == num_bitstrings, "length of costs vector must match number of bitstrings"
 
     n_distribution = np.zeros((num_bitstrings, num_distances, cost_axis_size))
 
-    for x in range(num_bitstrings): # 0:num_bitstrings-1
+    for x in range(num_bitstrings):  # 0:num_bitstrings-1
         for y in range(num_bitstrings):
             d = hamming_distance(x, y)
-            cost_y = int(costs[y]) # Convert from float to int
+            cost_y = int(costs[y])  # Convert from float to int
             n_distribution[x, d, cost_y] += 1
 
     return n_distribution
-
 
 
 @njit
@@ -156,7 +144,7 @@ def get_homogeneous_distribution_from_costs(costs, real_distribution, max_num_ed
     num_distances = real_distribution.shape[1]
     num_costs = real_distribution.shape[2]
 
-    cost_axis_size = max(num_costs, 1+max_num_edges)
+    cost_axis_size = max(num_costs, 1 + max_num_edges)
 
     homogeneous_distribution = np.zeros((cost_axis_size, num_distances, cost_axis_size))
     num_cost_occurences = np.zeros(num_costs)
@@ -178,8 +166,7 @@ def get_homogeneous_distribution_from_costs(costs, real_distribution, max_num_ed
     return homogeneous_distribution
 
 
-
-@njit(inline='always')
+@njit(inline="always")
 def hamming_distance(bitstring1: int, bitstring2: int):
     """
     Compute the Hamming distance between two bitstrings, given as integers.
@@ -196,12 +183,11 @@ def hamming_distance(bitstring1: int, bitstring2: int):
     xor = bitstring1 ^ bitstring2
     d = bitcount(xor)
     # Bits of xor are 1 if-and-only-if the bits of x and y differ.
-    # Therefore, xor.bit_count() is the number of bits that differ. 
+    # Therefore, xor.bit_count() is the number of bits that differ.
     return d
 
 
-
-@njit(inline='always')
+@njit(inline="always")
 def bitcount(x: int):
     """
     Counts the number of 1s in the binary representation of an integer x.
@@ -213,13 +199,12 @@ def bitcount(x: int):
     return count
 
 
-
 def pad_to_shape(arr, target_shape):
     """Pad arr with zeros to match target_shape."""
     arr_shape = np.array(arr.shape)
     assert np.all(arr_shape <= target_shape), "arr shape must be <= target_shape elementwise"
     pad_width = [(0, max(0, t - s)) for s, t in zip(arr.shape, target_shape)]
-    return np.pad(arr, pad_width, mode='constant', constant_values=0)
+    return np.pad(arr, pad_width, mode="constant", constant_values=0)
 
 
 def pad_to_match(a, b):
@@ -252,14 +237,12 @@ def pad_to_match(a, b):
         return larger, padded
 
 
-
 def pad_and_stack(arrays):
     """Pad all arrays to the largest shape among them, then stack along a new axis (0)."""
     assert all(arr.ndim == 3 for arr in arrays), "All arrays must be 3D"
     max_shape = tuple(max(arr.shape[i] for arr in arrays) for i in range(3))
     padded = [pad_to_shape(arr, max_shape) for arr in arrays]
     return np.stack(padded, axis=0)
-
 
 
 def average_distributions(distributions):
@@ -272,7 +255,6 @@ def average_distributions(distributions):
     return np.mean(stacked, axis=0)
 
 
-
 def stddev_distributions(distributions):
     """
     Compute the standard deviation of multiple 3D distributions.
@@ -281,7 +263,6 @@ def stddev_distributions(distributions):
     """
     stacked = pad_and_stack(distributions)
     return np.std(stacked, axis=0)
-
 
 
 def distributions_mean_and_stddev(distributions):
@@ -293,7 +274,6 @@ def distributions_mean_and_stddev(distributions):
     return np.mean(stacked, axis=0), np.std(stacked, axis=0)
 
 
-
 def plot_distribution_lines(distribution, cost_prime):
     """
     Make a line plot where each line is N(c'; d, c) for fixed cost c' and
@@ -303,13 +283,12 @@ def plot_distribution_lines(distribution, cost_prime):
     assert 0 <= cost_prime < num_costs_prime, "cost_prime out of bounds"
     plt.figure()
     for d in range(num_distances):
-        plt.plot(range(num_costs), distribution[cost_prime, d, :], label=f'd={d}')
-    plt.xlabel('Cost c')
-    plt.ylabel(f'N(c\'={cost_prime}; d, c)')
-    plt.title(f'Distribution Lines for cost c\'={cost_prime}')
+        plt.plot(range(num_costs), distribution[cost_prime, d, :], label=f"d={d}")
+    plt.xlabel("Cost c")
+    plt.ylabel(f"N(c'={cost_prime}; d, c)")
+    plt.title(f"Distribution Lines for cost c'={cost_prime}")
     plt.legend()
     plt.show()
-
 
 
 def plot_distribution_lines_all(distribution, suptitle="Distribution Lines for all c'"):
@@ -325,17 +304,17 @@ def plot_distribution_lines_all(distribution, suptitle="Distribution Lines for a
         row, col = divmod(cost_prime, ncols)
         ax = axes[row][col]
         for d in range(num_distances):
-            ax.plot(range(num_costs), distribution[cost_prime, d, :], label=f'd={d}')
-        ax.set_xlabel('Cost c')
-        ax.set_ylabel(f'N(c\'={cost_prime}; d, c)')
-        ax.set_title(f'c\'={cost_prime}')
-        ax.legend(fontsize='small')
+            ax.plot(range(num_costs), distribution[cost_prime, d, :], label=f"d={d}")
+        ax.set_xlabel("Cost c")
+        ax.set_ylabel(f"N(c'={cost_prime}; d, c)")
+        ax.set_title(f"c'={cost_prime}")
+        ax.legend(fontsize="small")
     # Hide unused subplots
     for idx in range(num_costs_prime, nrows * ncols):
         row, col = divmod(idx, ncols)
         fig.delaxes(axes[row][col])
     fig.suptitle(suptitle)
-    #plt.tight_layout(rect=[0, 0.03, 1, 0.95])  # leave space for suptitle
+    # plt.tight_layout(rect=[0, 0.03, 1, 0.95])  # leave space for suptitle
 
 
 def plot_stddev_div_mean_heatmap(distributions, cost_prime):
@@ -348,15 +327,16 @@ def plot_stddev_div_mean_heatmap(distributions, cost_prime):
     mean, stddev = distributions_mean_and_stddev(distributions)
     ratio = stddev / mean
     ## Copilot suggestion, don't think it's necessary
-    #with np.errstate(divide='ignore', invalid='ignore'):
+    # with np.errstate(divide='ignore', invalid='ignore'):
     #    ratio = np.where(stddev != 0, mean / stddev, 0)
-    plt.imshow(ratio, aspect='auto', origin='lower')
-    plt.colorbar(label='Dev/Avg')
+    plt.imshow(ratio, aspect="auto", origin="lower")
+    plt.colorbar(label="Dev/Avg")
     plt.xlabel("Cost c")
     plt.ylabel("Hamming Distance d")
     plt.title("Mean divided by Stddev Heatmap")
-    plt.title(f'Dev/Avg N from cost {cost_prime}')
+    plt.title(f"Dev/Avg N from cost {cost_prime}")
     plt.show()
+
 
 def distribution_array_to_dict(distribution_array):
     """
@@ -368,7 +348,7 @@ def distribution_array_to_dict(distribution_array):
     no key-value pair is created in the dictionary.
 
     This is done to make it easier to work with distributions for multiple
-    graphs, since the 
+    graphs, since the
     """
     assert len(distribution_array.shape) == 3
     # Keys are tuples of 3 integers, values are integers
@@ -380,18 +360,19 @@ def distribution_array_to_dict(distribution_array):
 
     return distribution_dict
 
+
 def normalize_homodist_slices(homodist):
     """
     Normalize each N(c'; :, :) slice of a homogeneous distribution independently.
-    
+
     For each cost c', the distribution N(c'; d, c) over all (distance, cost) pairs
     is normalized to sum to 1. This allows for fair comparison between proxy and
     real distributions when the total counts may differ.
-    
+
     Args:
         homodist: 3D array of shape (num_costs, num_distances, num_costs)
                  representing N(c'; d, c)
-    
+
     Returns:
         normalized: 3D array with same shape where each N(c'; :, :) slice sums to 1
     """
@@ -427,9 +408,10 @@ def distribution_mean_squared_error(proxy, homodist, normalize=True):
         homodist = normalize_homodist_slices(homodist)
 
     # Compute MSE
-    mse = np.mean((predicted - homodist)**2)
+    mse = np.mean((predicted - homodist) ** 2)
 
     return mse
+
 
 def get_homogeneous_distribution_from_proxy(proxy, num_constraints=0):
     """
@@ -441,16 +423,17 @@ def get_homogeneous_distribution_from_proxy(proxy, num_constraints=0):
     """
     num_constraints = max(num_constraints, proxy.num_constraints)
 
-    distribution = np.zeros((num_constraints+1, proxy.num_qubits+1, num_constraints+1))
+    distribution = np.zeros((num_constraints + 1, proxy.num_qubits + 1, num_constraints + 1))
 
     # Loop over all cost_1, distance, cost_2
-    #note: this is parallelizable
-    for cost_1 in range(num_constraints+1):
-        for distance in range(proxy.num_qubits+1):
-            for cost_2 in range(num_constraints+1):
+    # note: this is parallelizable
+    for cost_1 in range(num_constraints + 1):
+        for distance in range(proxy.num_qubits + 1):
+            for cost_2 in range(num_constraints + 1):
                 distribution[cost_1, distance, cost_2] = proxy.N_cost_distance_distribution(cost_1, distance, cost_2)
 
     return distribution
+
 
 def get_pearson_correlation_coefficients(homodist1, homodist2):
     """
@@ -461,4 +444,4 @@ def get_pearson_correlation_coefficients(homodist1, homodist2):
     assert homodist1.ndim == 3 and homodist2.ndim == 3, "Both distributions must be 3D arrays"
     homodist1, homodist2 = pad_to_match(homodist1, homodist2)
     pearson_function = lambda arr1, arr2: np.corrcoef(arr1.flatten(), arr2.flatten())[0, 1]
-    return [pearson_function(homodist1[i,:,:], homodist2[i,:,:]) for i in range(homodist1.shape[0])]
+    return [pearson_function(homodist1[i, :, :], homodist2[i, :, :]) for i in range(homodist1.shape[0])]

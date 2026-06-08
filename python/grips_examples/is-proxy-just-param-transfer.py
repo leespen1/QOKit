@@ -184,6 +184,7 @@ import sys
 import time
 
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -682,10 +683,12 @@ def save_transfer_comparison_plot(
         individual = sub["individual_approx_ratio"].to_numpy(dtype=float)
         transferred = sub["transferred_approx_ratio"].to_numpy(dtype=float)
 
-        bars1 = ax.bar(x - width / 2, individual, width, label="Per-case proxy params",
-                       yerr=sub["individual_std_approx_ratio"].to_numpy(dtype=float), capsize=3)
-        bars2 = ax.bar(x + width / 2, transferred, width, label="Mean transferred params",
-                       yerr=sub["transferred_std_approx_ratio"].to_numpy(dtype=float), capsize=3)
+        bars1 = ax.bar(
+            x - width / 2, individual, width, label="Per-case proxy params", yerr=sub["individual_std_approx_ratio"].to_numpy(dtype=float), capsize=3
+        )
+        bars2 = ax.bar(
+            x + width / 2, transferred, width, label="Mean transferred params", yerr=sub["transferred_std_approx_ratio"].to_numpy(dtype=float), capsize=3
+        )
 
         labels = []
         for _, row in sub.iterrows():
@@ -819,43 +822,57 @@ def run_study(
             # Evaluate with this case's individual proxy-optimal params
             print(f"  Evaluating n={num_qubits}, m={row['m']}, depth={depth}, p_edge={prob_edge:.3f} -- individual params")
             individual_metrics = evaluate_real_qaoa(
-                num_qubits, prob_edge, row["gammas"], row["betas"],
-                num_eval_graphs, eval_seed_start, real_backend,
+                num_qubits,
+                prob_edge,
+                row["gammas"],
+                row["betas"],
+                num_eval_graphs,
+                eval_seed_start,
+                real_backend,
             )
 
             # Evaluate with the mean transferred params for this (n, depth)
             mp = mean_params[depth]
             print(f"  Evaluating n={num_qubits}, m={row['m']}, depth={depth}, p_edge={prob_edge:.3f} -- mean transferred params")
             transferred_metrics = evaluate_real_qaoa(
-                num_qubits, prob_edge, mp["gammas"], mp["betas"],
-                num_eval_graphs, eval_seed_start, real_backend,
+                num_qubits,
+                prob_edge,
+                mp["gammas"],
+                mp["betas"],
+                num_eval_graphs,
+                eval_seed_start,
+                real_backend,
             )
 
-            comparison_rows.append({
-                "n": num_qubits,
-                "m": row["m"],
-                "depth": depth,
-                "requested_prob_edge": row["requested_prob_edge"],
-                "prob_edge": prob_edge,
-                "individual_approx_ratio": individual_metrics["mean_approx_ratio"],
-                "individual_std_approx_ratio": individual_metrics["std_approx_ratio"],
-                "individual_expectation": individual_metrics["mean_real_expectation"],
-                "transferred_approx_ratio": transferred_metrics["mean_approx_ratio"],
-                "transferred_std_approx_ratio": transferred_metrics["std_approx_ratio"],
-                "transferred_expectation": transferred_metrics["mean_real_expectation"],
-                "mean_optimum": individual_metrics["mean_optimum"],
-                "individual_gammas": repr([float(v) for v in row["gammas"]]),
-                "individual_betas": repr([float(v) for v in row["betas"]]),
-                "transferred_gammas": repr([float(v) for v in mp["gammas"]]),
-                "transferred_betas": repr([float(v) for v in mp["betas"]]),
-                "num_cases_in_mean": mp["num_cases"],
-                "num_eval_graphs": num_eval_graphs,
-            })
+            comparison_rows.append(
+                {
+                    "n": num_qubits,
+                    "m": row["m"],
+                    "depth": depth,
+                    "requested_prob_edge": row["requested_prob_edge"],
+                    "prob_edge": prob_edge,
+                    "individual_approx_ratio": individual_metrics["mean_approx_ratio"],
+                    "individual_std_approx_ratio": individual_metrics["std_approx_ratio"],
+                    "individual_expectation": individual_metrics["mean_real_expectation"],
+                    "transferred_approx_ratio": transferred_metrics["mean_approx_ratio"],
+                    "transferred_std_approx_ratio": transferred_metrics["std_approx_ratio"],
+                    "transferred_expectation": transferred_metrics["mean_real_expectation"],
+                    "mean_optimum": individual_metrics["mean_optimum"],
+                    "individual_gammas": repr([float(v) for v in row["gammas"]]),
+                    "individual_betas": repr([float(v) for v in row["betas"]]),
+                    "transferred_gammas": repr([float(v) for v in mp["gammas"]]),
+                    "transferred_betas": repr([float(v) for v in mp["betas"]]),
+                    "num_cases_in_mean": mp["num_cases"],
+                    "num_eval_graphs": num_eval_graphs,
+                }
+            )
 
             diff = individual_metrics["mean_approx_ratio"] - transferred_metrics["mean_approx_ratio"]
-            print(f"    individual={individual_metrics['mean_approx_ratio']:.4f}, "
-                  f"transferred={transferred_metrics['mean_approx_ratio']:.4f}, "
-                  f"diff={diff:+.4f}")
+            print(
+                f"    individual={individual_metrics['mean_approx_ratio']:.4f}, "
+                f"transferred={transferred_metrics['mean_approx_ratio']:.4f}, "
+                f"diff={diff:+.4f}"
+            )
 
     comparison_df = pd.DataFrame(comparison_rows)
     comparison_csv_path = os.path.join(output_dir, f"transfer_comparison_n{n_slug}.csv")
@@ -902,12 +919,9 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--num-gamma-grid", type=int, default=NUM_GAMMA_GRID)
     parser.add_argument("--num-beta-grid", type=int, default=NUM_BETA_GRID)
     parser.add_argument("--landscape-m-max", type=int, default=LANDSCAPE_M_MAX)
-    parser.add_argument("--num-eval-graphs", type=int, default=NUM_EVAL_GRAPHS,
-                        help="Number of random ER graphs to generate for real QAOA evaluation")
-    parser.add_argument("--eval-seed-start", type=int, default=EVAL_SEED_START,
-                        help="Starting seed for evaluation graph generation")
-    parser.add_argument("--real-backend", type=str, default=REAL_BACKEND,
-                        help="Simulator backend for real QAOA evaluation")
+    parser.add_argument("--num-eval-graphs", type=int, default=NUM_EVAL_GRAPHS, help="Number of random ER graphs to generate for real QAOA evaluation")
+    parser.add_argument("--eval-seed-start", type=int, default=EVAL_SEED_START, help="Starting seed for evaluation graph generation")
+    parser.add_argument("--real-backend", type=str, default=REAL_BACKEND, help="Simulator backend for real QAOA evaluation")
     parser.add_argument("--output-dir", type=str, default=OUTPUT_DIR)
     return parser
 

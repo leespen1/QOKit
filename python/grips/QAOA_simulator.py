@@ -6,17 +6,19 @@ the graph (ising model) that it is passed.
 
 Most other functions are written only for the purpose of QAOA_run to use them. 
 """
+
 import qokit, typing, scipy, time
 import numpy as np
 from qokit.fur import choose_simulator
 from qokit.fur.qaoa_simulator_base import QAOAFastSimulatorBase, TermsType
 
+
 def QAOA_run(
     ising_model: TermsType,
-    N: int, # Number of qubtis/vertices
-    p: int, # Number of QAOA "layers"
-    init_gamma: np.ndarray, # 1D array of length p
-    init_beta: np.ndarray, # 1D array of length p
+    N: int,  # Number of qubtis/vertices
+    p: int,  # Number of QAOA "layers"
+    init_gamma: np.ndarray,  # 1D array of length p
+    init_beta: np.ndarray,  # 1D array of length p
     optimizer_method: str = "COBYLA",
     optimizer_options: dict | None = None,
     mixer: str = "x",  # Using a different mixer is not yet supported
@@ -28,7 +30,11 @@ def QAOA_run(
 
     start_time = time.time()
     result = scipy.optimize.minimize(
-        inverse_objective_function(ising_model, N, p, mixer, expectations, overlaps, simulator_name=simulator_name), init_freq, args=(), method=optimizer_method, options=optimizer_options
+        inverse_objective_function(ising_model, N, p, mixer, expectations, overlaps, simulator_name=simulator_name),
+        init_freq,
+        args=(),
+        method=optimizer_method,
+        options=optimizer_options,
     )
     # the above returns a scipy optimization result object that has multiple attributes
     # result.x gives the optimal solutionsol.success #bool whether algorithm succeeded
@@ -42,7 +48,7 @@ def QAOA_run(
 
     if expectations is not None:
         expectations = list(map(make_time_relative, expectations))
-    
+
     if overlaps is not None:
         overlaps = list(map(make_time_relative, overlaps))
 
@@ -66,7 +72,7 @@ def get_simulator(N: int, terms: TermsType, sim_or_none: QAOAFastSimulatorBase |
         # For small graphs, if we don't specify the simulator_name, force simulator to use CPU. Examples show that CPU and GPU are equally fast around N == 8.
         if (N <= 7) and (simulator_name == "auto"):
             simclass = choose_simulator(name="python")
-        else: # If simulator_name is not given, will default to GPU for larger graphs.
+        else:  # If simulator_name is not given, will default to GPU for larger graphs.
             simclass = choose_simulator(name=simulator_name)
         return simclass(N, terms=terms)
     else:
@@ -74,7 +80,13 @@ def get_simulator(N: int, terms: TermsType, sim_or_none: QAOAFastSimulatorBase |
 
 
 def get_result(
-    N: int, terms: TermsType, gamma: np.ndarray, beta: np.ndarray, sim: QAOAFastSimulatorBase | None = None, result: np.ndarray | None = None, simulator_name: str = "auto"
+    N: int,
+    terms: TermsType,
+    gamma: np.ndarray,
+    beta: np.ndarray,
+    sim: QAOAFastSimulatorBase | None = None,
+    result: np.ndarray | None = None,
+    simulator_name: str = "auto",
 ) -> np.ndarray:
     if result is None:
         simulator = get_simulator(N, terms, sim, simulator_name=simulator_name)
@@ -84,7 +96,13 @@ def get_result(
 
 
 def get_simulator_and_result(
-    N: int, terms: TermsType, gamma: np.ndarray, beta: np.ndarray, sim: QAOAFastSimulatorBase | None = None, result: np.ndarray | None = None, simulator_name: str = "auto"
+    N: int,
+    terms: TermsType,
+    gamma: np.ndarray,
+    beta: np.ndarray,
+    sim: QAOAFastSimulatorBase | None = None,
+    result: np.ndarray | None = None,
+    simulator_name: str = "auto",
 ) -> tuple[QAOAFastSimulatorBase, np.ndarray]:
     simulator = get_simulator(N, terms, sim, simulator_name=simulator_name)
     if result is None:
@@ -92,27 +110,53 @@ def get_simulator_and_result(
     return (simulator, result)
 
 
-def get_state(N: int, terms: TermsType, gamma: np.ndarray, beta: np.ndarray, sim: QAOAFastSimulatorBase | None = None, result: np.ndarray | None = None, simulator_name: str = "auto"):
+def get_state(
+    N: int,
+    terms: TermsType,
+    gamma: np.ndarray,
+    beta: np.ndarray,
+    sim: QAOAFastSimulatorBase | None = None,
+    result: np.ndarray | None = None,
+    simulator_name: str = "auto",
+):
     simulator, result = get_simulator_and_result(N, terms, gamma, beta, sim, result, simulator_name=simulator_name)
     return simulator.get_statevector(result)
 
 
 def get_probabilities(
-    N: int, terms: TermsType, gamma: np.ndarray, beta: np.ndarray, sim: QAOAFastSimulatorBase | None = None, result: np.ndarray | None = None, simulator_name: str = "auto"
+    N: int,
+    terms: TermsType,
+    gamma: np.ndarray,
+    beta: np.ndarray,
+    sim: QAOAFastSimulatorBase | None = None,
+    result: np.ndarray | None = None,
+    simulator_name: str = "auto",
 ) -> np.ndarray:
     simulator, result = get_simulator_and_result(N, terms, gamma, beta, sim, result, simulator_name=simulator_name)
     return simulator.get_probabilities(result, preserve_state=True)
 
 
 def get_expectation(
-    N: int, terms: TermsType, gamma: np.ndarray, beta: np.ndarray, sim: QAOAFastSimulatorBase | None = None, result: np.ndarray | None = None, simulator_name: str = "auto"
+    N: int,
+    terms: TermsType,
+    gamma: np.ndarray,
+    beta: np.ndarray,
+    sim: QAOAFastSimulatorBase | None = None,
+    result: np.ndarray | None = None,
+    simulator_name: str = "auto",
 ) -> float:
     simulator, result = get_simulator_and_result(N, terms, gamma, beta, sim, result, simulator_name=simulator_name)
     return simulator.get_expectation(result, preserve_state=True)
 
 
 def get_overlap(
-    N: int, terms: TermsType, gamma: np.ndarray, beta: np.ndarray, sim: QAOAFastSimulatorBase | None = None, result: np.ndarray | None = None, simulator_name: str = "auto"
+    N: int,
+    terms: TermsType,
+    gamma: np.ndarray,
+    beta: np.ndarray,
+    sim: QAOAFastSimulatorBase | None = None,
+    result: np.ndarray | None = None,
+    simulator_name: str = "auto",
 ) -> float:
     simulator, result = get_simulator_and_result(N, terms, gamma, beta, sim, result, simulator_name=simulator_name)
     return simulator.get_overlap(result, preserve_state=True, optimization_type="max")

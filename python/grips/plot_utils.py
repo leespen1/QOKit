@@ -41,6 +41,8 @@ def plot_wireframe(xs: np.ndarray, ys: np.ndarray, data: np.ndarray, title: str,
     data : np.ndarray (2-dimensional)
         data[x][y] will be the z-coordinate at (x, y)
     """
+
+
 def plot_surface(xs: np.ndarray, ys: np.ndarray, data: np.ndarray, title: str, xlabel: str, ylabel: str, zlabel: str):
     fig = plt.figure()
     ax = fig.add_subplot(projection="3d")
@@ -92,14 +94,18 @@ def plot_3d_scatter(xs: np.ndarray, ys: np.ndarray, data: np.ndarray, title: str
     ax.set_title(title)
     return fig, ax
 
+
 """Given a Figure and corresponding 3D Axes, rotates the figure and saves the animation to a gif
 """
+
+
 def animate_3d_rotation(fig, ax, filename):
     def rotate(angle):
         ax.view_init(azim=angle)
 
     rot_animation = animation.FuncAnimation(fig, rotate, frames=np.arange(0, 362, 2), interval=100)
-    rot_animation.save(filename, dpi=80, writer='imagemagick')
+    rot_animation.save(filename, dpi=80, writer="imagemagick")
+
 
 """Plots a 2d projection (parallel projection onto y=0) of a 3d scatter plot for the given data
 

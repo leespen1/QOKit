@@ -114,10 +114,7 @@ def build_graph_batch(
     probability: float,
     ws_num_neighbors: int,
 ) -> list[nx.Graph]:
-    return [
-        make_graph(graph_type, num_nodes, seed_start + offset, probability, ws_num_neighbors)
-        for offset in range(num_graphs)
-    ]
+    return [make_graph(graph_type, num_nodes, seed_start + offset, probability, ws_num_neighbors) for offset in range(num_graphs)]
 
 
 def compute_empirical_cost_distribution(graphs: list[nx.Graph], num_constraints: int) -> np.ndarray:
@@ -391,11 +388,7 @@ def default_output_path(args) -> str:
     results_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "results")
     os.makedirs(results_dir, exist_ok=True)
     edge_probability_slug = str(args.edge_probability).replace(".", "p")
-    filename = (
-        f"proxy_study_{args.graph_type}_n{args.num_nodes}_g{args.num_graphs}"
-        f"_ep{edge_probability_slug}"
-        f"_p{args.depth}_{args.schedule_type}"
-    )
+    filename = f"proxy_study_{args.graph_type}_n{args.num_nodes}_g{args.num_graphs}" f"_ep{edge_probability_slug}" f"_p{args.depth}_{args.schedule_type}"
     if args.graph_type == "watts_strogatz":
         filename += f"_k{args.ws_num_neighbors}"
     filename += ".csv"
@@ -438,10 +431,7 @@ def main(args) -> pd.DataFrame:
     for proxy_name in proxy_names:
         print(f"\n--- Fitting {proxy_name} proxy N(c';d,c) ---")
         if proxy_name == "paper" and args.graph_type != "erdos_renyi":
-            print(
-                "Using PaperProxy as heuristic baseline; "
-                "analytical assumptions do not match this graph type."
-            )
+            print("Using PaperProxy as heuristic baseline; " "analytical assumptions do not match this graph type.")
         fit_start = time.perf_counter()
         fit_results[proxy_name] = fit_proxy(
             proxy_name=proxy_name,
@@ -500,10 +490,7 @@ def main(args) -> pd.DataFrame:
             row["proxy_row_runtime_sec"] = fit_runtimes[proxy_name] + proxy_opt_runtime_sec + real_qaoa_runtime_sec
             rows.append(row)
 
-            print(
-                f"  approx_ratio={row['mean_approx_ratio']:.4f}, "
-                f"fit_mse={row['fit_mse'] if row['fit_mse'] is not None else float('nan'):.6f}"
-            )
+            print(f"  approx_ratio={row['mean_approx_ratio']:.4f}, " f"fit_mse={row['fit_mse'] if row['fit_mse'] is not None else float('nan'):.6f}")
 
     results = pd.DataFrame(rows)
     total_study_runtime_sec = time.perf_counter() - total_start
@@ -530,8 +517,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--exclude-paper", dest="include_paper", action="store_false")
     parser.add_argument("--depth", type=int, default=1)
     parser.add_argument("--schedule-type", choices=SUPPORTED_SCHEDULE_TYPES, default="full")
-    parser.add_argument("--p-sources", default="native,empirical",
-                        help="Comma-separated P(c') sources: native (proxy built-in) and/or empirical (from graph instances)")
+    parser.add_argument(
+        "--p-sources", default="native,empirical", help="Comma-separated P(c') sources: native (proxy built-in) and/or empirical (from graph instances)"
+    )
     parser.add_argument("--optimizer-method", default="COBYLA")
     parser.add_argument("--optimizer-maxiter", type=int, default=200)
     parser.add_argument("--fit-max-iter", type=int, default=1000)

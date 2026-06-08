@@ -8,7 +8,7 @@ from spsa._utils import ArrayLike, immutable_view, type_check
 from math import isqrt, sqrt
 import scipy
 
-'''
+"""
 This .py file serves as a module to add additional c(classical) optimizers 
 to scipy.optimize.minimize, since that is used for our QAOA_run function. 
 
@@ -17,10 +17,11 @@ and then you are able to use
 scipy.optimize.minimize(f, x0, args = (), method = <method_name>, kwargs ...). 
 For example, for SPSA one could do 
 scipy.optimize.minimize(f, x0, args = (), method = spsa_for_scipy, adam = True/False, lr = 0.1, ...)
-'''
+"""
 
 
-def spsa_for_scipy(f: Callable[[np.ndarray], float],
+def spsa_for_scipy(
+    f: Callable[[np.ndarray], float],
     x: ArrayLike,
     /,
     *,
@@ -36,12 +37,12 @@ def spsa_for_scipy(f: Callable[[np.ndarray], float],
     momentum: float = 0.9,
     beta: float = 0.999,
     epsilon: float = 1e-7,
-    **kwargs #so we get no complaints from scipy passing extra keyword arguments
+    **kwargs,  # so we get no complaints from scipy passing extra keyword arguments
 ) -> np.ndarray:
     """
     Implementation of the SPSA optimization algorithm for minimizing an objective function.
 
-    It requires the following imports: 
+    It requires the following imports:
     import scipy
     import operator
     from typing import Callable, Iterator, Optional, SupportsFloat, Tuple, Type, Union
@@ -51,7 +52,7 @@ def spsa_for_scipy(f: Callable[[np.ndarray], float],
     import spsa.random.iterator
     from spsa._utils import ArrayLike, immutable_view, type_check
     from math import isqrt, sqrt
-    
+
     Parameters
     -----------
         f:
@@ -119,14 +120,14 @@ def spsa_for_scipy(f: Callable[[np.ndarray], float],
     rng = np.random.default_rng()
     iteration_counter = 0
     success_flag = False
-    #---------------------------------------------------------#
+    # ---------------------------------------------------------#
     # General momentum algorithm:                             #
     #     b(0) = 0                                            #
     #     f(0) = 0                                            #
     #     b(n + 1) = b(n) + (1 - beta) * (1 - b(n))           #
     #     f(n + 1) = f(n) + (1 - beta) * (estimate(n) - f(n)) #
     #     f(n) / b(n) ~ average(estimate(n))                  #
-    #---------------------------------------------------------#
+    # ---------------------------------------------------------#
     m1 = 1.0 - momentum
     m2 = 1.0 - beta
     # Estimate the noise in f.
@@ -185,7 +186,7 @@ def spsa_for_scipy(f: Callable[[np.ndarray], float],
         dx /= np.sqrt(square_gx / b2 + epsilon)
     # Run the number of iterations.
     for i in range(iterations):
-        iteration_counter += 1 #count the iterations
+        iteration_counter += 1  # count the iterations
         # Estimate the next point.
         x_next = x - lr * dx
         # Compute df/dx in at the next point.
@@ -246,7 +247,7 @@ def spsa_for_scipy(f: Callable[[np.ndarray], float],
             x_best = x_avg / bx
             consecutive_fails = 0
         if consecutive_fails > 128 * (improvement_fails + isqrt(x.size + 100)):
-            print(f'Failed to improve in {consecutive_fails} consecutive steps; stopping.\n')
+            print(f"Failed to improve in {consecutive_fails} consecutive steps; stopping.\n")
             success_flag = True
             break
     #     # Reset variables if diverging.
@@ -273,8 +274,7 @@ def spsa_for_scipy(f: Callable[[np.ndarray], float],
     result.nfev = iteration_counter
     result.success = success_flag
     if success_flag:
-        result.message = 'Local minimum found.'
-    else: 
-        result.message = 'Minimizer potentially not found; iterations limit hit.'
+        result.message = "Local minimum found."
+    else:
+        result.message = "Minimizer potentially not found; iterations limit hit."
     return result
-

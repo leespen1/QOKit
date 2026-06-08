@@ -2,16 +2,16 @@ import numpy as np
 import grips
 
 # def mse_dist_loss_direct(proxy, realdist, num_constraints, num_qubits):
-    
+
 #     predicted = np.zeros_like(realdist)
-    
+
 #     # Loop over all cost_1, distance, cost_2
 #     #note: this is parallelizable
 #     for cost_1 in range(num_constraints+1):
 #         for distance in range(num_qubits+1):
 #             for cost_2 in range(num_constraints+1):
 #                 predicted[cost_2, distance, cost_1] = proxy.N_cost_distance_distribution(cost_1, distance, cost_2)
-    
+
 #     # Normalize both to sum to 1 (or same scale)
 #     predicted_sum = predicted.sum()
 #     if predicted_sum == 0:
@@ -21,24 +21,32 @@ import grips
 
 #     predicted /= predicted_sum
 #     realdist_norm = realdist / realdist.sum()
-    
+
 #     # Compute MSE
 #     mse = np.mean((predicted - realdist_norm)**2)
 
 #     return mse
 
 
-
-def fit_proxy_to_real(proxy, realdist, init_params, bounds, optimizer='smart random search', max_iter=1000,\
-                        fail_til_shrink = 4, fail_til_end = 50,\
-                        SD_vs_paramrange = 0.2, grid_size_start = 0):
+def fit_proxy_to_real(
+    proxy,
+    realdist,
+    init_params,
+    bounds,
+    optimizer="smart random search",
+    max_iter=1000,
+    fail_til_shrink=4,
+    fail_til_end=50,
+    SD_vs_paramrange=0.2,
+    grid_size_start=0,
+):
     """
     Fits a proxy distribution to a given distribution realdist.
-    Currently uses a smart random search 
-    (perturb randomly, re-use helpful perturbations, shrink if we fail consecutively), 
+    Currently uses a smart random search
+    (perturb randomly, re-use helpful perturbations, shrink if we fail consecutively),
     combined with optionally added grid search for initial params.
 
-    This *should* be easy to reuse across different proxies. 
+    This *should* be easy to reuse across different proxies.
 
     Args:
         proxy (QAOA_proxy): The proxy model to fit.
@@ -50,7 +58,7 @@ def fit_proxy_to_real(proxy, realdist, init_params, bounds, optimizer='smart ran
         optimizer: The optimization algorithm to use. Defaults to 'smart random search'.
         max_iter = 1000: The maximum number of iterations for the optimizer. Defaults to 1000.
         fail_til_shrink = 4: Number of failures to improve til we shrink SDs of perturbs
-        fail_til_end = 50: Number of failures to improve until we terminate. 
+        fail_til_end = 50: Number of failures to improve until we terminate.
         SD_vs_paramrange = 0.1: Ratio (SD of perturbation)/(width of param bounds) for each perturbation
         grid_size_start = 0: If >0, do a grid search with this many points per parameter to find a good initial point.
 
@@ -59,7 +67,7 @@ def fit_proxy_to_real(proxy, realdist, init_params, bounds, optimizer='smart ran
             - np.ndarray: The best parameters found.
             - float: The final mean squared error loss.
     """
-    if optimizer == 'smart random search':
+    if optimizer == "smart random search":
         bounds = np.array(bounds)
         current_params = np.array(init_params)
         proxy.set_params(current_params)
@@ -69,20 +77,21 @@ def fit_proxy_to_real(proxy, realdist, init_params, bounds, optimizer='smart ran
         # Optional grid search for better initial params
         if grid_size_start and grid_size_start > 0:
             import itertools
+
             param_grids = [np.linspace(b[0], b[1], grid_size_start) for b in bounds]
-            
+
             for grid_point in itertools.product(*param_grids):
                 grid_point = np.array(grid_point)
                 proxy.set_params(grid_point)
                 mse = grips.distribution_mean_squared_error(proxy, realdist)
-                if (mse < best_mse):
+                if mse < best_mse:
                     best_mse = mse
                     best_params = grid_point.copy()
-            print('Finished initial grid search!')
+            print("Finished initial grid search!")
         # Set initial proxy parameters
         proxy.set_params(best_params)
         param_ranges = bounds[:, 1] - bounds[:, 0]
-        sds = param_ranges*SD_vs_paramrange #initial SDs of perturbations
+        sds = param_ranges * SD_vs_paramrange  # initial SDs of perturbations
         consecutive_failures = 0
         consecutive_failures_aftershrink = 0
         # Generate initial perturbation
@@ -104,21 +113,20 @@ def fit_proxy_to_real(proxy, realdist, init_params, bounds, optimizer='smart ran
                 consecutive_failures_aftershrink += 1
                 # Generate a new random perturbation
                 perturbation = np.random.normal(0, sds)
-            #if we failed consecutively, shrink SDs of the perturbations
+            # if we failed consecutively, shrink SDs of the perturbations
             if consecutive_failures >= fail_til_shrink:
-                sds *= (2.0 / 3.0) 
+                sds *= 2.0 / 3.0
                 consecutive_failures = 0
                 # Generate a new random perturbation with the new sds
                 perturbation = np.random.normal(0, sds)
-            #stop if we fail too many times even after shrinking
-            if consecutive_failures_aftershrink >= fail_til_end: 
+            # stop if we fail too many times even after shrinking
+            if consecutive_failures_aftershrink >= fail_til_end:
                 break
 
-            if (i+1) % (round(max_iter/10)) == 0 or i == max_iter - 1:
+            if (i + 1) % (round(max_iter / 10)) == 0 or i == max_iter - 1:
                 print(f"Iteration {i+1}, Best MSE: {best_mse:.6f}, Best Params: {best_params}, SDs: {sds}\n")
 
         proxy.set_params(best_params)
         return best_params, best_mse
     else:
         raise NotImplementedError(f"Optimizer '{optimizer}' is not implemented.")
-

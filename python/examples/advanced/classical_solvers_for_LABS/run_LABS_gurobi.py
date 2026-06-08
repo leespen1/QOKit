@@ -12,6 +12,7 @@ import numpy as np
 import logging
 import random
 
+
 def run_one_instance(path: str, env: Env, TTS: bool = True, n: int = 3, log_to_write: str = "", seed=None):
     if log_to_write:
         stdoutOrigin = sys.stdout
@@ -55,9 +56,9 @@ def run_LABS_gurobi(n_range, env: Env = "", TTS: bool = True, nb_runs=1):
 
     can use this as for example run_LABS_gurobi(10, 20)
 
-    RETURNS: 
+    RETURNS:
     runtimes, TYPE numpy array of length N by nb_runs
-        Contains runtimes of solving LABS for each N, for each run 
+        Contains runtimes of solving LABS for each N, for each run
     """
     if TTS:
         prefix = "TTS_"
@@ -86,36 +87,35 @@ def run_LABS_gurobi(n_range, env: Env = "", TTS: bool = True, nb_runs=1):
                 msg = f"{n},{raw_time_diff},{time_diff},{msol},{runid}\n"
                 f.write(msg)
             runend = time()
-            runtimes[ncount, runid] = runend-runstart
-    return runtimes 
+            runtimes[ncount, runid] = runend - runstart
+    return runtimes
 
 
-'''
+"""
 Here is an example script for how to use this function: 
-'''
+"""
 Heuristics = 0
 Threads = 8
 Cuts = 0
 Presolve = -1
 MAXINT = 2000000000
 
-n_min=10
+n_min = 10
 n_max = 20
 n_range = range(n_min, n_max)
 nb_runs = 5
 TTS = True
-gurobi_LABS_runtimes = run_LABS_gurobi(n_range, env = Env(''), TTS = TTS, nb_runs=nb_runs)
+gurobi_LABS_runtimes = run_LABS_gurobi(n_range, env=Env(""), TTS=TTS, nb_runs=nb_runs)
 
-avg_runtimes = np.mean(gurobi_LABS_runtimes, axis = 1)
+avg_runtimes = np.mean(gurobi_LABS_runtimes, axis=1)
 
-print('Gurobi runtimes were:\n')
+print("Gurobi runtimes were:\n")
 for count, n in enumerate(n_range):
-    print(f'N = {n_range[count]}: {avg_runtimes[count]}s')
+    print(f"N = {n_range[count]}: {avg_runtimes[count]}s")
 
 
-#to save the data from this run 
-#format: N in first column, runtimes for each nb_runs in later columns of the saved array
-n_range_array = np.reshape(n_range, (len(n_range), 1)) #enforce shape to use hstack
-runs_data_N_and_runtimes = np.hstack([n_range_array,gurobi_LABS_runtimes]) #now N and runtimes together
-np.save('gurobi_labs_runtime_for_N_from'+str(n_min) + '_to_'+str(n_max)+'_with_nbruns='+str(nb_runs),
-         runs_data_N_and_runtimes)
+# to save the data from this run
+# format: N in first column, runtimes for each nb_runs in later columns of the saved array
+n_range_array = np.reshape(n_range, (len(n_range), 1))  # enforce shape to use hstack
+runs_data_N_and_runtimes = np.hstack([n_range_array, gurobi_LABS_runtimes])  # now N and runtimes together
+np.save("gurobi_labs_runtime_for_N_from" + str(n_min) + "_to_" + str(n_max) + "_with_nbruns=" + str(nb_runs), runs_data_N_and_runtimes)

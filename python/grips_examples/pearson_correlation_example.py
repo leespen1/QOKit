@@ -5,29 +5,45 @@ import qokit.maxcut as mc
 import os
 import grips
 from grips import (
-    get_simulator, QAOA_run, QAOA_proxy, QAOA_proxy_expectation, QAOA_proxy_optimize_gamma_beta,
-    get_homogeneous_distribution,get_homogeneous_distribution_from_proxy,
-    TriangleProxy, NormalProxy, PaperProxy,
-    inverse_objective_function, get_expectation,  
-    maxcut, maxcut_approx_ratio, spsa_for_scipy,
-    plot_distribution_lines_all, fit_proxy_to_real, 
-    pad_and_stack, get_pearson_correlation_coefficients, pad_to_match
+    get_simulator,
+    QAOA_run,
+    QAOA_proxy,
+    QAOA_proxy_expectation,
+    QAOA_proxy_optimize_gamma_beta,
+    get_homogeneous_distribution,
+    get_homogeneous_distribution_from_proxy,
+    TriangleProxy,
+    NormalProxy,
+    PaperProxy,
+    inverse_objective_function,
+    get_expectation,
+    maxcut,
+    maxcut_approx_ratio,
+    spsa_for_scipy,
+    plot_distribution_lines_all,
+    fit_proxy_to_real,
+    pad_and_stack,
+    get_pearson_correlation_coefficients,
+    pad_to_match,
 )
+
 
 def n_choose_2(n):
     return n * (n - 1) // 2
 
+
 # 10 vertices, edge probability 1/3, same as Fig 3 of paper
 num_nodes = 10
 num_graphs = 100
-edge_probability = 1/3
+edge_probability = 1 / 3
 graphs = []
 homodists = []
 import random
+
 for i in range(num_graphs):
     graph = nx.erdos_renyi_graph(num_nodes, edge_probability)
-    #approx ratios later break if we have graphs with no edges
-    #add a random edge if the graph doesn't have one
+    # approx ratios later break if we have graphs with no edges
+    # add a random edge if the graph doesn't have one
     if graph.number_of_edges() == 0:
         nodes = list(graph.nodes)
         if len(nodes) >= 2:
@@ -37,7 +53,7 @@ for i in range(num_graphs):
     graphs.append(graph)
     homodists.append(homodist)
 
-#Q: is the scaling correct here with np.mean()?
+# Q: is the scaling correct here with np.mean()?
 homodists = pad_and_stack(homodists)
 analytic_homodist = np.mean(homodists, axis=0)
 
@@ -55,11 +71,10 @@ paper_pearson_coefficients = get_pearson_correlation_coefficients(analytic_homod
 triangle_pearson_coefficients = get_pearson_correlation_coefficients(analytic_homodist, triangle_homodist)
 
 
-plt.plot(range(analytic_homodist.shape[0]), paper_pearson_coefficients, label="Paper Proxy", marker='o')
-plt.plot(range(analytic_homodist.shape[0]), triangle_pearson_coefficients, label="Triangle Proxy", marker='o')
+plt.plot(range(analytic_homodist.shape[0]), paper_pearson_coefficients, label="Paper Proxy", marker="o")
+plt.plot(range(analytic_homodist.shape[0]), triangle_pearson_coefficients, label="Triangle Proxy", marker="o")
 plt.ylim(0, 1.1)
 plt.grid(True, which="both")
 plt.xlabel("Cost (c') of Target Bitstring")
 plt.ylabel("Pearson Correlation Coefficient")
 plt.show()
-

@@ -37,10 +37,10 @@ seeds = range(5)
 num_gamma = 100
 num_beta = 50
 p = 1  # QAOA depth
-compute_real_qaoa = False       # Expensive: full real QAOA grid sweep
-compute_real_homodist = False    # Expensive: instance-specific N(c';d,c) + Real P
+compute_real_qaoa = False  # Expensive: full real QAOA grid sweep
+compute_real_homodist = False  # Expensive: instance-specific N(c';d,c) + Real P
 compute_averaged_distributions = False  # Average N and P across all seeds; requires compute_real_homodist
-generate_plots = True          # Set False for text-only output (no matplotlib)
+generate_plots = True  # Set False for text-only output (no matplotlib)
 
 # Build gamma/beta grid once (shared across all seeds)
 gammas_1d = np.linspace(0, 2, num_gamma)  # in pi-units (QOKit convention: phase gate is exp(-iγC/2))
@@ -124,7 +124,8 @@ def run_single_seed(seed):
         if real_qaoa_expectations is not None:
             return real_qaoa_expectations[idx]
         return get_expectation(
-            num_nodes, ising_model,
+            num_nodes,
+            ising_model,
             np.array([gammas_flat[idx, 0] * np.pi]),
             np.array([betas_flat[idx, 0] * np.pi]),
         )
@@ -321,10 +322,7 @@ print(hdr)
 print(sep)
 
 for r in results:
-    line = (
-        f"  {r['seed']:>6}  {r['num_edges']:>3}  {r['c_opt']:>5}  "
-        f"{r['apx_paper']:>9.4f}  {r['apx_realP']:>9.4f}"
-    )
+    line = f"  {r['seed']:>6}  {r['num_edges']:>3}  {r['c_opt']:>5}  " f"{r['apx_paper']:>9.4f}  {r['apx_realP']:>9.4f}"
     if compute_real_homodist:
         line += f"  {r['apx_realNP']:>9.4f}"
     if compute_averaged_distributions and r.get("apx_avgNP") is not None:

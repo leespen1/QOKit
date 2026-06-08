@@ -23,7 +23,7 @@ import networkx as nx, numpy as np
 
 # Create a graph that consists of two connected nodes
 G = nx.Graph()
-G.add_edge(0,1)
+G.add_edge(0, 1)
 
 print("Computing n_dist ...")
 n_dist = get_real_distribution(G)
@@ -31,23 +31,7 @@ n_dist = get_real_distribution(G)
 print("Computed n_dist:")
 print(n_dist.astype(int))
 
-correct_n_dist = np.array([
-  [[1, 0],
-   [0, 2],
-   [1, 0]],
-
-  [[0,1],
-   [2,0],
-   [0,1]],
-
-  [[0,1],
-   [2,0],
-   [0,1]],
-
-  [[1,0],
-   [0,2],
-   [1,0]]
-])
+correct_n_dist = np.array([[[1, 0], [0, 2], [1, 0]], [[0, 1], [2, 0], [0, 1]], [[0, 1], [2, 0], [0, 1]], [[1, 0], [0, 2], [1, 0]]])
 
 assert np.array_equal(n_dist.astype(int), correct_n_dist), "n_dist computation was not correct!"
 print("[SUCCESS] Real distribution n_dist was computed correctly for the two-node example.")
@@ -58,15 +42,12 @@ N_dist = get_homogeneous_distribution(G)
 print("Computed N_dist:")
 print(N_dist.astype(int))
 
-correct_N_dist = np.array([
-  [[1, 0],
-   [0, 2],
-   [1, 0]],
-
-  [[0,1],
-   [2,0],
-   [0,1]],
-])
+correct_N_dist = np.array(
+    [
+        [[1, 0], [0, 2], [1, 0]],
+        [[0, 1], [2, 0], [0, 1]],
+    ]
+)
 
 assert np.array_equal(N_dist.astype(int), correct_N_dist), "N_dist computation was not correct!"
 print("[SUCCESS] Homogenous distribution N_dist was computed correctly for the two-node example.")

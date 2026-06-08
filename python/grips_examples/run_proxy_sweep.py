@@ -211,9 +211,7 @@ def write_text_report(df: pd.DataFrame, sweep_dir: str, total_runtime_sec: float
         "Best mean approximation ratio by configuration:",
     ]
 
-    grouped = df.sort_values("mean_approx_ratio", ascending=False).groupby(
-        ["graph_type", "num_nodes", "depth", "schedule_type"], as_index=False
-    )
+    grouped = df.sort_values("mean_approx_ratio", ascending=False).groupby(["graph_type", "num_nodes", "depth", "schedule_type"], as_index=False)
     best_rows = grouped.head(1)
     for _, row in best_rows.iterrows():
         config = row.get("config_label", row["proxy_name"])
@@ -249,8 +247,7 @@ def write_text_report(df: pd.DataFrame, sweep_dir: str, total_runtime_sec: float
                 for _, r in sub.iterrows():
                     mse_str = f"{r['fit_mse']:.6f}" if pd.notna(r.get("fit_mse")) else "N/A"
                     report_lines.append(
-                        f"    {str(r['config_label']):<30s}  approx={r['mean_approx_ratio']:.4f}  "
-                        f"proxy_exp={r['proxy_expectation']:.4f}  fit_mse={mse_str}"
+                        f"    {str(r['config_label']):<30s}  approx={r['mean_approx_ratio']:.4f}  " f"proxy_exp={r['proxy_expectation']:.4f}  fit_mse={mse_str}"
                     )
 
     report_path = os.path.join(sweep_dir, "report.txt")
@@ -291,10 +288,7 @@ def run_sweep(args) -> pd.DataFrame:
                         completed += 1
                         slug = study_slug(graph_type, num_nodes, depth, schedule_type, edge_probability, ws_num_neighbors)
                         output_path = os.path.join(per_study_dir, f"{slug}.csv")
-                        print(
-                            f"\n[{completed}/{total_configs}] Running {slug} "
-                            f"with num_graphs={args.num_graphs}, proxies={args.proxy_names}"
-                        )
+                        print(f"\n[{completed}/{total_configs}] Running {slug} " f"with num_graphs={args.num_graphs}, proxies={args.proxy_names}")
                         study_args = build_study_args(args, graph_type, num_nodes, depth, schedule_type, output_path)
                         study_args.edge_probability = edge_probability
                         study_args.ws_num_neighbors = ws_num_neighbors
@@ -355,8 +349,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--edge-probabilities", default=DEFAULT_EDGE_PROBABILITIES)
     parser.add_argument("--ws-neighbor-values", default=DEFAULT_WS_NEIGHBOR_VALUES)
     parser.add_argument("--proxy-names", default="triangle,normal")
-    parser.add_argument("--p-sources", default="native,empirical",
-                        help="Comma-separated P(c') sources: native and/or empirical")
+    parser.add_argument("--p-sources", default="native,empirical", help="Comma-separated P(c') sources: native and/or empirical")
     parser.add_argument("--include-paper", "--include-paper-er", dest="include_paper", action="store_true")
     parser.add_argument("--exclude-paper", dest="include_paper", action="store_false")
     parser.add_argument("--num-graphs", type=int, default=5)
