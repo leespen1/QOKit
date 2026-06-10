@@ -19,6 +19,10 @@ export PATH=/mnt/home/leespen1/.juliaup/bin:${PATH}
 # Prevent HPC LD_LIBRARY_PATH from interfering with Julia's bundled libraries
 unset LD_LIBRARY_PATH
 
+# GPU packages live in the shared "gpu" environment, stacked explicitly here
+# so the default env stays lean (dev tools only).
+export JULIA_LOAD_PATH="@:@gpu:@stdlib"
+
 echo "Node:   $(hostname)"
 echo "Julia:  $(julia --version)"
 echo "Date:   $(date)"
