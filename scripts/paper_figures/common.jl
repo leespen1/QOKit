@@ -118,23 +118,9 @@ end
 #                          Graph Generation                                     #
 #==============================================================================#
 
-"""
-    erdos_renyi_edges(n, p; rng=Random.default_rng())
-
-Generate an Erdős-Rényi random graph G(n, p) and return a vector of
-edge tuples (i, j) where 0 ≤ i < j < n (0-indexed vertices).
-"""
-function erdos_renyi_edges(n::Int, p::Float64; rng=Random.default_rng())
-    edges = Tuple{Int,Int}[]
-    for i in 0:(n-2)
-        for j in (i+1):(n-1)
-            if rand(rng) < p
-                push!(edges, (i, j))
-            end
-        end
-    end
-    return edges
-end
+# erdos_renyi_edges now lives in the JuliaQAOA module (src/graph_generators.jl),
+# alongside the other random-graph families; same implementation, so existing
+# seeds reproduce the same instances.
 
 """
     maxcut_optimal(costs)

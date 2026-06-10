@@ -17,6 +17,9 @@ end
 @testset "Subspace Compression" begin
     include("test_subspace_compression.jl")
 end
+@testset "Graph Generators" begin
+    include("test_graph_generators.jl")
+end
 @testset "QAOA Simulation (vs QOKit Python)" begin
     include("test_qaoa_simulation.jl")
 end

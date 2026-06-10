@@ -26,6 +26,7 @@ export cpu_multi_proxy_mse, gpu_multi_proxy_mse, sum_squared_error
 include("qaoa_simulation.jl")
 export maxcut_costs, apply_phase_gate!, apply_x_mixer!, qaoa_statevector, qaoa_expectation
 include("subspace_compression.jl") # exports its own names
+include("graph_generators.jl") # exports its own names
 
 # GPU function stubs — implementations provided by package extensions
 # (JuliaQAOACUDAExt when CUDA is loaded, JuliaQAOAKernelAbstractionsExt when KernelAbstractions is loaded)
