@@ -45,8 +45,9 @@ const FAMILIES = [
     ("ER(0.25)",      (rng, n) -> erdos_renyi_edges(n, 0.25; rng)),
     ("BA(k=2)",       (rng, n) -> barabasi_albert_edges(n, 2; rng)),
     ("BA(k=4)",       (rng, n) -> barabasi_albert_edges(n, 4; rng)),
-    ("WS(k=4,b=0.1)", (rng, n) -> watts_strogatz_edges(n, 4, 0.1; rng)),
-    ("WS(k=4,b=0.5)", (rng, n) -> watts_strogatz_edges(n, 4, 0.5; rng)),
+    # No commas in family names — they are CSV field values
+    ("WS(k=4;b=0.1)", (rng, n) -> watts_strogatz_edges(n, 4, 0.1; rng)),
+    ("WS(k=4;b=0.5)", (rng, n) -> watts_strogatz_edges(n, 4, 0.5; rng)),
     ("3-regular",     (rng, n) -> random_regular_edges(n, 3; rng)),
 ]
 
