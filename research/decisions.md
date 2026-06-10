@@ -18,3 +18,15 @@ Append-only. Each entry: date, decision, context. Newest at the bottom.
 5. **Timeline: complete submission-ready draft by mid-August 2026**, then arXiv preprint
    late August (sponsor deliverable) and QCE 2027 submission in April. Scale-up trimmed
    accordingly (max n=16–18, n=20 spot-checks only; Chung–Lu experiment cut).
+
+## 2026-06-13 — Publication venues
+
+6. **arXiv preprint in August 2026, then IEEE Transactions on Quantum Engineering**
+   as the journal target (quick-turnaround, high-likelihood, respectable in
+   engineering circles; PRResearch remains the stretch option if the V₂
+   analytics materialize). QCE 2027 contributed-track plan unchanged; check
+   dual-publication differentiation between the TQE and QCE versions before
+   the April 2027 submission. TQE APC ≈ $2,160 (2026 list; 5%/20% IEEE
+   member/society discounts; payable only on acceptance) — confirm funding
+   source (sponsor budget or an MSU read-and-publish agreement) before
+   submission. arXiv is free.
