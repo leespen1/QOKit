@@ -181,6 +181,11 @@ Manifest-*.toml
 *.png
 *.csv
 
+# ...but research-log artifacts are tracked: result CSVs are small and the
+# experiment READMEs cite them and embed the figures
+!research/experiments/**/*.csv
+!research/experiments/**/*.png
+
 data/PK_folder/julia_ex.py
 data/PK_folder/monte_carlo.jl
 .gitignore
