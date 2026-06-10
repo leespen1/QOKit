@@ -83,8 +83,18 @@ PaperProxy, exp 005) running in background.
   model's calibration breaks long before its argmax moves.** The argmax-robustness
   of the analytical proxy is itself a finding for §6.
   → [experiments/005_norm-filtered-paper-proxy](experiments/005_norm-filtered-paper-proxy/README.md)
-- E006 (running): physicality cap (reject predicted ⟨C⟩ > m only) — the surviving
-  candidate for the paper's practical recipe.
+- ~~E006: physicality cap~~ **Done: NEGATIVE — the model inflates predictions even
+  at its (correct) peak on sparse families, so any value-based veto rejects the
+  answer; on dense ER(0.5) the spurious region extends below the physical cap.**
+  Filter arc (004→005→006) closed: the analytical proxy's values are pure noise in
+  absolute terms; its argmax location is the only usable signal — excellent off
+  dense graphs, corrupted on dense ER(0.5) by a spurious large-β peak.
+  → [experiments/006_physicality-filter](experiments/006_physicality-filter/README.md)
+- E007 = E2.1 (running): per-class leakage anatomy over the (γ,β) plane — tests
+  whether the proxy's trust region is *predictable from leakage itself* (which
+  would subsume the filter question), separates density from angle rescaling
+  (H-density), and locates the ER(0.5) spurious peak relative to high-leakage
+  regions.
 - E2.1 (next up): (γ, β) leakage anatomy per family — separates the density effect
   from angle rescaling (H-density), tests Theorem 3's variance identity, and
   supplies the schedule diversity the p=3 gate lacked.
