@@ -10,8 +10,10 @@ program plan (Claude's plan file, to be mirrored into `research/program.md`).
 
 ## Where we are
 
-**Phase 0 complete (one day, ahead of schedule); Phase 1 (go/no-go gate, target
-~Jul 8) underway** — E1.1 done, E1.2/E1.3 next.
+**Phase 1 gate has run (planned ~Jul 8, ran Jun 10): PASS at p=1, inconclusive
+at p=3** — the theory-led framing proceeds, with the depth question moved to
+Phase 2's schedule-diverse measurements. One follow-up sweep (norm-filtered
+PaperProxy, exp 005) running in background.
 
 ## What we know (established results only)
 
@@ -40,6 +42,19 @@ program plan (Claude's plan file, to be mirrored into `research/program.md`).
 - **Surprise: density, not "ER-ness," drives compression error** — family-mean Σλ
   tracks edge count at Pearson 0.97; ER(0.5) is the *worst*-compressing family
   tested, 3-regular the best (at fixed unscaled angles; see exp 003 caveats).
+- **GATE (exp 004): leakage ranks families by parameter-setting regret at p=1**
+  (Spearman ρ = 0.86–0.96, criterion ≳0.8 met); at p=3 along proxy-chosen ramps
+  both quantities barely vary across families (ρ ≈ 0 — no signal, not a
+  contradiction). → [experiments/004_gate-leakage-vs-regret](experiments/004_gate-leakage-vs-regret/README.md)
+- **H-ER-specific (old log) is contradicted**: analytical PaperProxy with effective
+  edge probability gets regret ≈ 0.01–0.02 at p=1 on BA/WS/3-regular/sparse-ER —
+  *better* than exact compression (the smooth model regularizes parameter choice).
+  Its one failure is dense ER(0.5), where its argmax lands on an *unphysical
+  norm-inflated artifact* (predicted ⟨C⟩ = 93 on a 38-edge graph). Since exact
+  compression is contractive (Thm 1), norm inflation certifies model error for
+  free; a norm sanity filter repairs the diagnosed instance
+  (`004/diagnose_paper_artifact.jl`); exp 005 (running) quantifies strict-vs-loose
+  thresholds across all instances.
 
 ## Working hypotheses (NOT established — from the deleted research log or intuition)
 
@@ -62,12 +77,16 @@ program plan (Claude's plan file, to be mirrored into `research/program.md`).
 - ~~E1.1: is there headroom above baselines?~~ **Done, yes, on every family** (exp 002).
 - ~~E1.2: does Σλ track the overlap deficit?~~ **Done, yes — bound slack ~4×,
   near-functional predictor** (exp 003).
-- E1.3 (gate, ~Jul 8): do leakage, fidelity, and *parameter-setting regret* rank
-  graph families identically — and does swapping in the analytical PaperProxy N
-  isolate model error from compression error? (Exp 002 predicts model error
-  dominates at p=1; exp 003 already gives leakage ⇔ fidelity at ρ ≈ 1.)
-- E2.1 (queued behind E1.3): (γ, β) leakage anatomy — separates the density
-  effect from angle rescaling (H-density), tests Theorem 3's variance identity.
+- ~~E1.3 gate~~ **Run: PASS at p=1 (ρ = 0.86–0.96); p=3 inconclusive** (exp 004).
+- E005 (running): strict vs loose norm filter for the analytical proxy across all
+  instances — candidate "practical recipe" section for the paper.
+- E2.1 (next up): (γ, β) leakage anatomy per family — separates the density effect
+  from angle rescaling (H-density), tests Theorem 3's variance identity, and
+  supplies the schedule diversity the p=3 gate lacked.
+- Open framing question for the paper (not blocking): at p=3 the proxy-chosen
+  schedules equalize leakage across families — is regret there governed by
+  landscape/argmax robustness rather than fidelity? Phase-2 experiments decide
+  how §5 narrates depth.
 
 ## Decisions needed from Spencer
 
