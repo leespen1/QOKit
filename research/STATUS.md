@@ -10,11 +10,14 @@ program plan (Claude's plan file, to be mirrored into `research/program.md`).
 
 ## Where we are
 
-**Phase 1 complete (gate: PASS at p=1). Phase 2 mechanism work nearly complete
-in its first days**: E2.1 ✓ (leakage anatomy + O(βγ²m) law), E2.2 ✓ (sampled
-estimator + Theorem-3 verification), E2.3 ✓ (wrong-subspace verdict). Remaining
-in Phase 2: T2.0 (LaTeX theory section + literature pass) and E2.4 (fitted-shape
-paradox), then Phase-3 scale-up (n=16–18, HPC).
+**Phase 1 complete (gate: PASS at p=1). Phase 2 experiments complete** (E2.1
+leakage anatomy + O(βγ²m) law; E2.2 sampled estimator + Theorem-3 verification;
+E2.3 wrong-subspace verdict). **Phase 3 launched on MSU HPCC** (2026-06-12):
+E3.1 scale-up ranking at n=16–18 (exp 010, 14-task A100 array, jobs 9632352)
+and E3.2 depth scaling p=30 at n=16–20 (exp 011, 3-task CPU array, 9632353);
+HPC pipeline validated by pilot job 9629130 (all GPU paths match CPU, 245× at
+n=20). Remaining: T2.0 (LaTeX theory section + literature pass), E2.4
+(fitted-shape paradox), then Phase-4 assembly.
 
 ## What we know (established results only)
 
