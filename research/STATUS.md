@@ -10,10 +10,11 @@ program plan (Claude's plan file, to be mirrored into `research/program.md`).
 
 ## Where we are
 
-**Phase 1 gate has run (planned ~Jul 8, ran Jun 10): PASS at p=1, inconclusive
-at p=3** — the theory-led framing proceeds, with the depth question moved to
-Phase 2's schedule-diverse measurements. One follow-up sweep (norm-filtered
-PaperProxy, exp 005) running in background.
+**Phase 1 complete (gate: PASS at p=1). Phase 2 mechanism work nearly complete
+in its first days**: E2.1 ✓ (leakage anatomy + O(βγ²m) law), E2.2 ✓ (sampled
+estimator + Theorem-3 verification), E2.3 ✓ (wrong-subspace verdict). Remaining
+in Phase 2: T2.0 (LaTeX theory section + literature pass) and E2.4 (fitted-shape
+paradox), then Phase-3 scale-up (n=16–18, HPC).
 
 ## What we know (established results only)
 
@@ -103,9 +104,11 @@ PaperProxy, exp 005) running in background.
   differences; Phase-3 scale-up enabler confirmed. Bonus: Theorem 3's identity
   verified to 4.5×10⁻¹⁵ over 210 full-enumeration rows.**
   → [experiments/008_sampled-leakage-predictor](experiments/008_sampled-leakage-predictor/README.md)
-- E2.3 trajectory-PCA (running): is proxy degradation at depth a "not low-rank"
-  or a "wrong subspace" story? Smoke hints: trajectories are extremely low-rank
-  (k99 ≈ 3–5), pointing at "wrong subspace."
+- ~~E2.3 trajectory-PCA~~ **Done: "wrong subspace," decisively — p=20 ramp
+  trajectories have effective dimension 2–4 (99% energy), so a 2–3-dim PCA
+  subspace matches the entire (m+1)-dim cost-class subspace; proxy degradation
+  is mis-aim of the fixed cost-class frame, not state complexity.**
+  → [experiments/009_trajectory-pca](experiments/009_trajectory-pca/README.md)
 - Next up: T2.0 (LaTeX write-up of Thms 1–3 + the O(βγ²) lemma + lit pass, per
   `research/theory_notes.md`); E2.4 fitted-shape paradox explanation. Then
   Phase-3 scale-up.
