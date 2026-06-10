@@ -32,6 +32,14 @@ program plan (Claude's plan file, to be mirrored into `research/program.md`).
   *model-error* story (bad analytical N), not a compression-error story, at least
   at p=1 — sharpens what E1.3 must separate; (ii) depth, not graph family, is
   where compression error first bites.
+- **The Theorem-2 bound is tight enough to use, and leakage predicts fidelity.**
+  At p=20 ramps (840 runs, n=12–16): ‖ψ−φ‖ ≤ Σλ holds with median slack ≈ 4×
+  (never >10×), Σλ is a near-functional predictor of the actual distance, and it
+  ranks families by fidelity at Spearman ρ ≈ 0.96–1.0 (except the decayed
+  n=16/large-angle cell). → [experiments/003_leakage-vs-overlap](experiments/003_leakage-vs-overlap/README.md)
+- **Surprise: density, not "ER-ness," drives compression error** — family-mean Σλ
+  tracks edge count at Pearson 0.97; ER(0.5) is the *worst*-compressing family
+  tested, 3-regular the best (at fixed unscaled angles; see exp 003 caveats).
 
 ## Working hypotheses (NOT established — from the deleted research log or intuition)
 
@@ -52,11 +60,14 @@ program plan (Claude's plan file, to be mirrored into `research/program.md`).
 
 - ~~E0.1: is the proxy numerically identical to the compressed evolution?~~ **Done, yes** (exp 001).
 - ~~E1.1: is there headroom above baselines?~~ **Done, yes, on every family** (exp 002).
-- E1.2 (next): does accumulated per-layer leakage tightly track the true-vs-proxy
-  overlap deficit for p=20 ramps (Theorem-2 bound tightness)?
-- E1.3 (gate, ~Jul 8): do leakage, fidelity, and regret rank graph families
-  identically — and does swapping in the analytical PaperProxy N isolate model
-  error from compression error? (Exp 002 predicts model error dominates at p=1.)
+- ~~E1.2: does Σλ track the overlap deficit?~~ **Done, yes — bound slack ~4×,
+  near-functional predictor** (exp 003).
+- E1.3 (gate, ~Jul 8): do leakage, fidelity, and *parameter-setting regret* rank
+  graph families identically — and does swapping in the analytical PaperProxy N
+  isolate model error from compression error? (Exp 002 predicts model error
+  dominates at p=1; exp 003 already gives leakage ⇔ fidelity at ρ ≈ 1.)
+- E2.1 (queued behind E1.3): (γ, β) leakage anatomy — separates the density
+  effect from angle rescaling (H-density), tests Theorem 3's variance identity.
 
 ## Decisions needed from Spencer
 
