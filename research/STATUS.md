@@ -10,11 +10,14 @@ program plan (Claude's plan file, to be mirrored into `research/program.md`).
 
 ## Where we are
 
-**Phases 1–3 experimental work complete — all 14×20 E3.1 cells final.**
-Remaining before Phase-4 assembly: T2.0 (LaTeX theory section + literature
-pass; see `research/theory_notes.md`) and optionally E2.4 (fitted-shape
-paradox). HPC pipeline operational end-to-end (pilot 9629130; arrays
-9632352/9632353/9634813/9636873).
+**Phases 1–3 complete; Phase 4 (assembly) underway.** The paper repo
+(`papers/OverleafPaper`, branch `ClaudeResearch`) now holds
+`theory_compression.tex` (standalone theory notes with full proofs) and
+`qce2027_paper.tex` (full IEEE-format draft: theory + experimental anatomy
+from experiments 001–011 + figures; 4 pp with room to grow). Remaining:
+systematic literature pass before submission, optional E2.4, figure/table
+expansion, author list and acknowledgments. Overleaf shows only `main`, so
+merge the paper repo's ClaudeResearch branch when ready to edit there.
 
 ## What we know (established results only)
 
