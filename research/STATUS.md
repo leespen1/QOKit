@@ -98,9 +98,17 @@ PaperProxy, exp 005) running in background.
   does NOT flag the analytical proxy's spurious peak (38th percentile) —
   compression and model error are empirically independent axes, a central claim.
   → [experiments/007_leakage-anatomy](experiments/007_leakage-anatomy/README.md)
-- Next up: T2.0 (LaTeX write-up of Thms 1–3 + the new O(βγ²) lemma + lit pass,
-  per `research/theory_notes.md`); E2.2 sampled-variance predictor; E2.3
-  trajectory-PCA subspace comparison. Phase 2 mechanism work, then scale-up.
+- ~~E2.2 sampled-leakage predictor~~ **Done: S=5 estimates η_F to median 3.2%
+  error (uniform across families/angles) — far below the between-family
+  differences; Phase-3 scale-up enabler confirmed. Bonus: Theorem 3's identity
+  verified to 4.5×10⁻¹⁵ over 210 full-enumeration rows.**
+  → [experiments/008_sampled-leakage-predictor](experiments/008_sampled-leakage-predictor/README.md)
+- E2.3 trajectory-PCA (running): is proxy degradation at depth a "not low-rank"
+  or a "wrong subspace" story? Smoke hints: trajectories are extremely low-rank
+  (k99 ≈ 3–5), pointing at "wrong subspace."
+- Next up: T2.0 (LaTeX write-up of Thms 1–3 + the O(βγ²) lemma + lit pass, per
+  `research/theory_notes.md`); E2.4 fitted-shape paradox explanation. Then
+  Phase-3 scale-up.
 - E2.1 (next up): (γ, β) leakage anatomy per family — separates the density effect
   from angle rescaling (H-density), tests Theorem 3's variance identity, and
   supplies the schedule diversity the p=3 gate lacked.
