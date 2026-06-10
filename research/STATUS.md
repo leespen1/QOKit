@@ -10,11 +10,11 @@ program plan (Claude's plan file, to be mirrored into `research/program.md`).
 
 ## Where we are
 
-**Phases 1–3 experimental work complete** (one BA(k=4)/n=18 validation column
-refreshing, job 9636873). Remaining before Phase-4 assembly: T2.0 (LaTeX theory
-section + literature pass; see `research/theory_notes.md`) and optionally E2.4
-(fitted-shape paradox). HPC pipeline operational end-to-end (pilot 9629130;
-arrays 9632352/9632353/9634813).
+**Phases 1–3 experimental work complete — all 14×20 E3.1 cells final.**
+Remaining before Phase-4 assembly: T2.0 (LaTeX theory section + literature
+pass; see `research/theory_notes.md`) and optionally E2.4 (fitted-shape
+paradox). HPC pipeline operational end-to-end (pilot 9629130; arrays
+9632352/9632353/9634813/9636873).
 
 ## What we know (established results only)
 
