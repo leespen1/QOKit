@@ -22,6 +22,7 @@
 export hamming_distance
 export get_real_distribution_from_costs, get_homogeneous_distribution_from_costs
 export get_homogeneous_distribution_from_costs_direct
+export sampled_homogeneous_distribution
 export pad_to_shape, pad_to_match, pad_and_stack
 export average_distributions, stddev_distributions, distributions_mean_and_stddev
 export distribution_array_to_dict, get_pearson_correlation_coefficients
@@ -254,6 +255,69 @@ function get_homogeneous_distribution_from_costs_direct(
     end
 
     return homogeneous_distribution
+end
+
+
+"""
+    sampled_homogeneous_distribution(costs, num_edges, num_vertices;
+                                     samples_per_class, rng=default_rng())
+
+Estimate the homogeneous distribution N(c'; d, c) by averaging n(y; d, c) over
+up to `samples_per_class` bitstrings drawn uniformly without replacement from
+each attained cost class, instead of all of them. Cost O(S·m·2^n) versus
+O(4^n) for the exact computation. Classes with at most `samples_per_class`
+members are enumerated fully, so with `samples_per_class ≥ maximum class size`
+the result equals `get_homogeneous_distribution_from_costs_direct` exactly.
+Unattained classes give zero rows, matching the exact function.
+"""
+function sampled_homogeneous_distribution(
+    costs::AbstractVector{<:Real},
+    num_edges::Integer,
+    num_vertices::Integer;
+    samples_per_class::Integer,
+    rng::AbstractRNG=default_rng(),
+)
+    num_bitstrings = 1 << num_vertices
+    @assert length(costs) == num_bitstrings "Length of costs must equal 2^num_vertices"
+    @assert samples_per_class >= 1
+    num_distances = num_vertices + 1
+    num_costs = num_edges + 1
+
+    members = [Int[] for _ in 1:num_costs]
+    for x in 0:(num_bitstrings - 1)
+        push!(members[Int(costs[x + 1]) + 1], x)
+    end
+
+    # Draw all samples up front (serial: rng is not thread-safe), then
+    # accumulate the O(2^n) neighborhood scans in parallel per class.
+    chosen = [Int[] for _ in 1:num_costs]
+    for ci in 1:num_costs
+        Mc = length(members[ci])
+        Mc == 0 && continue
+        if Mc <= samples_per_class
+            chosen[ci] = members[ci]
+        else
+            idx = collect(1:Mc)
+            for i in 1:samples_per_class
+                j = rand(rng, i:Mc)
+                idx[i], idx[j] = idx[j], idx[i]
+            end
+            chosen[ci] = members[ci][idx[1:samples_per_class]]
+        end
+    end
+
+    N = zeros(Float64, num_costs, num_distances, num_costs)
+    @threads for ci in 1:num_costs
+        ys = chosen[ci]
+        isempty(ys) && continue
+        @inbounds for y in ys, z in 0:(num_bitstrings - 1)
+            d = hamming_distance(y, z)
+            N[ci, d + 1, Int(costs[z + 1]) + 1] += 1.0
+        end
+        N[ci, :, :] ./= length(ys)
+    end
+
+    return N
 end
 
 

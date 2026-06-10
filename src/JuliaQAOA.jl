@@ -4,6 +4,7 @@ using Distributions: pdf, Normal, MvNormal, Binomial, Multinomial
 using StaticArrays: @SVector, @SMatrix, SVector
 using LinearAlgebra: mul!
 using Base.Threads: @threads, nthreads, threadid, maxthreadid
+using Random: AbstractRNG, default_rng
 using ProgressMeter: @showprogress
 using InteractiveUtils
 using Statistics: mean, std, cor

@@ -1,0 +1,22 @@
+#!/bin/bash --login
+#SBATCH --job-name=e3_2_depth
+#SBATCH --mail-type=END,FAIL
+#SBATCH --mail-user=leespen1@msu.edu
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=16
+#SBATCH --mem=64G
+#SBATCH --partition=general-short
+#SBATCH --time=02:00:00
+#SBATCH --array=1-3
+#SBATCH --output=log_e3_2_%a_%j.log
+#SBATCH --export=NONE
+
+module purge
+export PATH=/mnt/home/leespen1/.juliaup/bin:${PATH}
+unset LD_LIBRARY_PATH
+export JULIA_NUM_THREADS=$SLURM_CPUS_PER_TASK
+
+echo "Node: $(hostname)  Task: $SLURM_ARRAY_TASK_ID  Date: $(date)"
+
+REPO=/mnt/home/leespen1/GRIPS/QOKit
+julia --project="$REPO" "$REPO/research/experiments/011_depth-scaling/run.jl"

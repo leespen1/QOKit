@@ -99,6 +99,39 @@ end
 end
 
 
+@testset "sampled homogeneous distribution" begin
+    rng = MersenneTwister(23)
+    n = 9
+    edges = random_edges(rng, n, 0.5)
+    m = length(edges)
+    costs = maxcut_costs(n, edges)
+
+    # Full sampling reproduces the exact computation bit-for-bit
+    N_exact = get_homogeneous_distribution_from_costs_direct(costs, m, n)
+    N_full = sampled_homogeneous_distribution(costs, m, n;
+                                              samples_per_class=1 << n, rng)
+    @test N_full == N_exact
+
+    # Small-S estimate: right shape, normalized rows (each slice sums to 2^n),
+    # deterministic given the rng seed
+    N5 = sampled_homogeneous_distribution(costs, m, n; samples_per_class=5,
+                                          rng=MersenneTwister(1))
+    @test size(N5) == size(N_exact)
+    counts = zeros(Int, m + 1)
+    for c in costs
+        counts[Int(c) + 1] += 1
+    end
+    for ci in findall(>(0), counts)
+        @test sum(N5[ci, :, :]) ≈ 1 << n
+    end
+    for ci in findall(==(0), counts)
+        @test all(iszero, N5[ci, :, :])
+    end
+    @test N5 == sampled_homogeneous_distribution(costs, m, n; samples_per_class=5,
+                                                 rng=MersenneTwister(1))
+end
+
+
 @testset "leakage diagnostics" begin
     rng = MersenneTwister(3)
     n = 7
