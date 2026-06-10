@@ -78,8 +78,13 @@ PaperProxy, exp 005) running in background.
 - ~~E1.2: does Σλ track the overlap deficit?~~ **Done, yes — bound slack ~4×,
   near-functional predictor** (exp 003).
 - ~~E1.3 gate~~ **Run: PASS at p=1 (ρ = 0.86–0.96); p=3 inconclusive** (exp 004).
-- E005 (running): strict vs loose norm filter for the analytical proxy across all
-  instances — candidate "practical recipe" section for the paper.
+- ~~E005: norm filter as universal recipe~~ **Done: NEGATIVE — rescues only dense
+  ER(0.5) (regret 0.159 → 0.077) and is catastrophic elsewhere; the analytical
+  model's calibration breaks long before its argmax moves.** The argmax-robustness
+  of the analytical proxy is itself a finding for §6.
+  → [experiments/005_norm-filtered-paper-proxy](experiments/005_norm-filtered-paper-proxy/README.md)
+- E006 (running): physicality cap (reject predicted ⟨C⟩ > m only) — the surviving
+  candidate for the paper's practical recipe.
 - E2.1 (next up): (γ, β) leakage anatomy per family — separates the density effect
   from angle rescaling (H-density), tests Theorem 3's variance identity, and
   supplies the schedule diversity the p=3 gate lacked.
