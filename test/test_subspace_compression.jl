@@ -81,6 +81,24 @@ end
 end
 
 
+@testset "MaxCut neighbor-cost identity (why leakage is O(βγ²))" begin
+    # Flipping bit i changes the cut by deg(i) − 2·cut_i(x), and Σ_i cut_i = 2c(x),
+    # so the distance-1 neighborhood cost-sum is a function of cost alone:
+    #     Σ_i c(x ⊕ e_i) = (n − 4)·c(x) + 2m.
+    # This kills the O(βγ) leakage term of one QAOA layer for MaxCut.
+    rng = MersenneTwister(17)
+    for prob in (0.25, 0.8), n in (6, 9)
+        edges = random_edges(rng, n, prob)
+        m = length(edges)
+        costs = maxcut_costs(n, edges)
+        for x in 0:(2^n - 1)
+            s = sum(costs[(x ⊻ (1 << i)) + 1] for i in 0:(n - 1))
+            @test s ≈ (n - 4) * costs[x + 1] + 2m
+        end
+    end
+end
+
+
 @testset "leakage diagnostics" begin
     rng = MersenneTwister(3)
     n = 7

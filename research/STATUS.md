@@ -90,11 +90,17 @@ PaperProxy, exp 005) running in background.
   absolute terms; its argmax location is the only usable signal — excellent off
   dense graphs, corrupted on dense ER(0.5) by a spurious large-β peak.
   → [experiments/006_physicality-filter](experiments/006_physicality-filter/README.md)
-- E007 = E2.1 (running): per-class leakage anatomy over the (γ,β) plane — tests
-  whether the proxy's trust region is *predictable from leakage itself* (which
-  would subsume the filter question), separates density from angle rescaling
-  (H-density), and locates the ER(0.5) spurious peak relative to high-leakage
-  regions.
+- ~~E007 = E2.1: leakage anatomy~~ **Done — three results:** (i) small-angle law
+  λ ≈ const·β·γ²·m, with the O(βγ) term killed by an exact MaxCut identity
+  (Σ_i c(x⊕e_i) = (n−4)c(x) + 2m — now a committed test) → quantitative
+  explanation of the proxy's small-γ accuracy, lemma for §3/§4; (ii) density law
+  sharpened: λ/(βγ²m) constant to ±40% across families; (iii) compression leakage
+  does NOT flag the analytical proxy's spurious peak (38th percentile) —
+  compression and model error are empirically independent axes, a central claim.
+  → [experiments/007_leakage-anatomy](experiments/007_leakage-anatomy/README.md)
+- Next up: T2.0 (LaTeX write-up of Thms 1–3 + the new O(βγ²) lemma + lit pass,
+  per `research/theory_notes.md`); E2.2 sampled-variance predictor; E2.3
+  trajectory-PCA subspace comparison. Phase 2 mechanism work, then scale-up.
 - E2.1 (next up): (γ, β) leakage anatomy per family — separates the density effect
   from angle rescaling (H-density), tests Theorem 3's variance identity, and
   supplies the schedule diversity the p=3 gate lacked.
