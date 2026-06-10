@@ -10,14 +10,11 @@ program plan (Claude's plan file, to be mirrored into `research/program.md`).
 
 ## Where we are
 
-**Phase 1 complete (gate: PASS at p=1). Phase 2 experiments complete** (E2.1
-leakage anatomy + O(βγ²m) law; E2.2 sampled estimator + Theorem-3 verification;
-E2.3 wrong-subspace verdict). **Phase 3 launched on MSU HPCC** (2026-06-12):
-E3.1 scale-up ranking at n=16–18 (exp 010, 14-task A100 array, jobs 9632352)
-and E3.2 depth scaling p=30 at n=16–20 (exp 011, 3-task CPU array, 9632353);
-HPC pipeline validated by pilot job 9629130 (all GPU paths match CPU, 245× at
-n=20). Remaining: T2.0 (LaTeX theory section + literature pass), E2.4
-(fitted-shape paradox), then Phase-4 assembly.
+**Phases 1–3 experimental work complete** (one BA(k=4)/n=18 validation column
+refreshing, job 9636873). Remaining before Phase-4 assembly: T2.0 (LaTeX theory
+section + literature pass; see `research/theory_notes.md`) and optionally E2.4
+(fitted-shape paradox). HPC pipeline operational end-to-end (pilot 9629130;
+arrays 9632352/9632353/9634813).
 
 ## What we know (established results only)
 
@@ -112,6 +109,18 @@ n=20). Remaining: T2.0 (LaTeX theory section + literature pass), E2.4
   subspace matches the entire (m+1)-dim cost-class subspace; proxy degradation
   is mis-aim of the fixed cost-class frame, not state complexity.**
   → [experiments/009_trajectory-pca](experiments/009_trajectory-pca/README.md)
+- **E3.1 (scale-up, n=16–18): the structure survives scale unchanged** — regret
+  flat in n (p=1: 0.03–0.05; p=3: 0.08–0.11), value-added positive everywhere at
+  family level, and **the sampled-N proxy (S=10) matches exact-N parameter
+  choices within ~0.01 AR with slightly LOWER regret** — the practical recipe
+  the filter arc failed to find (sampled N + empirical P). Family regret
+  differences compress at scale, so ranking claims must be scoped.
+  → [experiments/010_scaleup-ranking](experiments/010_scaleup-ranking/README.md)
+- **E3.2 (depth, p=30, n=16–20): leakage accumulates linearly in depth,
+  quantitatively as Theorem 3 predicts** (ratio 1.505 vs 1.5 at small ramps),
+  sublinearly in m along deep trajectories, with p=30 small-ramp overlaps of
+  0.71–0.81 even at n=20.
+  → [experiments/011_depth-scaling](experiments/011_depth-scaling/README.md)
 - Next up: T2.0 (LaTeX write-up of Thms 1–3 + the O(βγ²) lemma + lit pass, per
   `research/theory_notes.md`); E2.4 fitted-shape paradox explanation. Then
   Phase-3 scale-up.
