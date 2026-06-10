@@ -14,8 +14,13 @@ program plan (Claude's plan file, to be mirrored into `research/program.md`).
 
 ## What we know (established results only)
 
-*(empty — fresh start as of 2026-06-10; results appear here only once they have a
-committed, reproducible experiment under `research/experiments/`)*
+- **The homogeneous proxy is exactly an orthogonal subspace compression of QAOA**
+  (not an approximation): running the proxy with the same-instance empirical
+  N(c';d,c) equals evolve-one-layer-then-project-onto-cost-classes, to machine
+  precision. → [experiments/001_proxy-is-compression](experiments/001_proxy-is-compression/README.md)
+  Consequence: total proxy error splits cleanly into *compression error*
+  (leakage out of the cost-class subspace, model-independent) + *model error*
+  (using analytical/fitted N instead of the instance's own).
 
 ## Working hypotheses (NOT established — from the deleted research log or intuition)
 
@@ -31,8 +36,7 @@ committed, reproducible experiment under `research/experiments/`)*
 
 ## Open questions / next experiments
 
-- E0.1 (this week): is the proxy iteration *numerically identical* to the compressed
-  statevector evolution (Theorem 1), to 1e-10? Must pass before anything else.
+- ~~E0.1: is the proxy numerically identical to the compressed evolution?~~ **Done, yes** (exp 001).
 - E1.1–E1.3 (by ~Jul 8): the go/no-go gate — do leakage, fidelity, and parameter-setting
   regret rank graph families identically?
 

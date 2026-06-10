@@ -14,6 +14,9 @@ end
 @testset "QAOA Simulation (analytical)" begin
     include("test_qaoa_analytical.jl")
 end
+@testset "Subspace Compression" begin
+    include("test_subspace_compression.jl")
+end
 @testset "QAOA Simulation (vs QOKit Python)" begin
     include("test_qaoa_simulation.jl")
 end
