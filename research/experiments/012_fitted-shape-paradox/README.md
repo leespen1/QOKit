@@ -143,3 +143,7 @@ Landscape/argmax metrics: `julia --project research/experiments/012_fitted-shape
 (rebuilds model Ns from the params column — no refitting — and writes
 `landscape.csv` plus the printed displacement correlations in
 `landscape_followup.log`).
+
+Paper figure (`fitted_shape_paradox.png`, copied to the paper repo as
+`Figures/generated/fitted_shape_paradox.png`):
+`julia --project research/experiments/012_fitted-shape-paradox/make_paper_figure.jl`
