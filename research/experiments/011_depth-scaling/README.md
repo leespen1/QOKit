@@ -63,3 +63,7 @@ E1_SMOKE=1 julia --project research/experiments/011_depth-scaling/run.jl    # lo
 ```
 
 Output: `results_task<ID>.csv` per array task (long format, one row per layer).
+
+Paper figure (`depth_scaling.png`, copied to the paper repo as
+`Figures/generated/depth_scaling.png`):
+`julia --project research/experiments/011_depth-scaling/make_figure.jl`
