@@ -1,6 +1,6 @@
 # Research status
 
-*Last updated: 2026-06-11 (evening). This is the one page Spencer needs to read.
+*Last updated: 2026-06-12. This is the one page Spencer needs to read.
 Everything here links to a reproducible experiment or a committed document.*
 
 **Goal:** QCE 2027 contributed paper, *"When and why does the homogeneous proxy work?
@@ -14,7 +14,7 @@ program plan (Claude's plan file, to be mirrored into `research/program.md`).
 (`papers/OverleafPaper`, branch `ClaudeResearch`) now holds
 `theory_compression.tex` (standalone theory notes with full proofs) and
 `qce2027_paper.tex` (full IEEE-format draft: theory + experimental anatomy
-from experiments 001–011 + figures; 4 pp with room to grow). E2.4 is now done
+from experiments 001–013 + figures; 4 pp with room to grow). E2.4 is now done
 (exp 012, below) and folded into the paper's model-error section. The
 systematic literature pass is done (`research/literature_pass.md`): **all four
 claimed-new items survive** — no overlapping prior work found among Sud et
@@ -65,6 +65,16 @@ merge the paper repo's ClaudeResearch branch when ready to edit there.
   free; a norm sanity filter repairs the diagnosed instance
   (`004/diagnose_paper_artifact.jl`); exp 005 (running) quantifies strict-vs-loose
   thresholds across all instances.
+- **Timing (exp 013): the exact N is the pipeline's wall, and brute force is
+  free at simulable sizes.** On an A100, exact N costs 21.8 s at n=20 (clean
+  O(4ⁿ) growth) vs 0.48 s for the brute-force p=1 ceiling it competes with;
+  sampled N (S=10) is 50× cheaper (0.44 s). GPU statevector passes are
+  kernel-launch-bound (~0.2–0.3 ms, flat in n ≤ 20), so exhaustive grid search
+  matches the proxy pipeline end to end even at p=20; the pipeline's cost
+  advantage opens around n ≈ 22–24 (extrapolated). Running n=20 exact N
+  required grid-striding the GPU homodist kernel (commit `ce337950`). The
+  paper prints the measured table in §5.3.
+  → [experiments/013_timing-benchmark](experiments/013_timing-benchmark/README.md)
 
 ## Working hypotheses (NOT established — from the deleted research log or intuition)
 
