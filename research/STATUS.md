@@ -15,8 +15,13 @@ program plan (Claude's plan file, to be mirrored into `research/program.md`).
 `theory_compression.tex` (standalone theory notes with full proofs) and
 `qce2027_paper.tex` (full IEEE-format draft: theory + experimental anatomy
 from experiments 001–011 + figures; 4 pp with room to grow). E2.4 is now done
-(exp 012, below). Remaining: systematic literature pass before submission,
-folding exp 012 into §6, figure/table expansion, author list and
+(exp 012, below) and folded into the paper's model-error section. The
+systematic literature pass is done (`research/literature_pass.md`): **all four
+claimed-new items survive** — no overlapping prior work found among Sud et
+al.'s ~22 citers or the projection/lumping/MOR/surrogate literature; five
+citations added to the paper (closest neighbor: Krüger–Mauerer landscape
+approximation, Quantum 2025 — complementary, cited). One re-check recommended
+at submission time. Remaining: figure/table expansion, author list and
 acknowledgments. Overleaf shows only `main`, so
 merge the paper repo's ClaudeResearch branch when ready to edit there.
 
