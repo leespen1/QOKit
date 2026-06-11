@@ -1,6 +1,6 @@
 # Research status
 
-*Last updated: 2026-06-10 (evening). This is the one page Spencer needs to read.
+*Last updated: 2026-06-11 (evening). This is the one page Spencer needs to read.
 Everything here links to a reproducible experiment or a committed document.*
 
 **Goal:** QCE 2027 contributed paper, *"When and why does the homogeneous proxy work?
@@ -14,9 +14,10 @@ program plan (Claude's plan file, to be mirrored into `research/program.md`).
 (`papers/OverleafPaper`, branch `ClaudeResearch`) now holds
 `theory_compression.tex` (standalone theory notes with full proofs) and
 `qce2027_paper.tex` (full IEEE-format draft: theory + experimental anatomy
-from experiments 001–011 + figures; 4 pp with room to grow). Remaining:
-systematic literature pass before submission, optional E2.4, figure/table
-expansion, author list and acknowledgments. Overleaf shows only `main`, so
+from experiments 001–011 + figures; 4 pp with room to grow). E2.4 is now done
+(exp 012, below). Remaining: systematic literature pass before submission,
+folding exp 012 into §6, figure/table expansion, author list and
+acknowledgments. Overleaf shows only `main`, so
 merge the paper repo's ClaudeResearch branch when ready to edit there.
 
 ## What we know (established results only)
@@ -64,8 +65,12 @@ merge the paper repo's ClaudeResearch branch when ready to edit there.
 
 - H1: The proxy's usefulness is governed by leakage out of the cost-class subspace,
   which concentrates only for ER-like graphs. (The paper's central claim.)
-- H2: Fitted proxy shapes (triangle/Gaussian) with lower entrywise MSE against the
-  empirical N(c';d,c) gave *worse* parameter setting. (Old log; needs re-verification.)
+- ~~H2: Fitted proxy shapes (triangle/Gaussian) with lower entrywise MSE against the
+  empirical N(c';d,c) gave *worse* parameter setting.~~ **Confirmed** (exp 012:
+  Triangle fitting raises regret on 136/140 instances; Normal fitting improves the
+  objective 10× and never changes the chosen parameters). The proposed
+  dynamics-weighted *amplitude* norm does NOT explain it — regret is an
+  argmax-transfer quantity (see exp 012).
 - H3: Sampling 5–10 bitstrings per cost class suffices to estimate the quantities that
   matter. (Old log; needs re-verification in the leakage metric, not entrywise N.)
 - ~~H4: On ER(0.5), random balanced partitions reach ~75–85% approximation ratio.~~
@@ -124,12 +129,21 @@ merge the paper repo's ClaudeResearch branch when ready to edit there.
   sublinearly in m along deep trajectories, with p=30 small-ramp overlaps of
   0.71–0.81 even at n=20.
   → [experiments/011_depth-scaling](experiments/011_depth-scaling/README.md)
-- Next up: T2.0 (LaTeX write-up of Thms 1–3 + the O(βγ²) lemma + lit pass, per
-  `research/theory_notes.md`); E2.4 fitted-shape paradox explanation. Then
-  Phase-3 scale-up.
-- E2.1 (next up): (γ, β) leakage anatomy per family — separates the density effect
-  from angle rescaling (H-density), tests Theorem 3's variance identity, and
-  supplies the schedule diversity the p=3 gate lacked.
+- ~~E2.4 fitted-shape paradox~~ **Done: H2 confirmed strongly, and the planned
+  explanation is refuted in its simple form.** Entrywise-MSE fitting of shapes is
+  harmful (Triangle: mean p=1 regret 0.054 → 0.211, worse on 136/140) or inert
+  (Normal: 10× better MSE, argmax identical to the unfitted default on 140/140).
+  No scalar mismatch norm tested predicts regret (entrywise MSE ρ≈−0.1,
+  one-layer amplitude error ρ≈−0.2, landscape Pearson ρ≈+0.1); argmax
+  displacement does (ρ≈0.7). Raw PaperProxy has amplitude error ~1e5 (slice sums
+  up to 9e8) yet near-best regret — amplitude norms are hostage to scale
+  conventions the argmax ignores. Per-slice calibration to 2^n is argmax-neutral
+  at p=1 (0/140 changes for shapes). Extends the 004→005→006 arc: for *every*
+  model class, argmax location is the only usable signal; §6 recommendation is
+  "don't fit shapes by MSE — use defaults or analytical N."
+  → [experiments/012_fitted-shape-paradox](experiments/012_fitted-shape-paradox/README.md)
+- Next up: T2.0 (LaTeX write-up of Thms 1–3 + the O(βγ²) lemma); systematic
+  lit pass (in progress, `research/literature_pass.md`). Then Phase-4 assembly.
 - Open framing question for the paper (not blocking): at p=3 the proxy-chosen
   schedules equalize leakage across families — is regret there governed by
   landscape/argmax robustness rather than fidelity? Phase-2 experiments decide

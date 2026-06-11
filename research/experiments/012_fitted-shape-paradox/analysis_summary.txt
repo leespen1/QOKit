@@ -1,0 +1,41 @@
+E2.4 analysis — 140 instances, 9 non-emp models each
+
+Per-model means over all instances:
+model     mse_entry   eps_raw_am  eps_cal_am  regret_raw  regret_cal  
+emp       0.000e+00   0.0000      0.0000      0.0314      0.0314      
+paper     2.138e-05   102618.5130 0.1333      0.0412      0.0521      
+tri_init  2.814e-05   1.4800      0.6467      0.0542      0.0542      
+tri_25    2.612e-05   1.6491      0.5905      0.2107      0.2107      
+tri_50    2.612e-05   1.6501      0.5905      0.2108      0.2108      
+tri_fit   2.612e-05   1.6502      0.5904      0.2108      0.2108      
+norm_init 1.428e-04   0.1247      0.1247      0.1624      0.1624      
+norm_25   2.107e-05   1.3337      1.3979      0.1624      0.1624      
+norm_50   2.098e-05   1.1963      1.2315      0.1624      0.1624      
+norm_fit  2.096e-05   1.1355      1.1584      0.1624      0.1624      
+
+Per-instance Spearman ρ across the 9-model spectrum (mean ± sd, median; pooled):
+regret_raw ~ mse_entry          -0.088 ± 0.199   med -0.061   pooled +0.029   (N=140)
+regret_raw ~ eps_raw_mean       -0.307 ± 0.436   med -0.174   pooled -0.237   (N=140)
+regret_raw ~ eps_raw_argmax     -0.193 ± 0.487   med -0.069   pooled -0.260   (N=140)
+regret_cal ~ mse_entry          -0.095 ± 0.185   med -0.062   pooled +0.059   (N=140)
+regret_cal ~ eps_cal_mean       -0.100 ± 0.191   med -0.154   pooled -0.066   (N=140)
+regret_cal ~ eps_cal_argmax     -0.042 ± 0.185   med -0.102   pooled +0.067   (N=140)
+
+Triangle fit trajectory (init → fit), 140 instances:
+  mean ΔMSE      = -2.026e-06 (fit − init; negative = fit improved the objective)
+  mean Δregret_raw = +0.1566;  fit worse than init (raw): 136/140;  regret monotone ↓: 4/140
+  mean Δregret_cal = +0.1566;  fit worse than init (cal): 136/140
+Normal fit trajectory (init → fit), 140 instances:
+  mean ΔMSE      = -1.218e-04 (fit − init; negative = fit improved the objective)
+  mean Δregret_raw = +0.0000;  fit worse than init (raw): 0/140;  regret monotone ↓: 76/140
+  mean Δregret_cal = +0.0000;  fit worse than init (cal): 0/140
+
+calibration: paper      mean regret 0.0412 → 0.0521 (cal better on 12/140)
+calibration: tri_init   mean regret 0.0542 → 0.0542 (cal better on 0/140)
+calibration: tri_25     mean regret 0.2107 → 0.2107 (cal better on 0/140)
+calibration: tri_50     mean regret 0.2108 → 0.2108 (cal better on 0/140)
+calibration: tri_fit    mean regret 0.2108 → 0.2108 (cal better on 0/140)
+calibration: norm_init  mean regret 0.1624 → 0.1624 (cal better on 0/140)
+calibration: norm_25    mean regret 0.1624 → 0.1624 (cal better on 0/140)
+calibration: norm_50    mean regret 0.1624 → 0.1624 (cal better on 0/140)
+calibration: norm_fit   mean regret 0.1624 → 0.1624 (cal better on 0/140)
