@@ -239,8 +239,10 @@ ongoing work, but they shape the paper:
    evidence (7 points, p=1-only — collapses to ρ≈0 at p=3). Critique T1.1 recommends
    leading with the mechanism + argmax-transfer and demoting the ranking to
    corroboration. Agree? (The new §5.3 figure already scopes it honestly.)
-4. **Insert the E015 V₂ lemmas into §4?** They are exact and machine-verified; a
-   ready LaTeX block is in `research/v2_density_law.md`. Left §4 untouched pending
-   your OK — the theory is yours to own.
+4. **Fold the new E014/E015/E016 results into the paper?** Ready-to-paste LaTeX
+   (with figure-copy steps) for all three is in `research/proposed_paper_additions.md`
+   (E014→§5.4 argmax-transfer-at-depth + figure; E015 V₂ lemmas→§4, also in
+   `research/v2_density_law.md`; E016→§7 Discussion). I left §4/§5.4/§7 untouched —
+   the theory/framing is yours to own.
 5. **`theory_compression.tex` fate**: retire it, or keep as the "full proofs"
    companion/appendix? It now duplicates §3–4 and can drift out of sync.
