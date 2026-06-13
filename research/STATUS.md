@@ -27,6 +27,11 @@ merged to main**. Highlights:
    at p=3, regret↔fidelity ρ collapses to −0.02 while regret↔argmax-displacement
    stays 0.63. Direct evidence for the §5.4 thesis; resolves the depth framing
    question (it's parameter-space, not state-space, and not landscape flatness).
+7. **New result E016** — tested the Discussion's "most interesting open question"
+   (cheap instance-adapted low-rank frames): the headroom is real (oracle 4-dim
+   frame captures ~0.99) but the moving subspace rotates near-orthogonal over depth
+   (71→88°), so a cheap-prefix frame can't find it — the chicken-and-egg holds.
+   A measured obstacle for §7 future-work, not a method.
 
 **"Decisions needed from Spencer" (bottom) is no longer empty** — five items shape
 the paper; none block further work.
@@ -121,6 +126,14 @@ merge the paper repo's ClaudeResearch branch when ready to edit there.
   *quality* is a separate parameter-space matter — direct evidence for §5.4 and the
   mechanism behind "a worse-fidelity model picks better parameters."
   → [experiments/014_argmax-robustness](experiments/014_argmax-robustness/README.md)
+- **An instance-adapted low-rank frame is not cheaply discoverable (exp 016).** The
+  p=20 ramp trajectory is ~4-dim (oracle PCA captures ~0.99, confirming exp 009),
+  so a good 4-dim frame would beat the (m+1)-dim cost-class frame — but a frame
+  built from a cheap 5-layer prefix is near-orthogonal to the true late subspace
+  (principal angle 71→88° growing with ramp) and captures *less* than the zero-cost
+  cost-class frame. The moving subspace rotates over depth; the chicken-and-egg of
+  the Discussion's "most interesting open question" holds. A measured obstacle, not
+  a method. → [experiments/016_cheap-prefix-frame](experiments/016_cheap-prefix-frame/README.md)
 
 ## Working hypotheses (NOT established — from the deleted research log or intuition)
 
