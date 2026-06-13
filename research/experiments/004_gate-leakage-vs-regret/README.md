@@ -94,3 +94,19 @@ JULIA_NUM_THREADS=auto julia --project research/experiments/004_gate-leakage-vs-
 
 Seed 20260611 (same instance set as experiment 002). Output: `results.csv`.
 Smoke test: prefix `E1_SMOKE=1`.
+
+## Paper figure + table (§5.3)
+
+`make_ranking_figure.jl` synthesizes this experiment (n=12,14) with exp 010
+(n=16,18) into the §5.3 headline figure and regret table:
+
+```
+julia --project research/experiments/004_gate-leakage-vs-regret/make_ranking_figure.jl
+```
+
+Outputs `ranking.png` (panel a: leakage⇔regret at p=1, ρ=0.96/0.86; panel b:
+the rank correlation collapsing to ≈0 at p=3 — the ranking is a p=1 statement)
+and `regret_table.tex` (exact-compression regret, family × n, p=1 & p=3). Both
+are copied into the paper repo's `Figures/generated/`. The figure labels
+leakage as measured **at the proxy-chosen angles** to distinguish it from the
+fixed-angle density ordering of §5.2 (the family orderings are opposite).
