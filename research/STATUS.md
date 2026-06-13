@@ -1,7 +1,31 @@
 # Research status
 
-*Last updated: 2026-06-12. This is the one page Spencer needs to read.
-Everything here links to a reproducible experiment or a committed document.*
+*Last updated: 2026-06-13 (overnight autonomous session). This is the one page
+Spencer needs to read. Everything here links to a reproducible experiment or a
+committed document.*
+
+## Overnight digest (2026-06-13)
+
+Claude worked the paper autonomously while you slept. Everything below is on the
+`ClaudeResearch` branch of each repo, **committed locally, not pushed, paper not
+merged to main**. Highlights:
+
+1. **`research/paper_explainer.md`** — plain-language companion (you said the paper
+   was hard to follow): the proxy-as-compression reframe, the two error axes, the
+   three theorems as a story. Read this first.
+2. **`research/paper_critique.md`** — adversarial review + a full number audit
+   (every quoted statistic checks out; two errors found and fixed).
+3. **§5.3 now has its missing figure + regret table** — the central claim was
+   prose-only. Figure shows the leakage→regret ranking honestly: ρ=0.96/0.86 at
+   p=1, ≈0 at p=3. Paper compiles clean (14 pp). [exp 004]
+4. **Three unambiguous draft fixes applied** (−0.007 instance mis-attributed;
+   E001–E012→E013; a depth-overlap phrasing).
+5. **New result E015** — opened the V₂ black box behind the density law: two exact
+   lemmas (verified 1e-10) + a triangle-conditioning mechanism. Paper-ready LaTeX in
+   `research/v2_density_law.md`.
+
+**"Decisions needed from Spencer" (bottom) is no longer empty** — five items shape
+the paper; none block further work.
 
 **Goal:** QCE 2027 contributed paper, *"When and why does the homogeneous proxy work?
 QAOA parameter setting as subspace compression."* Complete draft by **Aug 15, 2026**;
@@ -75,6 +99,16 @@ merge the paper repo's ClaudeResearch branch when ready to edit there.
   required grid-striding the GPU homodist kernel (commit `ce337950`). The
   paper prints the measured table in §5.3.
   → [experiments/013_timing-benchmark](experiments/013_timing-benchmark/README.md)
+- **V₂ (the cubic-leakage variance functional) has an exact anatomy (exp 015).**
+  Two machine-verified lemmas (1e-10, 280 instances): (L1) V₂ is the within-cost-class
+  variance of T(y)=Σ_i(Σ_{j∼i}s_j)², and (L2) its *unconditional* variance is exactly
+  2·Σ_{j≠k}A_{jk}² (squared codegrees), → 8p²m² for ER. The cubic law λ₁=(βγ²/8)√V₂
+  holds to <0.3% everywhere. The density law √V₂∝m is an approximate cancellation:
+  codegree variance grows super-linearly with density, conditioning on cost removes a
+  triangle-driven fraction (ρ≈0.37 dense ER → 0.80 sparse 3-regular), and the two
+  nearly cancel. Advances the open V₂ problem to one quantity (the conditioning
+  correction). → [experiments/015_v2-density-law](experiments/015_v2-density-law/README.md);
+  derivation + paper-ready LaTeX in [research/v2_density_law.md](v2_density_law.md)
 
 ## Working hypotheses (NOT established — from the deleted research log or intuition)
 
@@ -166,4 +200,19 @@ merge the paper repo's ClaudeResearch branch when ready to edit there.
 
 ## Decisions needed from Spencer
 
-*(none right now)*
+Surfaced in the overnight critique (`research/paper_critique.md`); none block
+ongoing work, but they shape the paper:
+
+1. **Author list + acknowledgments** (paper lines 39, 802) — only you can fill these.
+2. **Venue/format**: the draft header says "IEEE TQE" (a journal) but the plan says
+   QCE 2027 (a conference: IEEEtran, ~8–12 pp, different review). Which target?
+   It gates reformatting and the length budget.
+3. **Headline framing**: the leakage→regret ranking is the paper's *weakest*
+   evidence (7 points, p=1-only — collapses to ρ≈0 at p=3). Critique T1.1 recommends
+   leading with the mechanism + argmax-transfer and demoting the ranking to
+   corroboration. Agree? (The new §5.3 figure already scopes it honestly.)
+4. **Insert the E015 V₂ lemmas into §4?** They are exact and machine-verified; a
+   ready LaTeX block is in `research/v2_density_law.md`. Left §4 untouched pending
+   your OK — the theory is yours to own.
+5. **`theory_compression.tex` fate**: retire it, or keep as the "full proofs"
+   companion/appendix? It now duplicates §3–4 and can drift out of sync.
