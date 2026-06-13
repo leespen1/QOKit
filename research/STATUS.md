@@ -23,6 +23,10 @@ merged to main**. Highlights:
 5. **New result E015** — opened the V₂ black box behind the density law: two exact
    lemmas (verified 1e-10) + a triangle-conditioning mechanism. Paper-ready LaTeX in
    `research/v2_density_law.md`.
+6. **New result E014** — depth regret is *argmax-transfer, decoupled from fidelity*:
+   at p=3, regret↔fidelity ρ collapses to −0.02 while regret↔argmax-displacement
+   stays 0.63. Direct evidence for the §5.4 thesis; resolves the depth framing
+   question (it's parameter-space, not state-space, and not landscape flatness).
 
 **"Decisions needed from Spencer" (bottom) is no longer empty** — five items shape
 the paper; none block further work.
@@ -109,6 +113,14 @@ merge the paper repo's ClaudeResearch branch when ready to edit there.
   nearly cancel. Advances the open V₂ problem to one quantity (the conditioning
   correction). → [experiments/015_v2-density-law](experiments/015_v2-density-law/README.md);
   derivation + paper-ready LaTeX in [research/v2_density_law.md](v2_density_law.md)
+- **Parameter-setting regret is argmax-transfer, decoupled from fidelity at depth
+  (exp 014).** Pooled over 140 instances, regret tracks argmax displacement at both
+  depths (ρ=0.76 at p=1, 0.63 at p=3) but the fidelity deficit only at p=1
+  (ρ=0.39→−0.02 at p=3). Landscape flat-peak robustness does not predict regret
+  (ρ≈−0.18/+0.10). The leakage calculus bounds the *state* error; parameter
+  *quality* is a separate parameter-space matter — direct evidence for §5.4 and the
+  mechanism behind "a worse-fidelity model picks better parameters."
+  → [experiments/014_argmax-robustness](experiments/014_argmax-robustness/README.md)
 
 ## Working hypotheses (NOT established — from the deleted research log or intuition)
 
@@ -193,10 +205,13 @@ merge the paper repo's ClaudeResearch branch when ready to edit there.
   → [experiments/012_fitted-shape-paradox](experiments/012_fitted-shape-paradox/README.md)
 - Next up: T2.0 (LaTeX write-up of Thms 1–3 + the O(βγ²) lemma); systematic
   lit pass (in progress, `research/literature_pass.md`). Then Phase-4 assembly.
-- Open framing question for the paper (not blocking): at p=3 the proxy-chosen
-  schedules equalize leakage across families — is regret there governed by
-  landscape/argmax robustness rather than fidelity? Phase-2 experiments decide
-  how §5 narrates depth.
+- ~~Open framing question: at p=3 the proxy-chosen schedules equalize leakage, so
+  is regret there governed by landscape/argmax robustness rather than fidelity?~~
+  **Resolved (exp 014): argmax transfer.** At p=3 fidelity decouples from regret
+  (ρ=−0.02) while argmax displacement still predicts it (ρ=0.63); landscape
+  flat-peak robustness does not (ρ≈0.1). §5 should narrate depth as a
+  parameter-space (argmax-transfer) story, not a fidelity one.
+  → [experiments/014_argmax-robustness](experiments/014_argmax-robustness/README.md)
 
 ## Decisions needed from Spencer
 
