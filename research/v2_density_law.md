@@ -111,6 +111,16 @@ Experiment 015 confirms the **cancellation** numerically: across the seven
 families the unconditional $\sqrt{\operatorname{Var}(T)}/m$ spans ~2.0–2.35×,
 while $\sqrt{V_2}/m$ spans only ~1.35–1.58× (n=12–18).
 
+A direct check (`conditioning_check.jl`) confirms the *form* of the correction:
+$\operatorname{Var}(\mathbb E[T\mid c]) = \operatorname{Var}_y(T) - V_2$ tracks
+$\tau^2/m$ at **Pearson 0.994** over 280 instances, with a consistent constant
+$\approx 60$ across the dense families (ER(0.5), BA(4), WS(0.1)) — larger than
+the crude analytic $36$, which is exactly why $\rho_{\rm cond}$ comes out below
+$1-p$. Triangle-free families (ER(0.25), $3$-regular, $\tau\approx0$) keep only a
+small residual correction. So the suppression that flattens the density law is
+**triangle-driven and concentrated on the dense graphs that need it**; what
+remains open is just the exact prefactor (and the small triangle-free residual).
+
 ## What this buys the paper
 
 1. **The black box is opened.** Leakage's driver is the within-class variance of

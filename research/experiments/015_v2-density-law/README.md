@@ -65,7 +65,11 @@ For Erdős–Rényi G(n,p) the unconditional piece is analytic: A_{jk} ~
 Binomial(n−2, p²), so E[Var_y(T)] = 2·n(n−1)·[(n−2)p²(1−p²) + ((n−2)p²)²]
 ≈ 2n⁴p⁴ = 8p²·m² (leading order). The remaining piece — E[Var(E[T|c])], the
 triangle-mediated conditioning correction — is the only ingredient still needed
-for a closed-form E[V₂]; this experiment isolates and quantifies it.
+for a closed-form E[V₂]; this experiment isolates and quantifies it. **Confirmed**
+by `conditioning_check.jl`: the correction Var(E[T|c]) = Var(T) − V₂ tracks τ²/m
+(τ = triangle count) at Pearson **0.994** over 280 instances, constant ≈60 across
+the dense families — the suppression that flattens the density law is
+triangle-driven.
 
 ## Results
 
@@ -92,6 +96,7 @@ cubic law on the diagonal; (b) √Var(T)/m vs √V₂/m by family — the flatte
 ```
 julia --project research/experiments/015_v2-density-law/run.jl
 julia --project research/experiments/015_v2-density-law/make_figure.jl
+julia --project research/experiments/015_v2-density-law/conditioning_check.jl
 ```
 
 Instances seeded by `20260611 + 10000·fam_idx + 100·n + inst` (identical to
