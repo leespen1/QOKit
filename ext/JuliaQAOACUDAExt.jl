@@ -181,7 +181,9 @@ function JuliaQAOA.gpu_get_homogeneous_distribution_from_costs_direct(
 
     threads_per_block = 256
     num_pairs = num_bitstrings * num_bitstrings
-    blocks = cld(num_pairs, threads_per_block)
+    # CUDA grid dimensions must fit in UInt32, which one thread per (x, y)
+    # pair exceeds for num_vertices >= 20; the kernel grid-strides instead.
+    blocks = min(cld(num_pairs, threads_per_block), 2^20)
 
     @cuda threads=threads_per_block blocks=blocks _homogeneous_distribution_kernel_priv!(
         privatized_counts, costs_gpu, num_bitstrings, num_vertices, num_copies
@@ -213,17 +215,20 @@ function _homogeneous_distribution_kernel_priv!(
     num_vertices::Int,
     num_copies::Int
 )
-    idx = (blockIdx().x - 1) * blockDim().x + threadIdx().x
+    # Int64 indices: there are up to 4^num_vertices pairs, far beyond Int32.
+    idx = Int64(blockIdx().x - 1) * blockDim().x + threadIdx().x
+    stride = Int64(gridDim().x) * blockDim().x
     num_pairs = num_bitstrings * num_bitstrings
+    copy_idx = ((blockIdx().x - 1) % num_copies) + 1
 
-    if idx <= num_pairs
+    while idx <= num_pairs
         x = (idx - 1) ÷ num_bitstrings
         y = (idx - 1) % num_bitstrings
         cost_x = costs[x + 1]
         cost_y = costs[y + 1]
         d = count_ones(x ⊻ y)
-        copy_idx = ((blockIdx().x - 1) % num_copies) + 1
         CUDA.@atomic privatized_counts[cost_x + 1, d + 1, cost_y + 1, copy_idx] += Int32(1)
+        idx += stride
     end
 
     return nothing
