@@ -5,6 +5,69 @@ and questions queued for Monday. Newest entry first. Established results go in
 [STATUS.md](STATUS.md); plain-language versions in [explainer.md](explainer.md);
 this file is the working diary.*
 
+## 2026-07-03 (Friday, afternoon — continuous-loop session)
+
+### Done
+
+- **E014 implemented and submitted: Slurm array job 11575420** (10 tasks =
+  5 families × n ∈ {12,14}, 15 instances each, CPU partition since n ≤ 14
+  needs no GPU). Three parts as designed this morning: (A) matched-MSE
+  perturbations with four d-profiles, (B) triangle/normal entrywise-MSE fits
+  + PaperProxy, (C) the same fits in the Theorem-3 weighted norm.
+  → `experiments/014_fitted-shape-paradox/`
+- **The smoke run caught a real methodological discovery, not just a bug:**
+  under the paper's raw Eq.-9 objective (exps 001–010 convention), *any*
+  coherent perturbation of N — even ε = 0.01 and transfer-invisible — plants
+  a norm-inflated beacon (predicted ⟨C⟩ ~ ε², up to 5×10⁵ on a 21-edge
+  graph) that hijacks the argmax. This is the exp-004–006 pathology in its
+  general form: the raw objective is unusable for model-error studies.
+  E014 therefore records a second, **normalized** ranking (divide by the
+  compressed state's weight Σ2ⁿP|Q|²; gauge-invariant) for every variant.
+- **Smoke-scale confirmation of the Theorem-3 prediction** (one n=10
+  ER(0.5) instance): normalized regret at matched entrywise MSE spans
+  0.0000 (nulled profile, invisible by construction) to 0.32 (aligned
+  profile) — the weighted error, not the MSE, governs regret. Also observed:
+  exact-N normw = 0.978 ≤ 1 (Thm-1 contractivity visible in the wild);
+  normalization even improved exact-N's own parameter choice; but it *hurt*
+  PaperProxy on that instance (raw regret 0.0011 → nrm 0.0995) — watch this
+  at scale, it complicates a clean "normalize, don't veto" recipe.
+- **Paper repo pushed** (pipeline-cost subsection with E013 timing table,
+  ff0e743, was sitting unpushed).
+- **Systematic literature pass launched** (background agent: parameter
+  setting/transfer, mean-field AOA & classical surrogates, Zwanzig–Mori /
+  lumpability precedents, non-ER instance dependence, DOS-based analyses,
+  and direct follow-ups to Sud et al.). Report will land at
+  `research/lit_scan_2026-07-03.md`; findings get folded into §2 next.
+
+### Decisions taken autonomously
+
+- **E014 ranks parameters under BOTH the raw Eq.-9 objective and the
+  normalized one**, reporting both regrets. Rationale: raw keeps continuity
+  with exps 001–010; normalized is the only instrument with dynamic range
+  for Part A (and doubles as the "normalize, don't veto" test). If the
+  normalized recipe survives the full run, it belongs in §6 and possibly
+  changes the paper's recommended objective — flag for Spencer.
+- **E014 runs CPU-only** (16 threads/task, general-short): at n ≤ 14 the
+  statevector grids and homodists are cheap; the GPU queue is the scarce
+  resource and E013 already showed the GPU adds nothing at this scale.
+- Perturbation amplitudes are relative (∝ ‖N[c',:,c]‖ per slice) and may
+  make N entries negative — accepted deliberately; the proxy iteration is
+  linear and Part A stress-tests the *metric*, not a physical model class.
+
+### Open questions for Monday (added)
+
+5. **If norm-division fixes model-error parameter setting at scale, do we
+   adopt the normalized objective paper-wide?** It changes Eq. 9 and every
+   experiment's headline numbers slightly (exact-N regret improved on the
+   smoke instance). Cleanest option: keep Eq. 9 for fidelity theory, use the
+   normalized estimator only in the §6 practical recipe, with one paragraph
+   explaining why (contractivity ⇒ exact N never inflates; model error
+   does ⇒ dividing removes the artifact the vetoes couldn't).
+6. **PaperProxy got *worse* under normalization on the smoke instance** —
+   if that pattern holds at scale, the story is subtler: the analytical
+   model's raw values happen to place its beacon *at* the good argmax on
+   non-pathological instances. Needs the full-run data before writing §6.
+
 ## 2026-07-03 (Friday)
 
 ### Done

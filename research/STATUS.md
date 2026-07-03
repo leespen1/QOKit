@@ -134,10 +134,18 @@ merge the paper repo's ClaudeResearch branch when ready to edit there.
   → [experiments/013_timing-benchmark](experiments/013_timing-benchmark/README.md)
 - ~~T2.0 theory write-up~~ **Done** — `theory_compression.tex` (standalone
   proofs) and the paper draft's §3 in the paper repo.
-- Next up: E2.4 fitted-shape paradox (does Theorem 3's f_d(β)-weighted model
-  error explain why lower entrywise-MSE fits set parameters worse? → experiment
-  014); systematic literature pass; paper figure/table expansion incl. E013
-  timing table.
+- **E014 fitted-shape paradox: RUNNING** (Slurm array 11575420, submitted
+  2026-07-03) — tests whether Theorem 3's f_d(β)-weighted model error, not
+  entrywise MSE, governs parameter-setting regret; includes perturbation
+  controls, triangle/normal fits in both norms, and a new "normalized
+  objective" candidate recipe (the smoke run showed the raw Eq.-9 objective
+  is hijacked by norm inflation under *any* coherent model perturbation —
+  and that normalizing restores Theorem-3-predicted behavior).
+  → [experiments/014_fitted-shape-paradox](experiments/014_fitted-shape-paradox/README.md)
+- Systematic literature pass: RUNNING (background scan; report →
+  `research/lit_scan_2026-07-03.md`, then folded into §2 of the paper).
+- Remaining for the draft: E014 write-up + §6 revision, lit-pass fold-in,
+  figure/table expansion, author list and acknowledgments.
 - Open framing question for the paper (not blocking): at p=3 the proxy-chosen
   schedules equalize leakage across families — is regret there governed by
   landscape/argmax robustness rather than fidelity? Phase-2 experiments decide

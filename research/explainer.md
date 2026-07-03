@@ -144,18 +144,41 @@ N(c';d,c) — and fits with *lower* mean-squared error set parameters *worse*.
 That's backwards, unless the error that matters isn't entrywise. Theorem 3
 says exactly that: the proxy update only sees N through the β-weighted
 combination Σ_d f_d(β)·N(c';d,c), where cancellations and weightings make
-some entries matter enormously and others not at all. Experiment 014 (in
-design) tests this directly: perturb N in ways that are large entrywise but
-small in the weighted norm (and vice versa), and refit the triangle/normal
-shapes, checking whether the weighted model error — not the entrywise MSE —
-predicts parameter-setting regret. If it does, the paradox dissolves and the
-paper gains a clean prescription: *fit proxies in the norm the algorithm
-actually uses.*
+some entries matter enormously and others not at all. Experiment 014 (now
+running as Slurm job 11575420) tests this directly: perturb N in ways that
+are large entrywise but small in the weighted norm (and vice versa), and
+refit the triangle/normal shapes, checking whether the weighted model error —
+not the entrywise MSE — predicts parameter-setting regret. If it does, the
+paradox dissolves and the paper gains a clean prescription: *fit proxies in
+the norm the algorithm actually uses.*
+
+**A discovery from E014's shakedown run, in plain language.** The proxy
+reports a predicted average cut value for each candidate (γ, β), and we pick
+the candidate with the biggest prediction. It turns out that if the N you
+feed the proxy is even slightly wrong — 1% off, even in a direction the
+dynamics provably can't see — the predicted values at *some* corner of the
+parameter grid explode (we saw a prediction of ~500,000 on a graph with 21
+edges, whose best cut is therefore at most 21). The reason: with a wrong N,
+the compressed state's total probability can grow past 1, and the "expected
+cost" of an inflated state looks huge. With the exact N this can never happen
+— Theorem 1 guarantees the total probability never grows — and we watched
+that hold: exact N kept total weight at 0.978 while every wrong N inflated
+it, up to tens of thousands. The candidate fix is embarrassingly simple:
+divide the prediction by the total weight, i.e. ask "what is the average cost
+of the state we actually have?" On the shakedown instance that one division
+made the theory-invisible perturbations exactly harmless (zero regret, as
+Theorem 3 says) and made regret track the weighted error cleanly. One
+wrinkle keeps us honest: the paper's own analytical proxy got slightly
+*worse* after the division on that instance — so no victory declaration until
+the 150-instance run reports. Earlier experiments (005/006) tried *rejecting*
+suspiciously inflated predictions and failed; *dividing* by the inflation may
+be the recipe that works.
 
 ## Where the paper stands
 
 Full IEEE-format draft exists (`papers/OverleafPaper/qce2027_paper.tex`,
-branch ClaudeResearch) with the theory and experiments 001–011; a
-multi-reviewer quality pass is running and its fixes will land next. Remaining
-before the August arXiv target: fold in E013's timing table, resolve E014,
-systematic literature pass, figures/tables polish.
+branch ClaudeResearch) with the theory, experiments 001–011, and the E013
+pipeline-cost subsection; the 4-lens review fixes are applied and pushed.
+Remaining before the August arXiv target: resolve E014 and revise §6
+accordingly, fold in the systematic literature pass (scan running, report →
+`lit_scan_2026-07-03.md`), figures/tables polish, author list.
