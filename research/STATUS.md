@@ -1,7 +1,9 @@
 # Research status
 
-*Last updated: 2026-06-10 (evening). This is the one page Spencer needs to read.
-Everything here links to a reproducible experiment or a committed document.*
+*Last updated: 2026-07-03. This is the one page Spencer needs to read.
+Everything here links to a reproducible experiment or a committed document.
+Plain-language walkthrough of all results: [explainer.md](explainer.md).
+Running journal of the autonomous work: [journal.md](journal.md).*
 
 **Goal:** QCE 2027 contributed paper, *"When and why does the homogeneous proxy work?
 QAOA parameter setting as subspace compression."* Complete draft by **Aug 15, 2026**;
@@ -124,12 +126,18 @@ merge the paper repo's ClaudeResearch branch when ready to edit there.
   sublinearly in m along deep trajectories, with p=30 small-ramp overlaps of
   0.71–0.81 even at n=20.
   → [experiments/011_depth-scaling](experiments/011_depth-scaling/README.md)
-- Next up: T2.0 (LaTeX write-up of Thms 1–3 + the O(βγ²) lemma + lit pass, per
-  `research/theory_notes.md`); E2.4 fitted-shape paradox explanation. Then
-  Phase-3 scale-up.
-- E2.1 (next up): (γ, β) leakage anatomy per family — separates the density effect
-  from angle rescaling (H-density), tests Theorem 3's variance identity, and
-  supplies the schedule diversity the p=3 gate lacked.
+- **E013 (timing): the pipeline's cost is obtaining N, not running the proxy** —
+  exact N is O(4^n) (21.8 s at n=20 on an A100, prohibitive past n≈24), sampled
+  N (S=10) is 50× cheaper, the sweep itself scales with m² not 2^n; at
+  simulable sizes GPU statevector grid search matches the proxy's speed, so
+  the honest pitch is asymptotic + expensive-evaluation settings.
+  → [experiments/013_timing-benchmark](experiments/013_timing-benchmark/README.md)
+- ~~T2.0 theory write-up~~ **Done** — `theory_compression.tex` (standalone
+  proofs) and the paper draft's §3 in the paper repo.
+- Next up: E2.4 fitted-shape paradox (does Theorem 3's f_d(β)-weighted model
+  error explain why lower entrywise-MSE fits set parameters worse? → experiment
+  014); systematic literature pass; paper figure/table expansion incl. E013
+  timing table.
 - Open framing question for the paper (not blocking): at p=3 the proxy-chosen
   schedules equalize leakage across families — is regret there governed by
   landscape/argmax robustness rather than fidelity? Phase-2 experiments decide
