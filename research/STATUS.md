@@ -5,21 +5,74 @@ Everything here links to a reproducible experiment or a committed document.
 Plain-language walkthrough of all results: [explainer.md](explainer.md).
 Running journal of the autonomous work: [journal.md](journal.md).*
 
+## ⚠ Branch reconciliation (2026-07-03)
+
+Two autonomous work lines had diverged from commit `8680853` without knowing
+about each other: an **overnight session of 2026-06-13** (experiments 012,
+014–016, the literature pass, the paper critique — pushed to
+`origin/ClaudeResearch` but never pulled here) and the **July sessions** on
+this clone (E013 write-up, explainer/journal, and a fitted-shape experiment
+that unknowingly re-tested exp 012's question with a different design). They
+were merged today. Consequences:
+
+- The July fitted-shape experiment is **renumbered 017** (the June line
+  already owned 012 and 014); its design and exp 012's turn out to be
+  *complementary, not redundant* — see the joint entry below.
+- The June-13 session's **paper-repo edits were committed only on an
+  unpushed clone and are presumed lost** (§5.3 ranking figure + regret
+  table, three draft fixes, two number-audit corrections, five citations).
+  All of their *content* is preserved in committed QOKit files
+  (`paper_critique.md`, `literature_pass.md`, `proposed_paper_additions.md`,
+  and the figure generators in exps 004/011/012) and is being re-applied to
+  the paper.
+- `explainer.md` (results walkthrough, July line) and `paper_explainer.md`
+  (paper companion, June line) both exist; they serve different purposes but
+  overlap — consolidation is queued as a Spencer decision.
+
+## Overnight digest (2026-06-13, from the merged line)
+
+1. **`research/paper_explainer.md`** — plain-language companion to the paper:
+   the proxy-as-compression reframe, the two error axes, the theorems as a
+   story.
+2. **`research/paper_critique.md`** — adversarial review + full number audit
+   (every quoted statistic checked; two errors found). *[Paper-side fixes
+   lost with the unpushed clone — being re-applied.]*
+3. **§5.3 ranking figure + regret table** — generator committed (exp 004);
+   the figure shows the leakage→regret ranking honestly (ρ=0.96/0.86 at p=1,
+   ≈0 at p=3). *[Inclusion in the tex lost — being re-applied.]*
+4. **New result E015** — the V₂ black box behind the density law opened: two
+   exact lemmas + a triangle-conditioning mechanism; paper-ready LaTeX in
+   `research/v2_density_law.md`.
+5. **New result E014 (argmax-robustness)** — depth regret is argmax-transfer,
+   decoupled from fidelity at p=3; resolves the depth framing question.
+6. **New result E016** — cheap-prefix low-rank frames can't find the moving
+   trajectory subspace (71→88° rotation); the Discussion's chicken-and-egg
+   holds. A measured obstacle, not a method.
+7. Five decisions for Spencer surfaced (see bottom).
+
 **Goal:** QCE 2027 contributed paper, *"When and why does the homogeneous proxy work?
 QAOA parameter setting as subspace compression."* Complete draft by **Aug 15, 2026**;
-arXiv late August; submit April 2027. Full plan: see `research/decisions.md` and the
-program plan (Claude's plan file, to be mirrored into `research/program.md`).
+arXiv late August; submit April 2027. Full plan: see `research/decisions.md` and
+`research/program.md`.
 
 ## Where we are
 
 **Phases 1–3 complete; Phase 4 (assembly) underway.** The paper repo
-(`papers/OverleafPaper`, branch `ClaudeResearch`) now holds
-`theory_compression.tex` (standalone theory notes with full proofs) and
-`qce2027_paper.tex` (full IEEE-format draft: theory + experimental anatomy
-from experiments 001–011 + figures; 4 pp with room to grow). Remaining:
-systematic literature pass before submission, optional E2.4, figure/table
-expansion, author list and acknowledgments. Overleaf shows only `main`, so
-merge the paper repo's ClaudeResearch branch when ready to edit there.
+(`papers/OverleafPaper`, branch `ClaudeResearch`) holds
+`theory_compression.tex` (standalone proofs) and `qce2027_paper.tex`
+(IEEE-format draft: theory + experimental anatomy from experiments 001–013,
+including the E013 pipeline-cost subsection added 2026-07-03). The
+systematic literature pass is done (`research/literature_pass.md`): **all
+four claimed-new items survive** — no overlapping prior work among Sud et
+al.'s ~22 citers or the projection/lumping/MOR/surrogate literature; five
+citations to add (closest neighbor: Krüger–Mauerer landscape approximation,
+Quantum 2025 — complementary); an independent second scan is running as a
+cross-check (`lit_scan_2026-07-03.md` when done). Remaining for the draft:
+re-apply the June-13 paper edits from committed sources, fold in
+`proposed_paper_additions.md` (E014/E015/E016 snippets), write the §6
+fitted-shape subsection from exps 012+017, figure/table expansion, author
+list and acknowledgments. Overleaf shows only `main`; merge the paper repo's
+ClaudeResearch branch when ready to edit there.
 
 ## What we know (established results only)
 
@@ -59,31 +112,78 @@ merge the paper repo's ClaudeResearch branch when ready to edit there.
   norm-inflated artifact* (predicted ⟨C⟩ = 93 on a 38-edge graph). Since exact
   compression is contractive (Thm 1), norm inflation certifies model error for
   free; a norm sanity filter repairs the diagnosed instance
-  (`004/diagnose_paper_artifact.jl`); exp 005 (running) quantifies strict-vs-loose
-  thresholds across all instances.
-- **The fitted-shape paradox is resolved, and the shape-fitting program is
-  dead on representational grounds** (exp 014, 150 instances): regret under
-  model error is governed by the f_d(β)-weighted transfer error (Thm 3's
-  norm), which entrywise MSE anti-predicts; but even weighted-norm-optimal
-  triangle/normal fits keep relative weighted error ≥ 0.92 and regret ≈
-  0.13–0.17 vs 0.04 for exact N — no fit objective can save shapes that
-  cannot express the transfer operator. Bonus refinements: contractivity
-  held on all 150 instances (max exact-N norm weight 0.984); *any* coherent
-  1%-scale model error hijacks the raw Eq.-9 argmax via norm inflation, yet
-  dividing the norm out is *worse* for the analytical model (regret 0.05 →
-  0.16) — its raw landscape is argmax-informative. Recommended recipe
-  unchanged: sampled N + empirical P + raw objective.
-  → [experiments/014_fitted-shape-paradox](experiments/014_fitted-shape-paradox/README.md)
+  (`004/diagnose_paper_artifact.jl`); exps 005/006 quantify why value-based
+  filters nonetheless fail as a recipe.
+- **Timing (exp 013): the exact N is the pipeline's wall, and brute force is
+  free at simulable sizes.** On an A100, exact N costs 21.8 s at n=20 (clean
+  O(4ⁿ) growth) vs 0.48 s for the brute-force p=1 ceiling it competes with;
+  sampled N (S=10) is 50× cheaper (0.44 s). GPU statevector passes are
+  kernel-launch-bound (~0.2–0.3 ms, flat in n ≤ 20), so exhaustive grid search
+  matches the proxy pipeline end to end even at p=20; the pipeline's cost
+  advantage opens around n ≈ 22–24 (extrapolated). Running n=20 exact N
+  required grid-striding the GPU homodist kernel (commit `ce337950`). The
+  paper prints the measured table in §5.3.
+  → [experiments/013_timing-benchmark](experiments/013_timing-benchmark/README.md)
+- **V₂ (the cubic-leakage variance functional) has an exact anatomy (exp 015).**
+  Two machine-verified lemmas (1e-10, 280 instances): (L1) V₂ is the within-cost-class
+  variance of T(y)=Σ_i(Σ_{j∼i}s_j)², and (L2) its *unconditional* variance is exactly
+  2·Σ_{j≠k}A_{jk}² (squared codegrees), → 8p²m² for ER. The cubic law λ₁=(βγ²/8)√V₂
+  holds to <0.3% everywhere. The density law √V₂∝m is an approximate cancellation:
+  codegree variance grows super-linearly with density, conditioning on cost removes a
+  triangle-driven fraction (ρ≈0.37 dense ER → 0.80 sparse 3-regular), and the two
+  nearly cancel. Advances the open V₂ problem to one quantity (the conditioning
+  correction). → [experiments/015_v2-density-law](experiments/015_v2-density-law/README.md);
+  derivation + paper-ready LaTeX in [research/v2_density_law.md](v2_density_law.md)
+- **Parameter-setting regret is argmax-transfer, decoupled from fidelity at depth
+  (exp 014).** Pooled over 140 instances, regret tracks argmax displacement at both
+  depths (ρ=0.76 at p=1, 0.63 at p=3) but the fidelity deficit only at p=1
+  (ρ=0.39→−0.02 at p=3). Landscape flat-peak robustness does not predict regret
+  (ρ≈−0.18/+0.10). The leakage calculus bounds the *state* error; parameter
+  *quality* is a separate parameter-space matter — direct evidence for §5.4 and the
+  mechanism behind "a worse-fidelity model picks better parameters."
+  → [experiments/014_argmax-robustness](experiments/014_argmax-robustness/README.md)
+- **An instance-adapted low-rank frame is not cheaply discoverable (exp 016).** The
+  p=20 ramp trajectory is ~4-dim (oracle PCA captures ~0.99, confirming exp 009),
+  so a good 4-dim frame would beat the (m+1)-dim cost-class frame — but a frame
+  built from a cheap 5-layer prefix is near-orthogonal to the true late subspace
+  (principal angle 71→88° growing with ramp) and captures *less* than the zero-cost
+  cost-class frame. The moving subspace rotates over depth; the chicken-and-egg of
+  the Discussion's "most interesting open question" holds. A measured obstacle, not
+  a method. → [experiments/016_cheap-prefix-frame](experiments/016_cheap-prefix-frame/README.md)
+- **The fitted-shape paradox is fully dissected — two independent designs agree
+  and interlock (exps 012 + 017).** exp 012 (June 13, the G-RIPS fitting
+  conventions): entrywise-MSE fitting is harmful (Triangle: regret 0.054 → 0.211,
+  worse on 136/140) or inert (Normal: 10× better MSE, argmax never moves), and
+  across the fitted-model zoo *no scalar mismatch norm* predicts regret — only
+  argmax displacement does (ρ≈0.7). exp 017 (July 3, controlled error
+  *directions* at matched entrywise MSE, gauge-fixed metrics): Theorem 3's
+  f_d(β)-weighted transfer error *does* govern regret when it has dynamic range
+  (pooled ρ=0.74 vs 0.38 for MSE; transfer-invisible perturbations at 50%
+  entrywise error carry zero excess regret) — but every realistic shape fit
+  saturates that norm (≥0.92 *even when fitted in it*), which is exactly why
+  012 saw no discriminating scalar across models. Joint story for §6: error
+  *direction* relative to the dynamics is the causal quantity; shape families
+  err almost entirely in visible directions, so no fit objective can save them
+  (017 Part C), and within a model class only argmax displacement
+  discriminates (012, 014). Bonus: *any* coherent model error hijacks the raw
+  Eq.-9 argmax via norm inflation (predicted ⟨C⟩ up to 5×10⁵; Thm-1
+  contractivity held on all 150 instances, exact-N weight ≤ 0.984), yet
+  dividing the norm out *hurts* the analytical proxy (regret 0.05 → 0.16) —
+  its raw landscape is argmax-informative, sharpening 012's "amplitude norms
+  are scale-hostage" and the 004–006 "values are noise" claim.
+  → [experiments/012_fitted-shape-paradox](experiments/012_fitted-shape-paradox/README.md),
+  [experiments/017_error-directions](experiments/017_error-directions/README.md)
 
 ## Working hypotheses (NOT established — from the deleted research log or intuition)
 
 - H1: The proxy's usefulness is governed by leakage out of the cost-class subspace,
   which concentrates only for ER-like graphs. (The paper's central claim.)
 - ~~H2: Fitted proxy shapes (triangle/Gaussian) with lower entrywise MSE against the
-  empirical N(c';d,c) gave *worse* parameter setting.~~ **Confirmed and explained**
-  (exp 014: MSE orders triangle-vs-normal against regret in 45/150 instances —
-  an anti-predictor; Theorem 3's weighted transfer error is the quantity that
-  ranks correctly, and the misranking is exactly the paradox the old log saw).
+  empirical N(c';d,c) gave *worse* parameter setting.~~ **Confirmed twice and
+  explained** (exp 012: fitting harmful or inert under the G-RIPS conventions;
+  exp 017: entrywise MSE is an *anti-predictor* — it orders triangle-vs-normal
+  against regret in 105/150 instances — while Theorem 3's weighted transfer
+  error is the quantity that governs, and shape families saturate it).
 - H3: Sampling 5–10 bitstrings per cost class suffices to estimate the quantities that
   matter. (Old log; needs re-verification in the leakage metric, not entrywise N.)
 - ~~H4: On ER(0.5), random balanced partitions reach ~75–85% approximation ratio.~~
@@ -110,7 +210,8 @@ merge the paper repo's ClaudeResearch branch when ready to edit there.
   answer; on dense ER(0.5) the spurious region extends below the physical cap.**
   Filter arc (004→005→006) closed: the analytical proxy's values are pure noise in
   absolute terms; its argmax location is the only usable signal — excellent off
-  dense graphs, corrupted on dense ER(0.5) by a spurious large-β peak.
+  dense graphs, corrupted on dense ER(0.5) by a spurious large-β peak. (Refined by
+  exp 017: the raw value *landscape* is argmax-informative; see What-we-know.)
   → [experiments/006_physicality-filter](experiments/006_physicality-filter/README.md)
 - ~~E007 = E2.1: leakage anatomy~~ **Done — three results:** (i) small-angle law
   λ ≈ const·β·γ²·m, with the O(βγ) term killed by an exact MaxCut identity
@@ -142,38 +243,69 @@ merge the paper repo's ClaudeResearch branch when ready to edit there.
   sublinearly in m along deep trajectories, with p=30 small-ramp overlaps of
   0.71–0.81 even at n=20.
   → [experiments/011_depth-scaling](experiments/011_depth-scaling/README.md)
-- **E013 (timing): the pipeline's cost is obtaining N, not running the proxy** —
-  exact N is O(4^n) (21.8 s at n=20 on an A100, prohibitive past n≈24), sampled
-  N (S=10) is 50× cheaper, the sweep itself scales with m² not 2^n; at
-  simulable sizes GPU statevector grid search matches the proxy's speed, so
-  the honest pitch is asymptotic + expensive-evaluation settings.
-  → [experiments/013_timing-benchmark](experiments/013_timing-benchmark/README.md)
+- ~~E2.4 fitted-shape paradox~~ **Done: H2 confirmed strongly, and the planned
+  explanation is refuted in its simple form.** Entrywise-MSE fitting of shapes is
+  harmful (Triangle: mean p=1 regret 0.054 → 0.211, worse on 136/140) or inert
+  (Normal: 10× better MSE, argmax identical to the unfitted default on 140/140).
+  No scalar mismatch norm tested predicts regret (entrywise MSE ρ≈−0.1,
+  one-layer amplitude error ρ≈−0.2, landscape Pearson ρ≈+0.1); argmax
+  displacement does (ρ≈0.7). Raw PaperProxy has amplitude error ~1e5 (slice sums
+  up to 9e8) yet near-best regret — amplitude norms are hostage to scale
+  conventions the argmax ignores. Per-slice calibration to 2^n is argmax-neutral
+  at p=1 (0/140 changes for shapes). Extends the 004→005→006 arc: for *every*
+  model class, argmax location is the only usable signal; §6 recommendation is
+  "don't fit shapes by MSE — use defaults or analytical N."
+  → [experiments/012_fitted-shape-paradox](experiments/012_fitted-shape-paradox/README.md)
+- ~~E017 error directions (July re-test of 012's question)~~ **Done — the
+  missing half of the 012 story: with gauge-fixed metrics and controlled error
+  directions at matched entrywise MSE, the weighted transfer error does govern
+  regret (ρ=0.74; invisible directions are free even at 50% error), shape
+  families saturate it (which is why 012 saw no scalar signal), weighted-norm
+  refitting does not rescue them, and normalizing the objective is an
+  instrument, not a recipe (it hurts the analytical proxy 0.05 → 0.16).**
+  See the joint What-we-know entry.
+  → [experiments/017_error-directions](experiments/017_error-directions/README.md)
+- ~~Open framing question: at p=3 the proxy-chosen schedules equalize leakage, so
+  is regret there governed by landscape/argmax robustness rather than fidelity?~~
+  **Resolved (exp 014): argmax transfer.** At p=3 fidelity decouples from regret
+  (ρ=−0.02) while argmax displacement still predicts it (ρ=0.63); landscape
+  flat-peak robustness does not (ρ≈0.1). §5 should narrate depth as a
+  parameter-space (argmax-transfer) story, not a fidelity one.
+  → [experiments/014_argmax-robustness](experiments/014_argmax-robustness/README.md)
 - ~~T2.0 theory write-up~~ **Done** — `theory_compression.tex` (standalone
-  proofs) and the paper draft's §3 in the paper repo.
-- ~~E014 fitted-shape paradox~~ **Done (2026-07-03, 150 instances): the
-  paradox dissolves — Theorem 3's weighted transfer error governs regret
-  (ρ = 0.74 vs 0.38 for entrywise MSE; transfer-invisible perturbations at
-  50% entrywise error carry zero excess regret), and entrywise MSE actively
-  misranks triangle vs normal (45/150, worse than chance) where the weighted
-  metric ranks correctly (105/150). Two negative punchlines: refitting in
-  the weighted norm does NOT rescue the shapes (representational error ≈ 1 —
-  the shape families, not the fit objective, are the problem), and the
-  normalized objective is a measuring instrument, not a recipe — it *hurts*
-  the analytical proxy (regret 0.05 → 0.16), whose raw unnormalized
-  landscape is argmax-informative. §6 claim to refine: "no usable absolute
-  information" stands; "only the argmax location is usable" understates —
-  the raw value landscape carries the signal.**
-  → [experiments/014_fitted-shape-paradox](experiments/014_fitted-shape-paradox/README.md)
-- Systematic literature pass: RUNNING (background scan; report →
-  `research/lit_scan_2026-07-03.md`, then folded into §2 of the paper).
-- Remaining for the draft: §6 revision with E014 (fitted-shape resolution +
-  refined value-information claim + E014 money figure), lit-pass fold-in,
-  figure/table expansion, author list and acknowledgments.
-- Open framing question for the paper (not blocking): at p=3 the proxy-chosen
-  schedules equalize leakage across families — is regret there governed by
-  landscape/argmax robustness rather than fidelity? Phase-2 experiments decide
-  how §5 narrates depth.
+  proofs) and the paper draft's §3 in the paper repo (see Spencer decision 5).
+- Next up (Phase-4 assembly, in order): (1) re-apply the lost June-13 paper
+  edits from committed sources — §5.3 figure + regret table (generator in exp
+  004), three draft fixes + two number corrections (`paper_critique.md`), five
+  citations (`literature_pass.md`); (2) fold `proposed_paper_additions.md`
+  (E014→§5.4, E015→§4, E016→§7); (3) write the §6 fitted-shape/model-error
+  subsection from exps 012+017; (4) cross-check the second lit scan
+  (`lit_scan_2026-07-03.md`, running) against `literature_pass.md`;
+  (5) figure/table expansion, author list, acknowledgments.
 
 ## Decisions needed from Spencer
 
-*(none right now)*
+Items 1–5 surfaced in the June-13 critique (`research/paper_critique.md`);
+item 6 added 2026-07-03. None block ongoing work, but they shape the paper:
+
+1. **Author list + acknowledgments** — only you can fill these.
+2. **Venue/format**: the draft header says "IEEE TQE" (a journal) but the plan says
+   QCE 2027 (a conference: IEEEtran, ~8–12 pp, different review). Which target?
+   It gates reformatting and the length budget.
+3. **Headline framing**: the leakage→regret ranking is the paper's *weakest*
+   evidence (7 points, p=1-only — collapses to ρ≈0 at p=3). Critique T1.1 recommends
+   leading with the mechanism + argmax-transfer and demoting the ranking to
+   corroboration. Agree? (The §5.3 figure scopes it honestly.)
+4. **Fold the new E014/E015/E016 results into the paper?** Ready-to-paste LaTeX
+   (with figure-copy steps) for all three is in `research/proposed_paper_additions.md`
+   (E014→§5.4 argmax-transfer-at-depth + figure; E015 V₂ lemmas→§4, also in
+   `research/v2_density_law.md`; E016→§7 Discussion). §4/§5.4/§7 left untouched —
+   the theory/framing is yours to own.
+5. **`theory_compression.tex` fate**: retire it, or keep as the "full proofs"
+   companion/appendix? It now duplicates §3–4 and can drift out of sync.
+6. **§6 framing after exps 012+017**: adopt the refined claim — "the analytical
+   proxy's values carry no *absolute* information, but their raw landscape is
+   argmax-informative; normalizing or calibrating it away discards signal" —
+   and present the fitted-shape post-mortem as `direction of error > size of
+   error`? This slightly amends the 004–006 phrasing already in the draft.
+   Also: `explainer.md` vs `paper_explainer.md` — keep both or consolidate?
