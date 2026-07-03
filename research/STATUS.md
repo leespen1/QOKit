@@ -61,13 +61,29 @@ merge the paper repo's ClaudeResearch branch when ready to edit there.
   free; a norm sanity filter repairs the diagnosed instance
   (`004/diagnose_paper_artifact.jl`); exp 005 (running) quantifies strict-vs-loose
   thresholds across all instances.
+- **The fitted-shape paradox is resolved, and the shape-fitting program is
+  dead on representational grounds** (exp 014, 150 instances): regret under
+  model error is governed by the f_d(β)-weighted transfer error (Thm 3's
+  norm), which entrywise MSE anti-predicts; but even weighted-norm-optimal
+  triangle/normal fits keep relative weighted error ≥ 0.92 and regret ≈
+  0.13–0.17 vs 0.04 for exact N — no fit objective can save shapes that
+  cannot express the transfer operator. Bonus refinements: contractivity
+  held on all 150 instances (max exact-N norm weight 0.984); *any* coherent
+  1%-scale model error hijacks the raw Eq.-9 argmax via norm inflation, yet
+  dividing the norm out is *worse* for the analytical model (regret 0.05 →
+  0.16) — its raw landscape is argmax-informative. Recommended recipe
+  unchanged: sampled N + empirical P + raw objective.
+  → [experiments/014_fitted-shape-paradox](experiments/014_fitted-shape-paradox/README.md)
 
 ## Working hypotheses (NOT established — from the deleted research log or intuition)
 
 - H1: The proxy's usefulness is governed by leakage out of the cost-class subspace,
   which concentrates only for ER-like graphs. (The paper's central claim.)
-- H2: Fitted proxy shapes (triangle/Gaussian) with lower entrywise MSE against the
-  empirical N(c';d,c) gave *worse* parameter setting. (Old log; needs re-verification.)
+- ~~H2: Fitted proxy shapes (triangle/Gaussian) with lower entrywise MSE against the
+  empirical N(c';d,c) gave *worse* parameter setting.~~ **Confirmed and explained**
+  (exp 014: MSE orders triangle-vs-normal against regret in 45/150 instances —
+  an anti-predictor; Theorem 3's weighted transfer error is the quantity that
+  ranks correctly, and the misranking is exactly the paradox the old log saw).
 - H3: Sampling 5–10 bitstrings per cost class suffices to estimate the quantities that
   matter. (Old log; needs re-verification in the leakage metric, not entrywise N.)
 - ~~H4: On ER(0.5), random balanced partitions reach ~75–85% approximation ratio.~~
@@ -134,17 +150,24 @@ merge the paper repo's ClaudeResearch branch when ready to edit there.
   → [experiments/013_timing-benchmark](experiments/013_timing-benchmark/README.md)
 - ~~T2.0 theory write-up~~ **Done** — `theory_compression.tex` (standalone
   proofs) and the paper draft's §3 in the paper repo.
-- **E014 fitted-shape paradox: RUNNING** (Slurm array 11575420, submitted
-  2026-07-03) — tests whether Theorem 3's f_d(β)-weighted model error, not
-  entrywise MSE, governs parameter-setting regret; includes perturbation
-  controls, triangle/normal fits in both norms, and a new "normalized
-  objective" candidate recipe (the smoke run showed the raw Eq.-9 objective
-  is hijacked by norm inflation under *any* coherent model perturbation —
-  and that normalizing restores Theorem-3-predicted behavior).
+- ~~E014 fitted-shape paradox~~ **Done (2026-07-03, 150 instances): the
+  paradox dissolves — Theorem 3's weighted transfer error governs regret
+  (ρ = 0.74 vs 0.38 for entrywise MSE; transfer-invisible perturbations at
+  50% entrywise error carry zero excess regret), and entrywise MSE actively
+  misranks triangle vs normal (45/150, worse than chance) where the weighted
+  metric ranks correctly (105/150). Two negative punchlines: refitting in
+  the weighted norm does NOT rescue the shapes (representational error ≈ 1 —
+  the shape families, not the fit objective, are the problem), and the
+  normalized objective is a measuring instrument, not a recipe — it *hurts*
+  the analytical proxy (regret 0.05 → 0.16), whose raw unnormalized
+  landscape is argmax-informative. §6 claim to refine: "no usable absolute
+  information" stands; "only the argmax location is usable" understates —
+  the raw value landscape carries the signal.**
   → [experiments/014_fitted-shape-paradox](experiments/014_fitted-shape-paradox/README.md)
 - Systematic literature pass: RUNNING (background scan; report →
   `research/lit_scan_2026-07-03.md`, then folded into §2 of the paper).
-- Remaining for the draft: E014 write-up + §6 revision, lit-pass fold-in,
+- Remaining for the draft: §6 revision with E014 (fitted-shape resolution +
+  refined value-information claim + E014 money figure), lit-pass fold-in,
   figure/table expansion, author list and acknowledgments.
 - Open framing question for the paper (not blocking): at p=3 the proxy-chosen
   schedules equalize leakage across families — is regret there governed by

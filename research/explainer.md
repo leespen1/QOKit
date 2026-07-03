@@ -137,48 +137,67 @@ proxy's real value is at scales beyond simulation, or when each real-QAOA
 evaluation is expensive (actual hardware).
 → [exp 013](experiments/013_timing-benchmark/README.md)
 
-## The open mystery we're attacking next: the fitted-shape paradox
+## The fitted-shape paradox: solved (exp 014, 2026-07-03)
 
 The G-RIPS triangle and normal proxies were *fitted* to match the empirical
 N(c';d,c) — and fits with *lower* mean-squared error set parameters *worse*.
 That's backwards, unless the error that matters isn't entrywise. Theorem 3
 says exactly that: the proxy update only sees N through the β-weighted
 combination Σ_d f_d(β)·N(c';d,c), where cancellations and weightings make
-some entries matter enormously and others not at all. Experiment 014 (now
-running as Slurm job 11575420) tests this directly: perturb N in ways that
-are large entrywise but small in the weighted norm (and vice versa), and
-refit the triangle/normal shapes, checking whether the weighted model error —
-not the entrywise MSE — predicts parameter-setting regret. If it does, the
-paradox dissolves and the paper gains a clean prescription: *fit proxies in
-the norm the algorithm actually uses.*
+some entries matter enormously and others not at all.
 
-**A discovery from E014's shakedown run, in plain language.** The proxy
-reports a predicted average cut value for each candidate (γ, β), and we pick
-the candidate with the biggest prediction. It turns out that if the N you
-feed the proxy is even slightly wrong — 1% off, even in a direction the
-dynamics provably can't see — the predicted values at *some* corner of the
-parameter grid explode (we saw a prediction of ~500,000 on a graph with 21
-edges, whose best cut is therefore at most 21). The reason: with a wrong N,
-the compressed state's total probability can grow past 1, and the "expected
-cost" of an inflated state looks huge. With the exact N this can never happen
-— Theorem 1 guarantees the total probability never grows — and we watched
-that hold: exact N kept total weight at 0.978 while every wrong N inflated
-it, up to tens of thousands. The candidate fix is embarrassingly simple:
-divide the prediction by the total weight, i.e. ask "what is the average cost
-of the state we actually have?" On the shakedown instance that one division
-made the theory-invisible perturbations exactly harmless (zero regret, as
-Theorem 3 says) and made regret track the weighted error cleanly. One
-wrinkle keeps us honest: the paper's own analytical proxy got slightly
-*worse* after the division on that instance — so no victory declaration until
-the 150-instance run reports. Earlier experiments (005/006) tried *rejecting*
-suspiciously inflated predictions and failed; *dividing* by the inflation may
-be the recipe that works.
+**11. The paradox dissolves under the right error metric (exp 014,
+150 instances, 5 families, n=12–14).** We corrupted the exact N with
+same-sized errors pointing in different "directions": one direction the
+dynamics amplifies, one it provably cannot see, one in between, one random.
+Entrywise, these corruptions are identical in size — up to 50% of N. Result:
+the invisible corruptions cost *exactly nothing* (regret equal to the exact-N
+baseline, even at 50% error), while the amplified direction at just 1% error
+already costs 0.13 of approximation ratio. Across everything we ran, the
+weighted error predicts regret at rank-correlation 0.74; entrywise MSE
+manages 0.38 — and on the actual triangle-vs-normal comparison MSE gets the
+order *backwards* in 105 of 150 instances (the normal fit has lower MSE but
+higher regret). The old G-RIPS observation was real, and it was never a
+paradox — we were measuring fit quality with the wrong ruler.
+→ [exp 014](experiments/014_fitted-shape-paradox/README.md)
+
+**12. But the tempting fix fails — the shapes themselves are the problem.**
+If MSE is the wrong ruler, surely refitting the triangle/normal shapes with
+the *right* ruler (the weighted error) fixes parameter setting? No: the
+refit barely moves the triangle (better in 77 of 150, worse in 67) and hurts
+the normal. The reason is honest and final: even the *best possible*
+triangle or normal keeps ≥ 92% relative error in the weighted norm — these
+two-to-four-parameter shapes simply cannot imitate how the real N drives the
+dynamics. Shape fitting didn't fail because of a bad objective; it failed
+because the shape families are too poor. This strengthens the paper's actual
+recommendation: estimate N by *sampling bitstrings* (a few per cost class,
+exp 010) — sampling has no shape assumption to get wrong.
+
+**13. A subtlety about "inflated" predictions that sharpens experiments
+004–006.** With any slightly-wrong N, the proxy's predicted values explode
+somewhere on the parameter grid (predictions of ~500,000 on 21-edge graphs
+whose best cut is 21): wrong N lets the compressed state's total probability
+grow past 1, which Theorem 1 forbids for the exact N — and indeed exact N
+stayed ≤ 0.984 on all 150 instances while every wrong N inflated, sometimes
+by 10⁵. The obvious cure — divide each prediction by its state's total
+weight, "average cost of the state you actually have" — is the right
+*measuring instrument* (results 11–12 use it), but as a parameter-setting
+recipe it *backfires*: it slightly hurts even the exact N, and it badly
+hurts the paper's analytical proxy (regret 0.05 → 0.16). Translation: the
+analytical proxy's raw numbers are meaningless as *values* (that we knew),
+but *where they are large* is genuinely informative — its inflation tends to
+sit on top of good parameters (except the known dense-graph artifact), so
+dividing the inflation out throws away signal. Practical bottom line is
+unchanged: sampled N + empirical cost distribution + the ordinary objective.
 
 ## Where the paper stands
 
 Full IEEE-format draft exists (`papers/OverleafPaper/qce2027_paper.tex`,
 branch ClaudeResearch) with the theory, experiments 001–011, and the E013
 pipeline-cost subsection; the 4-lens review fixes are applied and pushed.
-Remaining before the August arXiv target: resolve E014 and revise §6
-accordingly, fold in the systematic literature pass (scan running, report →
+E014 is resolved (results 11–13 above) and now needs to be *written into*
+§6, including a likely figure (regret vs corruption size for the four
+directions — the visual proof that error direction, not size, is what
+matters). Also remaining before the August arXiv target: fold in the
+systematic literature pass (scan running, report →
 `lit_scan_2026-07-03.md`), figures/tables polish, author list.

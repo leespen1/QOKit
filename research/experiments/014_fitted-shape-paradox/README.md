@@ -4,15 +4,57 @@
 entrywise MSE that the G-RIPS shape fits minimized — control
 parameter-setting regret?
 
-**Answer.** *Pending — Slurm array job 11575420 running (submitted 2026-07-03).*
+**Answer. Yes — the weighted transfer error, not entrywise MSE, governs
+regret (paradox resolved); but "fit in the weighted norm" does NOT rescue the
+triangle/normal shapes (their representational error in the weighted norm is
+irreducibly ≈ 1), and the normalized objective, while the right *measuring
+instrument*, is a *worse parameter-setter* for the analytical model, whose
+raw values turn out to be argmax-informative.**
 
-**Early signal from the n=10 smoke (single ER(0.5) instance, coarse grid):**
-under the normalized ranking, the transfer-invisible `nulled` perturbation has
-regret 0.0000 at every ε (entrywise MSE up to 0.23), while the aligned `lowd`
-perturbation's regret grows 0.10 → 0.32 with ε — at matched entrywise MSE,
-regret tracked the weighted error exactly. The raw Eq.-9 ranking was instead
-destroyed by every perturbation (norm-inflation hijack, normw up to 4.7×10⁴ vs
-0.978 for exact N — contractivity in action).
+Full numbers: [analysis.txt](analysis.txt) (regenerate with
+`julia analyze.jl`). Slurm array 11575420, all 10 tasks COMPLETED, 150
+instances × 23 variants = 3450 rows. Three headline results:
+
+1. **Part A — the paradox dissolves.** At matched entrywise error
+   (‖ΔN‖ = ε‖N‖), regret under the normalized ranking is governed by the
+   weighted error: transfer-invisible profiles (`nulled`, `highd`) sit at the
+   exact-N baseline regret (0.029–0.043 vs baseline 0.0415) *even at ε = 0.5*,
+   while the aligned profile hits 0.13–0.17 already at ε = 0.01. Pooled
+   Spearman(regret, ew_avg) = 0.74 vs Spearman(regret, mse_rel) = 0.38
+   (per-cell: 0.66–0.84 vs 0.22–0.50). Correlations are capped by regret's
+   grid quantization and early saturation of the aligned profile.
+2. **Part B — entrywise MSE misranks; the weighted metric ranks.** The
+   normal fit has *lower* entrywise error than the triangle fit (0.60 vs
+   0.69 pooled) but *higher* regret in most instances — entrywise MSE orders
+   the pair correctly in only 45/150 instances (worse than chance, the
+   G-RIPS paradox exactly), while ew_avg orders it correctly in 105/150.
+   Against PaperProxy the weighted metric is also the better predictor
+   (104–118 of ~148 vs 88).
+3. **Part C — the prescriptive fix FAILS (negative result).** Refitting in
+   the weighted norm barely helps the triangle (77 better / 6 tie / 67 worse,
+   mean Δregret +0.007) and hurts the normal (16/64/70, −0.016): even the
+   weighted-norm-optimal shapes keep relative weighted error ≥ 0.92. The
+   fitted-shape program fails on *representational* grounds — the shape
+   families cannot express the transfer operator — not because G-RIPS chose
+   the wrong fit objective. This independently supports the paper's sampled-N
+   recipe (exp 010), which needs no shape class at all.
+
+**The raw-objective sideshow (norm inflation).** Thm-1 contractivity held on
+every instance (exact-N norm weight ≤ 0.984 ≤ 1), while *every* coherent
+perturbation — even ε = 0.01, transfer-invisible — inflated some grid point's
+norm enough to hijack the raw Eq.-9 argmax (pooled raw regret ≈ 0.16 for all
+16 perturbation variants regardless of shape or scale; median norm weights up
+to 3.8×10⁵ for fitted shapes). But normalization is NOT a better
+parameter-setting recipe: it slightly hurts exact N (raw 0.0315 vs nrm
+0.0415, raw better in 99/150) and badly hurts the analytical PaperProxy
+(raw 0.051/0.045 → nrm 0.16; raw better in ~132/150). The exp-004–006
+finding must be refined: the analytical proxy's values carry no usable
+*absolute* information, but its raw (unnormalized) landscape is
+argmax-informative — its norm inflation is *correlated with parameter
+quality* off the dense-ER pathology, so dividing it out discards signal.
+The practical recommendation is unchanged (sampled N + empirical P + raw
+objective); the normalized objective is the right instrument for *measuring*
+model-error effects (Parts A–C above), not for setting parameters.
 
 ## Why this experiment
 

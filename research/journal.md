@@ -9,6 +9,22 @@ this file is the working diary.*
 
 ### Done
 
+- **E014 COMPLETE, same afternoon** — all 10 array tasks finished in 2–8 min
+  each (far under the 90-min budget), 3450 rows, logs clean, analysis in
+  `experiments/014_fitted-shape-paradox/analysis.txt`. Results (details in
+  the experiment README):
+  1. *Paradox resolved:* weighted transfer error governs regret (pooled
+     Spearman 0.74 vs 0.38 for MSE); invisible perturbations at 50%
+     entrywise error carry zero excess regret; MSE orders triangle-vs-normal
+     *against* regret in 105/150 instances (an anti-predictor).
+  2. *Prescriptive fix fails:* weighted-norm refits don't rescue the shapes
+     (triangle +0.007 marginal, normal −0.016; representational error stays
+     ≥ 0.92). Shape fitting is dead on representational, not
+     objective-function, grounds.
+  3. *Normalized objective is instrument, not recipe:* it hurts exact N
+     slightly (0.0315 → 0.0415) and the analytical proxy badly
+     (0.05 → 0.16, worse in ~132/150) — PaperProxy's raw landscape is
+     argmax-informative, refining the 004–006 "values are noise" claim.
 - **E014 implemented and submitted: Slurm array job 11575420** (10 tasks =
   5 families × n ∈ {12,14}, 15 instances each, CPU partition since n ≤ 14
   needs no GPU). Three parts as designed this morning: (A) matched-MSE
@@ -56,17 +72,25 @@ this file is the working diary.*
 
 ### Open questions for Monday (added)
 
-5. **If norm-division fixes model-error parameter setting at scale, do we
-   adopt the normalized objective paper-wide?** It changes Eq. 9 and every
-   experiment's headline numbers slightly (exact-N regret improved on the
-   smoke instance). Cleanest option: keep Eq. 9 for fidelity theory, use the
-   normalized estimator only in the §6 practical recipe, with one paragraph
-   explaining why (contractivity ⇒ exact N never inflates; model error
-   does ⇒ dividing removes the artifact the vetoes couldn't).
-6. **PaperProxy got *worse* under normalization on the smoke instance** —
-   if that pattern holds at scale, the story is subtler: the analytical
-   model's raw values happen to place its beacon *at* the good argmax on
-   non-pathological instances. Needs the full-run data before writing §6.
+5. ~~Adopt the normalized objective paper-wide?~~ **Answered by the full run:
+   no.** The normalized objective is the correct *measuring instrument* for
+   model-error effects (Parts A–C all use it) but a *worse parameter-setter*
+   (hurts exact N in 99/150, hurts PaperProxy in ~132/150). Plan: Eq. 9
+   stays; §6 gains the E014 story — paradox resolution, shape-fitting
+   post-mortem, and the refined claim "raw values carry no *absolute*
+   information but the raw landscape is argmax-informative." Sanity-check
+   this framing with Spencer before it goes in the paper.
+6. ~~PaperProxy worse under normalization — smoke fluke?~~ **Confirmed at
+   scale** (see 5). The mechanistic *why* — what about the analytical N
+   makes its norm inflation correlate with parameter quality — is open and
+   would make a nice §6 paragraph or follow-up note. Candidate story: the
+   analytical model's inflation is largest where the true landscape is also
+   large (both are driven by constructive small-d interference), except on
+   dense ER where the multinomial tail misfires. Not yet tested.
+7. **E014's Part-A device (matched-MSE perturbation quartet) could become a
+   paper figure** — regret vs ε for the four profiles is the visual proof
+   that entrywise size doesn't matter and direction does. Draft next
+   session; needs no new compute.
 
 ## 2026-07-03 (Friday)
 

@@ -1,0 +1,66 @@
+loaded 3450 rows from 10 task files
+
+== Sanity ==
+exactN max normw_raw = 0.9843731253284129 (Thm 1 ⇒ ≤ 1)
+exactN mean regret: raw  0.0315, nrm  0.0415
+
+== Part A: regret at matched entrywise MSE (pooled over cells) ==
+shape    ε      mean mse_rel  mean ew_avg  mean regret_nrm  mean regret_raw
+lowd     0.01      0.01       0.9401      0.1346          0.1608
+lowd     0.05    0.0499        0.997      0.1652          0.1608
+lowd     0.2     0.1961       0.9997       0.164          0.1608
+lowd     0.5     0.4473       0.9999       0.165          0.1608
+highd    0.01    0.0055       0.0298      0.0407          0.1562
+highd    0.05    0.0265       0.1478      0.0375          0.1608
+highd    0.2     0.0945       0.5141      0.0305          0.1608
+highd    0.5     0.1926       0.8307      0.0289          0.1608
+nulled   0.01     0.006       0.0538      0.0411          0.1608
+nulled   0.05    0.0293       0.2599      0.0418          0.1608
+nulled   0.2     0.1051       0.7258       0.043          0.1608
+nulled   0.5     0.2152       0.9361      0.0409          0.1608
+random   0.01    0.0097        0.687       0.091          0.1599
+random   0.05    0.0485       0.9546       0.142          0.1608
+random   0.2     0.1908       0.9961      0.1885          0.1608
+random   0.5     0.4387       0.9992       0.193          0.1608
+
+Spearman(regret_nrm, ·) over pert rows (+exactN anchor), per cell:
+cell                  ρ(ew_avg)  ρ(ew_star_nrm)  ρ(mse_rel)   [n rows]
+3-regular n=12           0.84       0.78          0.497   [255]
+3-regular n=14          0.724      0.703          0.245   [255]
+BA(k=4) n=12            0.701      0.742          0.394   [255]
+BA(k=4) n=14             0.77      0.722          0.398   [255]
+ER(0.25) n=12            0.76      0.737          0.498   [255]
+ER(0.25) n=14           0.659      0.556          0.223   [255]
+ER(0.5) n=12            0.684       0.76           0.37   [255]
+ER(0.5) n=14            0.712      0.751           0.26   [255]
+WS(k=4;b=0.1) n=12      0.735      0.782           0.44   [255]
+WS(k=4;b=0.1) n=14        0.8      0.829          0.432   [255]
+POOLED                   0.74      0.749           0.38
+
+== Part B: models (pooled means) ==
+model             mse_rel  ew_avg   regret_nrm  regret_raw  normw(med)
+fit:triangle:mse   0.6895   0.9794   0.1382      0.2317     1770.99
+fit:normal:mse     0.6049   0.9986   0.1579      0.1608       58.48
+fit:triangle:wgt   0.8186   0.9158   0.1314      0.3336        4.23
+fit:normal:wgt     0.9931   0.9706   0.1738        0.16     377608.62
+paper:empP         0.9613   0.9759   0.1617      0.0509     122381.1
+paper:binP         0.9613   0.9759   0.1403      0.0446      293.88
+
+Pairwise ranking concordance with regret_nrm across instances
+(fraction of instance-pairs where the metric orders the two models
+ the same way regret does; ties in regret skipped):
+fit:triangle:mse vs fit:normal:mse       mse: 45/150   ew_avg: 105/150
+fit:triangle:mse vs paper:empP           mse: 88/147   ew_avg: 118/147
+fit:normal:mse vs paper:empP             mse: 88/148   ew_avg: 104/148
+
+== Part C: fit in weighted norm vs entrywise (paired, regret_nrm) ==
+triangle  wgt better/tie/worse: 77/6/67,  mean Δregret (mse−wgt) =  0.0068
+normal    wgt better/tie/worse: 16/64/70,  mean Δregret (mse−wgt) = -0.0159
+
+== Normalize-don't-veto: regret_raw − regret_nrm by class ==
+class           mean Δ     nrm better/tie/worse
+exactN            -0.01    51/0/99
+perturbations    0.0637    1840/189/371
+fits (all)       0.0712    297/140/163
+paper:empP      -0.1108    18/0/132
+paper:binP      -0.0958    17/0/133
