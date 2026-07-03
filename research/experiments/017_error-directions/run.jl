@@ -1,5 +1,5 @@
 #=
-E014 (was E2.4) — The fitted-shape paradox: does Theorem 3's f_d(β)-weighted
+E017 (July re-test of exp 012's question, formerly numbered E014) — The fitted-shape paradox: does Theorem 3's f_d(β)-weighted
 model error explain why lower entrywise-MSE fits can set parameters WORSE?
 
 Theorem 3 says the proxy update sees the model N(c';d,c) only through the
@@ -40,8 +40,8 @@ Slurm array: tasks 1..10 map to (family, n) pairs, 15 instances each
 (SLURM_ARRAY_TASK_ID; unset/0 = run all tasks serially).
 Each task writes results_task<ID>.csv (long format: one row per variant).
 
-Submit:  cd research/experiments/014_fitted-shape-paradox && sbatch run.sb
-Smoke:   E14_SMOKE=1 julia --project research/experiments/014_fitted-shape-paradox/run.jl
+Submit:  cd research/experiments/017_error-directions && sbatch run.sb
+Smoke:   E17_SMOKE=1 julia --project research/experiments/017_error-directions/run.jl
 =#
 
 using JuliaQAOA
@@ -58,7 +58,7 @@ catch
 end
 println("USE_GPU = ", USE_GPU)
 
-const SMOKE = get(ENV, "E14_SMOKE", "0") == "1"
+const SMOKE = get(ENV, "E17_SMOKE", "0") == "1"
 
 const SEED = 20260703
 const NS = SMOKE ? [10] : [12, 14]
@@ -387,7 +387,7 @@ function main()
                     "pred_raw,normw_raw,fit_obj,fit_params")
         foreach(r -> println(io, r), rows)
     end
-    println("E014 task(s) complete → $outpath")
+    println("E017 task(s) complete → $outpath")
 end
 
 main()

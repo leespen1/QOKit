@@ -5,13 +5,87 @@ and questions queued for Monday. Newest entry first. Established results go in
 [STATUS.md](STATUS.md); plain-language versions in [explainer.md](explainer.md);
 this file is the working diary.*
 
+## 2026-07-03 (Friday, evening — branch reconciliation + second lit scan)
+
+### The discovery
+
+Pushing today's work failed: `origin/ClaudeResearch` held **21 commits this
+clone had never fetched** — a June-13 overnight autonomous session
+(timestamps +0900) that produced experiments **012 (fitted-shape paradox),
+014 (argmax-robustness), 015 (V₂ anatomy), 016 (cheap-prefix frame)**, the
+systematic literature pass, the paper critique with number audit, and
+ready-to-paste paper snippets. The two lines forked at `8680853`. This
+clone's July sessions unknowingly duplicated parts of it (the E013 write-up
+describes the *same* Slurm runs; the kernel fix trees are byte-identical)
+and re-tested exp 012's question under the name "E014."
+
+### Done
+
+- **Merged `origin/ClaudeResearch`** (merge commit `9c49d7b`): STATUS.md
+  rewritten to weave both accounts with a prominent reconciliation note; the
+  two E013 READMEs (same run, two write-ups) unified.
+- **Renamed today's experiment 014 → `017_error-directions`** (the June line
+  owns 012 and 014; pushed history wins naming). Slurm job name/log
+  identifiers keep `e014`/11575420 in sacct; a README note maps them.
+- **Wrote the 012 ↔ 017 synthesis** (new README section + joint STATUS
+  entry): 012 found *no scalar norm* discriminates regret across its
+  fitted-model zoo (only argmax displacement, ρ≈0.7); 017 shows the weighted
+  transfer error *is* causal when given dynamic range (matched-MSE direction
+  quartet) and that shape fits *saturate* it — which is exactly why 012 saw
+  no scalar signal. The two designs interlock rather than contradict.
+- **Determined the June-13 paper-repo edits are lost** (committed only on an
+  unpushed clone: §5.3 figure inclusion, three draft fixes, two number
+  corrections, five citations; the critique references a ~800-line tex, ours
+  is ~550). All content is reconstructible from committed sources
+  (`paper_critique.md`, `literature_pass.md`, figure generators,
+  `proposed_paper_additions.md`) — queued as the next paper-thread task.
+- **Second literature scan complete** (`research/lit_scan_2026-07-03.md`) —
+  run independently before the June pass was discovered, so it doubles as a
+  cross-check. Agreements: novelty of the four core contributions confirmed
+  by two independent scans; Krüger–Mauerer (Quantum 2025) is the closest
+  neighbor in both. **New referee risks the June pass missed:** (i)
+  Theorem 2's technique is the *Dirac–Frenkel a posteriori bound* (Lubich
+  2008, Thm II.1.5), already ported to variational quantum evolution by
+  Zoufal et al. 2023 — cite and reframe as "known technique, new object";
+  (ii) Burgholzer et al. (ACM TQC 2025) apply lumpability-style bisimulation
+  to quantum circuits including QAOA-on-MaxCut (exact-only) — the "to our
+  knowledge" sentence needs rescoping; (iii) Grover-mixer QAOA is *exactly*
+  Perfect Homogeneity — a zero-leakage boundary case Theorem 1 should
+  mention; (iv) the draft's parameter-setting paragraph needs ~7 standard
+  refs (Zhou FOURIER/INTERP, TQA, fixed angles, concentration, linear-ramp
+  at scale); (v) citation hygiene: the tex doesn't load
+  `Mitsubishi_B_references.bib` at all (inline thebibliography), sud2024
+  title is the arXiv variant, a 2026 "subspace compression" sketching
+  preprint warrants a disambiguating footnote.
+
+### Decisions taken autonomously
+
+- **Merged rather than rebased** (preserves both true histories), resolved
+  doc conflicts by weaving, renumbered my experiment rather than theirs
+  (theirs is pushed), and recorded everything here + STATUS for Monday.
+- **Both lit-pass reports stay**; §2 revision will use their union
+  (June: breadth + citer sweep; July: technique-lineage risks).
+- `explainer.md` (results walkthrough) and `paper_explainer.md` (paper
+  companion) both kept for now — consolidation queued as Spencer decision 6.
+
+### Open questions for Monday (added)
+
+8. **Why did this clone never fetch June 13–July 3?** Worth a workflow
+   guard: the loop now runs `git fetch && git status -sb` at session start
+   (added to the loop's own checklist) so divergence surfaces immediately,
+   not at push time.
+9. **The June-13 session's paper edits are gone** — re-applying them is
+   mechanical from the critique + generators, but if you have that clone
+   (another machine/directory?), a `git push` from it would save an hour and
+   preserve exact history. Check before Monday's session if convenient.
+
 ## 2026-07-03 (Friday, afternoon — continuous-loop session)
 
 ### Done
 
-- **E014 COMPLETE, same afternoon** — all 10 array tasks finished in 2–8 min
+- **E017 COMPLETE, same afternoon** — all 10 array tasks finished in 2–8 min
   each (far under the 90-min budget), 3450 rows, logs clean, analysis in
-  `experiments/014_fitted-shape-paradox/analysis.txt`. Results (details in
+  `experiments/017_error-directions/analysis.txt`. Results (details in
   the experiment README):
   1. *Paradox resolved:* weighted transfer error governs regret (pooled
      Spearman 0.74 vs 0.38 for MSE); invisible perturbations at 50%
@@ -25,19 +99,19 @@ this file is the working diary.*
      slightly (0.0315 → 0.0415) and the analytical proxy badly
      (0.05 → 0.16, worse in ~132/150) — PaperProxy's raw landscape is
      argmax-informative, refining the 004–006 "values are noise" claim.
-- **E014 implemented and submitted: Slurm array job 11575420** (10 tasks =
+- **E017 implemented and submitted: Slurm array job 11575420** (10 tasks =
   5 families × n ∈ {12,14}, 15 instances each, CPU partition since n ≤ 14
   needs no GPU). Three parts as designed this morning: (A) matched-MSE
   perturbations with four d-profiles, (B) triangle/normal entrywise-MSE fits
   + PaperProxy, (C) the same fits in the Theorem-3 weighted norm.
-  → `experiments/014_fitted-shape-paradox/`
+  → `experiments/017_error-directions/`
 - **The smoke run caught a real methodological discovery, not just a bug:**
   under the paper's raw Eq.-9 objective (exps 001–010 convention), *any*
   coherent perturbation of N — even ε = 0.01 and transfer-invisible — plants
   a norm-inflated beacon (predicted ⟨C⟩ ~ ε², up to 5×10⁵ on a 21-edge
   graph) that hijacks the argmax. This is the exp-004–006 pathology in its
   general form: the raw objective is unusable for model-error studies.
-  E014 therefore records a second, **normalized** ranking (divide by the
+  E017 therefore records a second, **normalized** ranking (divide by the
   compressed state's weight Σ2ⁿP|Q|²; gauge-invariant) for every variant.
 - **Smoke-scale confirmation of the Theorem-3 prediction** (one n=10
   ER(0.5) instance): normalized regret at matched entrywise MSE spans
@@ -57,13 +131,13 @@ this file is the working diary.*
 
 ### Decisions taken autonomously
 
-- **E014 ranks parameters under BOTH the raw Eq.-9 objective and the
+- **E017 ranks parameters under BOTH the raw Eq.-9 objective and the
   normalized one**, reporting both regrets. Rationale: raw keeps continuity
   with exps 001–010; normalized is the only instrument with dynamic range
   for Part A (and doubles as the "normalize, don't veto" test). If the
   normalized recipe survives the full run, it belongs in §6 and possibly
   changes the paper's recommended objective — flag for Spencer.
-- **E014 runs CPU-only** (16 threads/task, general-short): at n ≤ 14 the
+- **E017 runs CPU-only** (16 threads/task, general-short): at n ≤ 14 the
   statevector grids and homodists are cheap; the GPU queue is the scarce
   resource and E013 already showed the GPU adds nothing at this scale.
 - Perturbation amplitudes are relative (∝ ‖N[c',:,c]‖ per slice) and may
@@ -76,7 +150,7 @@ this file is the working diary.*
    no.** The normalized objective is the correct *measuring instrument* for
    model-error effects (Parts A–C all use it) but a *worse parameter-setter*
    (hurts exact N in 99/150, hurts PaperProxy in ~132/150). Plan: Eq. 9
-   stays; §6 gains the E014 story — paradox resolution, shape-fitting
+   stays; §6 gains the E017 story — paradox resolution, shape-fitting
    post-mortem, and the refined claim "raw values carry no *absolute*
    information but the raw landscape is argmax-informative." Sanity-check
    this framing with Spencer before it goes in the paper.
@@ -87,7 +161,7 @@ this file is the working diary.*
    analytical model's inflation is largest where the true landscape is also
    large (both are driven by constructive small-d interference), except on
    dense ER where the multinomial tail misfires. Not yet tested.
-7. **E014's Part-A device (matched-MSE perturbation quartet) could become a
+7. **E017's Part-A device (matched-MSE perturbation quartet) could become a
    paper figure** — regret vs ε for the four profiles is the visual proof
    that entrywise size doesn't matter and direction does. Draft next
    session; needs no new compute.
@@ -114,15 +188,17 @@ this file is the working diary.*
   claims-vs-evidence, writing/venue fit, related-work coverage) with
   adversarial verification of factual findings; fixes to be applied to the
   paper repo when it reports back.
-- **E014 (fitted-shape paradox, was "E2.4") in design** — see below.
+- **E017 (fitted-shape paradox, was "E2.4") in design** — see below.
 
 ### Decisions taken autonomously
 
 - **Experiment numbering: next experiment is 014, leaving 012 as a permanent
   gap.** There is no `012_*` directory and no trace of one in git history;
   reusing 012 after 013 would make directory order disagree with execution
-  order.
-- **E014 design: two-part test of the Theorem-3 explanation for the
+  order. *[Superseded same day by the branch reconciliation: 012 and 014 DID
+  exist on origin/ClaudeResearch, unfetched; the experiment described below
+  was renumbered 017. See the evening entry.]*
+- **E017 design: two-part test of the Theorem-3 explanation for the
   fitted-shape paradox.** Part A, controlled perturbations of the exact
   empirical N at matched entrywise MSE but very different f_d(β)-weighted
   error (prediction: regret tracks the weighted error, not the MSE). Part B,
@@ -145,7 +221,7 @@ this file is the working diary.*
    brute force; its value is asymptotic + expensive-evaluation settings"?
    It contradicts the original speedup pitch but matches program.md's
    assessment and is defensible.
-2. **E014 scope:** Part B fits triangle/normal with entrywise-MSE random
+2. **E017 scope:** Part B fits triangle/normal with entrywise-MSE random
    search (mirroring what G-RIPS did). Should we *also* fit in the weighted
    norm to demonstrate the prescriptive fix ("fit in the right norm"), or
    keep that for a follow-up? Currently planning to include it — it turns a

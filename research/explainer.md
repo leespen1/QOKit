@@ -3,7 +3,7 @@
 *A plain-language walkthrough of everything we've established so far, kept
 current as results land. One section per idea, each linked to the experiment
 that proves it. For the one-page program state, see [STATUS.md](STATUS.md).
-Last updated: 2026-07-03 (through experiment 013).*
+Last updated: 2026-07-03 (through experiment 017; sections for the June-13 line's experiments 014–016 are queued — see STATUS for their one-paragraph summaries).*
 
 ## The one-paragraph version
 
@@ -137,7 +137,15 @@ proxy's real value is at scales beyond simulation, or when each real-QAOA
 evaluation is expensive (actual hardware).
 → [exp 013](experiments/013_timing-benchmark/README.md)
 
-## The fitted-shape paradox: solved (exp 014, 2026-07-03)
+## The fitted-shape paradox: solved (exps 012 + 017, 2026-07-03)
+
+*(A twist discovered at push time: a June-13 autonomous session had already
+attacked this same paradox as experiment 012, with a different design — it
+fit the shapes exactly the way G-RIPS did, found that fitting makes things
+worse or does nothing, and found that no single "how wrong is N" number
+predicted regret across its models. Today's experiment 017 explains why both
+sets of results are right, and together they make the complete story below.
+The branches are now merged; details in the journal.)*
 
 The G-RIPS triangle and normal proxies were *fitted* to match the empirical
 N(c';d,c) — and fits with *lower* mean-squared error set parameters *worse*.
@@ -146,7 +154,7 @@ says exactly that: the proxy update only sees N through the β-weighted
 combination Σ_d f_d(β)·N(c';d,c), where cancellations and weightings make
 some entries matter enormously and others not at all.
 
-**11. The paradox dissolves under the right error metric (exp 014,
+**11. The paradox dissolves under the right error metric (exp 017,
 150 instances, 5 families, n=12–14).** We corrupted the exact N with
 same-sized errors pointing in different "directions": one direction the
 dynamics amplifies, one it provably cannot see, one in between, one random.
@@ -159,7 +167,7 @@ manages 0.38 — and on the actual triangle-vs-normal comparison MSE gets the
 order *backwards* in 105 of 150 instances (the normal fit has lower MSE but
 higher regret). The old G-RIPS observation was real, and it was never a
 paradox — we were measuring fit quality with the wrong ruler.
-→ [exp 014](experiments/014_fitted-shape-paradox/README.md)
+→ [exp 017](experiments/017_error-directions/README.md)
 
 **12. But the tempting fix fails — the shapes themselves are the problem.**
 If MSE is the wrong ruler, surely refitting the triangle/normal shapes with
@@ -195,7 +203,7 @@ unchanged: sampled N + empirical cost distribution + the ordinary objective.
 Full IEEE-format draft exists (`papers/OverleafPaper/qce2027_paper.tex`,
 branch ClaudeResearch) with the theory, experiments 001–011, and the E013
 pipeline-cost subsection; the 4-lens review fixes are applied and pushed.
-E014 is resolved (results 11–13 above) and now needs to be *written into*
+E017 is resolved (results 11–13 above) and now needs to be *written into*
 §6, including a likely figure (regret vs corruption size for the four
 directions — the visual proof that error direction, not size, is what
 matters). Also remaining before the August arXiv target: fold in the

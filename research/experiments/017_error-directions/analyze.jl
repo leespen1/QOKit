@@ -1,8 +1,8 @@
 #=
-E014 analysis — reads results_task*.csv and prints the summary tables that
+E017 analysis — reads results_task*.csv and prints the summary tables that
 back the README's Answer. Pure stdlib (plain CSV split; no quoted fields).
 
-Run: julia research/experiments/014_fitted-shape-paradox/analyze.jl
+Run: julia research/experiments/017_error-directions/analyze.jl
 =#
 
 using Statistics

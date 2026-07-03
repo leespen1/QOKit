@@ -1,5 +1,5 @@
 #!/bin/bash --login
-#SBATCH --job-name=e014_fitshape
+#SBATCH --job-name=e017_errdir
 #SBATCH --mail-type=END,FAIL
 #SBATCH --mail-user=leespen1@msu.edu
 #SBATCH --ntasks=1
@@ -8,7 +8,7 @@
 #SBATCH --partition=general-short
 #SBATCH --time=01:30:00
 #SBATCH --array=1-10
-#SBATCH --output=log_e014_%a_%A.log
+#SBATCH --output=log_e017_%a_%A.log
 #SBATCH --export=NONE
 
 # CPU-only: n <= 14 statevector grids and homodists are cheap on 16 threads;
@@ -22,4 +22,4 @@ export JULIA_NUM_THREADS=$SLURM_CPUS_PER_TASK
 echo "Node: $(hostname)  Date: $(date)  Task: $SLURM_ARRAY_TASK_ID"
 
 REPO=/mnt/home/leespen1/GRIPS/QOKit
-julia --project="$REPO" "$REPO/research/experiments/014_fitted-shape-paradox/run.jl"
+julia --project="$REPO" "$REPO/research/experiments/017_error-directions/run.jl"

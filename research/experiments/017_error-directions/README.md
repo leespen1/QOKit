@@ -1,4 +1,8 @@
-# E014 — The fitted-shape paradox: is the weighted norm the right fit objective?
+# 017 — Error directions: which norm on ΔN governs parameter-setting regret?
+
+*(Formerly numbered E014; renumbered after the 2026-07-03 branch reconciliation
+because the June-13 line owns experiments 012 and 014. Slurm job name and log
+files keep the original e014/job-11575420 identifiers in sacct.)*
 
 **Question.** Does Theorem 3's f_d(β)-weighted transfer error — not the
 entrywise MSE that the G-RIPS shape fits minimized — control
@@ -123,6 +127,29 @@ exact-N proxy's chosen β), real-QAOA `ar`, `regret`, argmax displacement
 (`dgamma`, `dbeta`), the proxy's raw predicted ⟨C⟩ (`pred_exp`, norm-inflation
 diagnostic), and fit parameters.
 
+## Relation to experiment 012 (the June-13 independent test)
+
+Exp 012 tested the same H2 question with the actual G-RIPS fitting
+conventions (slice-normalized MSE, `fit_proxy_to_real` optimizer settings,
+fit-trajectory snapshots) and found that **no scalar mismatch norm — not
+entrywise MSE, not one-layer amplitude error, not landscape correlation —
+predicts regret across its 10-model zoo; only argmax displacement does
+(ρ≈0.7)**. This experiment's Part A explains why both results are right: the
+weighted transfer error *is* the governing quantity when it has dynamic range
+(controlled directions span 4 orders of magnitude in it at fixed MSE), but
+every realistic shape fit *saturates* it (≥ 0.92 here even after
+weighted-norm fitting; 012's zoo likewise all-bad), so within a model class
+the norm carries no discriminating signal and the downstream argmax
+displacement becomes the operative predictor. Two design differences also
+matter: 012's amplitude norms were scale-hostage (raw PaperProxy error ~1e5
+from slice-sum conventions) whereas the transfer-matrix metric here is
+gauge-fixed — global scale optimized out, which is exactly the invariance of
+the argmax; and 012 measured state-level error while E_w is operator-level.
+Joint conclusion for §6: *direction of model error relative to the dynamics,
+not its size, is causal; shape families err almost entirely in visible
+directions; argmax displacement is the only within-class discriminator; and
+no fit objective rescues the shapes.*
+
 ## Figures
 
 *(added after analysis)*
@@ -143,6 +170,6 @@ diagnostic), and fit parameters.
 ## Reproduce
 
 ```bash
-cd research/experiments/014_fitted-shape-paradox && sbatch run.sb   # full
-E14_SMOKE=1 julia --project research/experiments/014_fitted-shape-paradox/run.jl  # smoke
+cd research/experiments/017_error-directions && sbatch run.sb   # full
+E17_SMOKE=1 julia --project research/experiments/017_error-directions/run.jl  # smoke
 ```
