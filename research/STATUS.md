@@ -279,8 +279,9 @@ ClaudeResearch branch when ready to edit there.
   related-work rewrite with 25 verified references from the union of both
   lit passes, E015 lemmas in §4, E014 argmax-transfer + figure in §5, E016
   in the Discussion, and the exps-012+017 fitted-shape paragraph in §5.4 —
-  all done. Remaining: §5.3 ranking figure + regret table (generator in exp
-  004, needs a Julia/CairoMakie run — next), optional E015/E016 figures,
+  all done. §5.3 ranking figure + regret table restored (paper commit
+  `f10027b` — the generator's outputs were already committed in exp 004; no
+  rerun needed). Remaining: optional E015/E016 figures,
   dense-sentence pass (critique T3.1), glossary table, author list,
   acknowledgments, and Spencer decisions 1–6 below.
 
