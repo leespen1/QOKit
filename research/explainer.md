@@ -201,11 +201,14 @@ unchanged: sampled N + empirical cost distribution + the ordinary objective.
 ## Where the paper stands
 
 Full IEEE-format draft exists (`papers/OverleafPaper/qce2027_paper.tex`,
-branch ClaudeResearch) with the theory, experiments 001–011, and the E013
-pipeline-cost subsection; the 4-lens review fixes are applied and pushed.
-E017 is resolved (results 11–13 above) and now needs to be *written into*
-§6, including a likely figure (regret vs corruption size for the four
-directions — the visual proof that error direction, not size, is what
-matters). Also remaining before the August arXiv target: fold in the
-systematic literature pass (scan running, report →
-`lit_scan_2026-07-03.md`), figures/tables polish, author list.
+branch ClaudeResearch; compiles at 7 pages). As of 2026-07-04 it contains:
+the theory with the new V₂ lemmas, the stories of experiments 001–017
+(including the fitted-shape dissection above and the argmax-transfer
+figure), an honest "this is not a laptop speedup" framing, and a
+related-work section built from two independent literature scans
+(36 references, all verified). Still to do before the August arXiv target:
+one recovered figure (the leakage-vs-regret ranking; its generator is
+already written), a readability pass over the densest paragraphs, optional
+extra figures, and the six decisions queued for Spencer in STATUS.md
+(author list, venue format, headline framing, fate of the standalone
+theory file, and the §6 wording).

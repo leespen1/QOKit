@@ -5,6 +5,40 @@ and questions queued for Monday. Newest entry first. Established results go in
 [STATUS.md](STATUS.md); plain-language versions in [explainer.md](explainer.md);
 this file is the working diary.*
 
+## 2026-07-04 (Saturday — paper session: recovered edits + both lit passes folded in)
+
+### Done
+
+- **The paper absorbed everything the reconciliation staged** (paper repo
+  commit `e9ba232`, pushed; compiles clean at 7 pp, zero unresolved refs):
+  - Number-audit fixes re-applied (the −0.007 misattribution, the
+    overlap-range phrasing); experiment range bumped to E001–E017.
+  - Abstract/intro reframed per critique T2.3: no more
+    "depths where simulation is intractable" promise; an explicit
+    "not a laptop speedup" expectation-setting paragraph in the intro.
+  - Related work rewritten from the *union* of the June and July lit
+    passes: 25 verified references added (Grover-mixer = exact
+    homogeneity; Kemeny–Snell lumping origins; Burgholzer bisimulation
+    rescopes "to our knowledge"; Dirac–Frenkel lineage for Thm 2 with
+    Lubich/Martinazzo/Zoufal, claimed as known-technique-new-object;
+    the He et al. parameter-setting toolbox; the classical-surrogate
+    family; Krüger–Mauerer contrast).
+  - E015's two V₂ lemmas + density-law remark now in §4; the
+    linear-depth law's proved-vs-measured status stated plainly (T2.5);
+    the |+⟩-eigenstate observation completes the cubic sketch (T3.3).
+  - E014 argmax-transfer paragraph + figure in §5; E016 resolves the
+    Discussion's cheap-frame question.
+  - New §5.4 paragraph: the fitted-shape paradox dissected via exps
+    012+017, including the refined "no *absolute* information, but the
+    raw landscape is argmax-informative" claim and the
+    normalization-as-instrument finding.
+- **Remaining paper backlog:** §5.3 ranking figure + regret table (the one
+  still-unrecovered June-13 item; generator committed in exp 004 — needs a
+  Julia/CairoMakie run, queued next); optional v2_anatomy and prefix_frame
+  figures; T3.1 dense-sentence pass; T3.5 glossary table (existed only in
+  the lost long draft); Spencer decisions 1–6 (venue, authors, framing,
+  theory_compression.tex, §6 wording).
+
 ## 2026-07-03 (Friday, evening — branch reconciliation + second lit scan)
 
 ### The discovery

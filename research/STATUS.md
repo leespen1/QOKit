@@ -274,14 +274,15 @@ ClaudeResearch branch when ready to edit there.
   → [experiments/014_argmax-robustness](experiments/014_argmax-robustness/README.md)
 - ~~T2.0 theory write-up~~ **Done** — `theory_compression.tex` (standalone
   proofs) and the paper draft's §3 in the paper repo (see Spencer decision 5).
-- Next up (Phase-4 assembly, in order): (1) re-apply the lost June-13 paper
-  edits from committed sources — §5.3 figure + regret table (generator in exp
-  004), three draft fixes + two number corrections (`paper_critique.md`), five
-  citations (`literature_pass.md`); (2) fold `proposed_paper_additions.md`
-  (E014→§5.4, E015→§4, E016→§7); (3) write the §6 fitted-shape/model-error
-  subsection from exps 012+017; (4) cross-check the second lit scan
-  (`lit_scan_2026-07-03.md`, running) against `literature_pass.md`;
-  (5) figure/table expansion, author list, acknowledgments.
+- Phase-4 assembly progress (2026-07-04, paper commit `e9ba232`, 7 pp,
+  compiles clean): number-audit fixes, abstract/intro reframe,
+  related-work rewrite with 25 verified references from the union of both
+  lit passes, E015 lemmas in §4, E014 argmax-transfer + figure in §5, E016
+  in the Discussion, and the exps-012+017 fitted-shape paragraph in §5.4 —
+  all done. Remaining: §5.3 ranking figure + regret table (generator in exp
+  004, needs a Julia/CairoMakie run — next), optional E015/E016 figures,
+  dense-sentence pass (critique T3.1), glossary table, author list,
+  acknowledgments, and Spencer decisions 1–6 below.
 
 ## Decisions needed from Spencer
 
