@@ -5,6 +5,39 @@ and questions queued for Monday. Newest entry first. Established results go in
 [STATUS.md](STATUS.md); plain-language versions in [explainer.md](explainer.md);
 this file is the working diary.*
 
+## 2026-07-04 (Saturday, later — critique burn-down complete; E018 queued)
+
+### Done
+
+- **§5.3 ranking figure + regret table restored** (paper `f10027b`) — the
+  last unrecovered June-13 item; exp 004 had the outputs committed all
+  along, so this was pure wiring. Captions carry the honest scope (panel b
+  shows the p=3 collapse) and distinguish proxy-chosen-angle leakage from
+  the fixed-angle density law.
+- **Abstract's four-clause closer split; argmax transfer named up front**
+  (`ad09027`); **model-error subsection opens with its one-line thesis;
+  glossary reading key rebuilt** and referenced from the intro
+  (`ad50808`). With these, every critique item that doesn't require
+  Spencer is closed: T1.1, T1.2, T1.4, T2.1, T2.3, T2.5, T3.1 (named
+  items), T3.3, T3.5 done; T1.3/T3.2 are decisions 2/5; T3.4 has no
+  target section in this draft.
+- **Explainer: plain-language sections 14–16** for the June-line
+  experiments (argmax transfer at depth; the V₂ codegree/triangle
+  anatomy; the cheap-prefix-frame obstacle) (`a24abf7`).
+
+### Next
+
+- **E018 (critique T2.4): the transfer-calibration row.** Question: how
+  does proxy regret compare to plain angle transfer from a small instance
+  of the same family? Design sketch: per (family, n) cell of exps
+  002/010, grid-optimize angles on one n=10 source instance's true
+  landscape, apply to every target instance, and measure regret against
+  the targets' already-recorded grid ceilings (read from the 002/010
+  CSVs; seeds are in the CSVs, so instances regenerate exactly). One
+  statevector evaluation per target per depth — light, but routed through
+  Slurm per the ground rules. Produces the one-row calibration a referee
+  will ask for ("transfer regret X vs proxy regret Y on the same cells").
+
 ## 2026-07-04 (Saturday — paper session: recovered edits + both lit passes folded in)
 
 ### Done
