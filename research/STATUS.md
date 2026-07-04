@@ -1,6 +1,6 @@
 # Research status
 
-*Last updated: 2026-07-03. This is the one page Spencer needs to read.
+*Last updated: 2026-07-04. This is the one page Spencer needs to read.
 Everything here links to a reproducible experiment or a committed document.
 Plain-language walkthrough of all results: [explainer.md](explainer.md).
 Running journal of the autonomous work: [journal.md](journal.md).*
@@ -57,21 +57,23 @@ arXiv late August; submit April 2027. Full plan: see `research/decisions.md` and
 
 ## Where we are
 
-**Phases 1–3 complete; Phase 4 (assembly) underway.** The paper repo
-(`papers/OverleafPaper`, branch `ClaudeResearch`) holds
-`theory_compression.tex` (standalone proofs) and `qce2027_paper.tex`
-(IEEE-format draft: theory + experimental anatomy from experiments 001–013,
-including the E013 pipeline-cost subsection added 2026-07-03). The
-systematic literature pass is done (`research/literature_pass.md`): **all
-four claimed-new items survive** — no overlapping prior work among Sud et
-al.'s ~22 citers or the projection/lumping/MOR/surrogate literature; five
-citations to add (closest neighbor: Krüger–Mauerer landscape approximation,
-Quantum 2025 — complementary); an independent second scan is running as a
-cross-check (`lit_scan_2026-07-03.md` when done). Remaining for the draft:
-re-apply the June-13 paper edits from committed sources, fold in
-`proposed_paper_additions.md` (E014/E015/E016 snippets), write the §6
-fitted-shape subsection from exps 012+017, figure/table expansion, author
-list and acknowledgments. Overleaf shows only `main`; merge the paper repo's
+**Phases 1–3 complete; Phase 4 (assembly) well underway.** The paper repo
+(`papers/OverleafPaper`, branch `ClaudeResearch`, head `f10027b`) holds
+`theory_compression.tex` (standalone proofs — fate is decision 5) and
+`qce2027_paper.tex`, which as of 2026-07-04 compiles clean at 7 pp with:
+theory + the E015 V₂ lemmas, the experimental anatomy of exps 001–017
+(argmax-transfer figure, §5.3 ranking figure + regret table, the
+exps-012+017 fitted-shape paragraph, E013 pipeline costs, E016 in the
+Discussion), an honest not-a-laptop-speedup framing, and a related-work
+section built from the union of **two independent literature passes**
+(`literature_pass.md`, June: all four claimed-new items survive;
+`lit_scan_2026-07-03.md`, July: adds the Dirac–Frenkel/Zoufal lineage for
+Thm 2, Burgholzer bisimulation rescoping, Grover-mixer boundary case) —
+36 verified references. Remaining for the draft: readability pass over the
+densest paragraphs (critique T3.1), optional E015/E016 figures, a glossary
+table (existed only in the lost long draft), plain-language explainer
+sections for exps 012/014–016, author list/acknowledgments, and Spencer
+decisions 1–6 (bottom). Overleaf shows only `main`; merge the paper repo's
 ClaudeResearch branch when ready to edit there.
 
 ## What we know (established results only)
