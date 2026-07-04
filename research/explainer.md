@@ -3,7 +3,7 @@
 *A plain-language walkthrough of everything we've established so far, kept
 current as results land. One section per idea, each linked to the experiment
 that proves it. For the one-page program state, see [STATUS.md](STATUS.md).
-Last updated: 2026-07-03 (through experiment 017; sections for the June-13 line's experiments 014–016 are queued — see STATUS for their one-paragraph summaries).*
+Last updated: 2026-07-04 (through experiment 017, including plain-language sections for the June-13 line's experiments 014–016).*
 
 ## The one-paragraph version
 
@@ -197,6 +197,49 @@ but *where they are large* is genuinely informative — its inflation tends to
 sit on top of good parameters (except the known dense-graph artifact), so
 dividing the inflation out throws away signal. Practical bottom line is
 unchanged: sampled N + empirical cost distribution + the ordinary objective.
+
+## The June-13 line's other results, in plain language
+
+**14. At depth, what matters is where the peak is, not how good the state is.**
+The proxy produces two things: an approximate *state* and a chosen *(γ, β)*.
+Experiment 014 (the June line's, on 140 instances) asked which one controls
+success. At p=1, both do: instances where the proxy's state is closer to the
+truth, and instances where its chosen peak sits closer to the true best peak,
+both have lower regret. At p=3 the two come apart completely: state quality
+stops predicting regret at all (correlation −0.02, i.e. nothing), while
+"how far did the chosen peak move" keeps predicting it (0.63). So parameter
+setting is a *parameter-space* game — the proxy can be a mediocre state
+approximator and still be a great parameter setter, which is exactly how the
+analytical formula beats the exact compression off dense graphs. This is now
+a figure in the paper.
+→ [exp 014](experiments/014_argmax-robustness/README.md)
+
+**15. Why does density drive leakage? The black box, opened.** Theorem 3
+says leakage is a variance, but of a complicated quantity. Experiment 015
+proved two exact simplifications (machine-verified on 280 instances): the
+quantity boils down to T(y) = how much the cut value *curves* when you flip
+each bit in turn, and the size of T's fluctuations — before conditioning on
+cost — is exactly twice the sum of squared *codegrees* ("for each pair of
+vertices, how many common neighbors do they have?"). Codegrees grow fast
+with density, which would make dense graphs leak much more than they do; but
+conditioning on the cost class removes a chunk that is carried by
+*triangles*, and triangles also grow fast with density. The two effects
+nearly cancel, and that near-cancellation *is* the density law of result 2.
+What's left open is one number (the exact size of the triangle correction —
+it tracks triangles²/edges at correlation 0.994).
+→ [exp 015](experiments/015_v2-density-law/README.md)
+
+**16. The obvious "better proxy" idea has a measured obstacle.** Since the
+QAOA trajectory is only ~4-dimensional (result 7), a frame built around
+*those* 4 directions would beat the (m+1)-dimensional cost-class frame — if
+you could find them cheaply. Experiment 016 tried the cheap route: build the
+frame from the first 5 layers, use it for the rest. It fails, and now we
+know why: the trajectory's 4-dimensional home *rotates* as depth grows (the
+early and late subspaces end up nearly perpendicular, 71–88°), so a frame
+learned early captures *less* of the late trajectory than the free
+cost-class frame does. Beating the compression would require modeling the
+rotation itself — a genuine open problem, now with a number attached.
+→ [exp 016](experiments/016_cheap-prefix-frame/README.md)
 
 ## Where the paper stands
 
