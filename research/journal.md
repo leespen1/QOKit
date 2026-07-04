@@ -261,10 +261,10 @@ and re-tested exp 012's question under the name "E014."
    analytical model's inflation is largest where the true landscape is also
    large (both are driven by constructive small-d interference), except on
    dense ER where the multinomial tail misfires. Not yet tested.
-7. **E017's Part-A device (matched-MSE perturbation quartet) could become a
-   paper figure** — regret vs ε for the four profiles is the visual proof
-   that entrywise size doesn't matter and direction does. Draft next
-   session; needs no new compute.
+7. ~~E017's Part-A device as a paper figure~~ **Done (2026-07-04):**
+   `fitted_shape_directions.png` generated (exp 017), included in §5.4
+   (paper `6777c36`) — invisible directions ride the exact-N baseline to
+   ε=0.5, visible ones leave it at ε=0.01.
 
 ## 2026-07-03 (Friday)
 

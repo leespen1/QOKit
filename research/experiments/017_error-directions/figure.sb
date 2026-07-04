@@ -1,0 +1,17 @@
+#!/bin/bash --login
+#SBATCH --job-name=e017_figure
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=4
+#SBATCH --mem=8G
+#SBATCH --partition=general-short
+#SBATCH --time=00:20:00
+#SBATCH --output=log_figure_%j.log
+#SBATCH --export=NONE
+
+module purge
+export PATH=/mnt/home/leespen1/.juliaup/bin:${PATH}
+unset LD_LIBRARY_PATH
+export JULIA_NUM_THREADS=$SLURM_CPUS_PER_TASK
+
+REPO=/mnt/home/leespen1/GRIPS/QOKit
+julia --project="$REPO" "$REPO/research/experiments/017_error-directions/make_paper_figure.jl"
