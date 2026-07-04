@@ -5,7 +5,30 @@ standard cheap alternative — transferring angles grid-optimized on a small
 (n=10) instance of the same family? (Paper-critique item T2.4: the one
 calibration number a referee will predictably ask for.)
 
-**Answer.** *Pending — Slurm job 11677649 running (submitted 2026-07-04).*
+**Answer. Transfer wins every cell, usually by ~10×: pooled transfer regret
+0.0072 (median 0.0026) vs 0.0606 for the exact-compression proxy; even the
+worst transfer cell (dense ER, p=3, n=18: 0.042) beats the proxy's 0.09.**
+
+Job 11677649 (65 s), 700 targets × 3 sources × 2 depths, all seed
+regenerations asserted. Full table: [analysis.txt](analysis.txt)
+(`julia analyze.jl`). Patterns worth noting:
+
+- **Within-family parameter concentration is extremely strong at these
+  sizes.** A single n=10 source's true-landscape argmax transfers to n=12–18
+  targets at regret ≤ 0.005 on five of seven families (p=1); best-of-3
+  sources drives 3-regular to ≈ 0.0003 (consistent with the fixed-angle
+  literature) and WS(k=4;b=0.1) to ≈ 0.0001 (a near-deterministic family).
+- **The one place transfer strains is dense ER at depth**: p=3 regret grows
+  with n (0.008 at n=12 → 0.042 at n=18), the same regime where compression
+  leaks most. Everywhere else transfer regret is flat or falling in n.
+- **Implication for the paper (§5.4/§6):** at classically simulable sizes
+  the proxy is dominated not only in speed (E013) but in regret by the
+  cheapest standard method. This *supports* the argmax-transfer thesis
+  (parameters concentrate, so a small instance's argmax is all you need)
+  and sharpens the honest pitch: the proxy's unique regime is where no
+  cheap source landscape exists — beyond-simulation sizes with the
+  analytical N, and hardware settings where every evaluation costs shots.
+  The understanding/error-calculus contribution is untouched by this.
 
 ## Method
 

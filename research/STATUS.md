@@ -258,6 +258,14 @@ ClaudeResearch branch when ready to edit there.
   model class, argmax location is the only usable signal; §6 recommendation is
   "don't fit shapes by MSE — use defaults or analytical N."
   → [experiments/012_fitted-shape-paradox](experiments/012_fitted-shape-paradox/README.md)
+- ~~E018 transfer calibration (critique T2.4)~~ **Done (2026-07-04, job
+  11677649): plain within-family angle transfer from one n=10 source beats
+  every proxy variant on all 28 cells, usually by ~10× (pooled regret 0.007
+  vs 0.06; only dense-ER p=3 strains, 0.008 → 0.042 by n=18). Parameter
+  concentration made concrete; the paper's abstract and §5.4 now state the
+  symmetric practical conclusion — the proxy's regime is where no cheap
+  source landscape exists.**
+  → [experiments/018_transfer-calibration](experiments/018_transfer-calibration/README.md)
 - ~~E017 error directions (July re-test of 012's question)~~ **Done — the
   missing half of the 012 story: with gauge-fixed metrics and controlled error
   directions at matched entrywise MSE, the weighted transfer error does govern

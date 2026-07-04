@@ -5,6 +5,39 @@ and questions queued for Monday. Newest entry first. Established results go in
 [STATUS.md](STATUS.md); plain-language versions in [explainer.md](explainer.md);
 this file is the working diary.*
 
+## 2026-07-04 (Saturday, evening — E018 run and folded in; pre-Spencer backlog complete)
+
+### Done
+
+- **E018 complete in 65 s** (job 11677649; 700 targets regenerated from the
+  002/010 seeds, all asserted): **transfer wins every cell** — pooled
+  regret 0.007 (median 0.003) vs 0.06 for the exact-compression proxy;
+  best-of-3 sources drives 3-regular to ~0.0003 and WS(0.1) to ~0.0001;
+  the only strain is dense ER at p=3 (0.008 → 0.042 as n grows to 18),
+  the same regime where compression leaks most.
+  → `experiments/018_transfer-calibration/` (+ analysis.txt)
+- **Folded into the paper immediately** (`e7dea19`, now 8 pp): a
+  calibration paragraph in §5.4 citing the concentration/fixed-angle
+  literature, and one honest closing sentence in the abstract ("the
+  proxy's regime is where no cheap source landscape exists"). Explainer
+  gained result 17; STATUS updated.
+- **Noticed while editing:** the current draft header is already
+  `\documentclass[conference]{IEEEtran}` — the critique's venue-ambiguity
+  item (decision 2) referred to the lost long draft's header; what's left
+  of that decision is only the page-budget question (8 pp now, QCE limit
+  ~8–12).
+
+### State of the loop
+
+With E018 in, **every item actionable without Spencer is done**: critique
+burn-down complete, both lit passes folded, all experiment results written
+into paper + explainer + STATUS, both repos pushed and in sync. What
+remains is Spencer-gated (decisions 1–6, §6/§5.4 wording sign-off, page
+budget) or optional (E015/E016 figures pending venue, a T2.2 ruggedness
+mechanism experiment, deeper readability sweeps). The loop will keep
+ticking at a slower cadence and pick up anything new (e.g., replies,
+CI, or a fresh idea vetted against the program plan).
+
 ## 2026-07-04 (Saturday, later — critique burn-down complete; E018 queued)
 
 ### Done

@@ -198,6 +198,25 @@ sit on top of good parameters (except the known dense-graph artifact), so
 dividing the inflation out throws away signal. Practical bottom line is
 unchanged: sampled N + empirical cost distribution + the ordinary objective.
 
+**17. The referee question we asked ourselves first: is the proxy better
+than just borrowing angles? No — not at sizes we can check.** (Exp 018,
+run 2026-07-04.) Take one small graph (n=10) from a family, find its best
+angles by brute force (cheap at n=10), and use those same angles on every
+bigger instance of the family. On all 28 (family, size, depth) cells this
+"transfer" beats every proxy variant, usually by 10×: overall transfer
+regret 0.007 vs the proxy's 0.06. On the most structured family
+(Watts–Strogatz, low rewiring) transfer is essentially perfect; the only
+place it strains is dense ER at depth (regret grows to 0.04 by n=18) —
+exactly where compression leaks most. This isn't a paradox, it's the
+argmax-transfer story at full strength: within a family, the best angles
+barely move between instances, so *any* cheap look at one instance's
+landscape suffices. The paper now says this plainly, and the proxy's honest
+unique regime shrinks to: sizes too big to simulate (where only the
+analytical formula exists) and hardware settings where every evaluation
+costs money. The theory contribution — knowing *why* and *when*, with error
+bars — is untouched.
+→ [exp 018](experiments/018_transfer-calibration/README.md)
+
 ## The June-13 line's other results, in plain language
 
 **14. At depth, what matters is where the peak is, not how good the state is.**
