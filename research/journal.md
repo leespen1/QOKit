@@ -5,6 +5,38 @@ and questions queued for Monday. Newest entry first. Established results go in
 [STATUS.md](STATUS.md); plain-language versions in [explainer.md](explainer.md);
 this file is the working diary.*
 
+## 2026-07-04 (Saturday, night, later — fresh referee pass applied)
+
+### Done
+
+- **Fresh referee pass on the current draft came back accept-trajectory
+  with one real factual error**, now fixed (paper `f3f62f0`): the bolded
+  "regret does not grow with n" contradicted the paper's own per-family
+  regret table (monotone growth in all 7 families, +0.005 to +0.018 over
+  n=12→18, resolvable against the ~0.001 SEs). The text now states the
+  numbers and owns the correction. Report:
+  `research/referee_pass_2026-07-04.md`.
+- **Overselling residues cleaned**: sampled-N demoted from "recommended
+  recipe" to "best proxy variant" with an explicit pointer that transfer
+  owns the family regime; the hardware claim rescoped (transfer's source
+  is classical too — shots don't rescue the proxy; the honest
+  differentiator is per-instance vs family-dependent methods); "within
+  0.01" → measured 0.011–0.016; "decouples entirely" scoped to p=3;
+  GPU-parity scoped to n≤20 with the extrapolated n≈22–24 crossover.
+- **Limits expanded** with the weighted-cost boundary (singleton classes
+  trivialize the compression; binned classes flagged as the open
+  extension; Thms 2–3 are partition-agnostic, the cubic lemma is
+  MaxCut-specific) and the noiseless scope of all comparisons.
+- **Structure**: abstract cut ~330 → ~200 words; "What should a
+  practitioner do?" split into its own subsection; a short Conclusion
+  added; the stale "literature pass predates submission" sentence
+  removed. Skipped by judgment: compressing the V₂ lemmas and merging the
+  two trajectory passages (both would cost clarity more than space).
+- Of the referee's top-5 unanswered questions, three are now answered in
+  Limits (weighted costs, noise, MaxCut-specificity), the empty-toolbox
+  point is in the practitioner subsection + Conclusion, and the p=3 depth
+  gap is exactly what E019 (running, array 11740470) closes.
+
 ## 2026-07-04 (Saturday, night — Spencer's new directive: never idle, decide and go)
 
 ### Directive (from Spencer, verbatim intent)
