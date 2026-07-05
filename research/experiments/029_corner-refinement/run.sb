@@ -1,0 +1,23 @@
+#!/bin/bash --login
+#SBATCH --job-name=e029_refine
+#SBATCH --mail-type=END,FAIL
+#SBATCH --mail-user=leespen1@msu.edu
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=16
+#SBATCH --mem=16G
+#SBATCH --partition=general-short
+#SBATCH --time=02:00:00
+#SBATCH --array=1-2
+#SBATCH --output=log_e029_%a_%A.log
+#SBATCH --export=NONE
+
+module purge
+export PATH=/mnt/home/leespen1/.juliaup/bin:${PATH}
+unset LD_LIBRARY_PATH
+export JULIA_NUM_THREADS=$SLURM_CPUS_PER_TASK
+
+echo "Node: $(hostname)  Date: $(date)  Task: $SLURM_ARRAY_TASK_ID"
+
+REPO=/mnt/home/leespen1/GRIPS/QOKit
+# --gcthreads=1: task 3 hit a parallel-GC-marking abort under allocation churn
+julia --gcthreads=1 --project="$REPO" "$REPO/research/experiments/029_corner-refinement/run.jl"
