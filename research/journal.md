@@ -5,6 +5,35 @@ and questions queued for Monday. Newest entry first. Established results go in
 [STATUS.md](STATUS.md); plain-language versions in [explainer.md](explainer.md);
 this file is the working diary.*
 
+## 2026-07-05 (Sunday — coherence pass applied; E022 queued)
+
+### Done
+
+- **Coherence pass: 16 findings, all resolved** (paper `d2c0c6c`; report
+  committed). Worst: Table II's caption still carried the retracted
+  "regret is flat in n" claim directly above a table showing monotone
+  growth — exactly the kind of survivor a hostile referee screenshots.
+  Also fixed: three wrong-target section refs after the practitioner
+  split; "best proxy variant" scoped to p≤3 everywhere; hardware shots
+  removed from the timing regimes (transfer avoids them equally — the
+  argument only separates offline from on-device methods); η_F jargon;
+  SE conventions split (AR means 0.002–0.006 vs regret cells ~0.001);
+  bin-count phrasing aligned; Table III's K renamed J (with the n factor
+  restored in the sweep scaling); the weighted extension added to
+  contribution 5.
+
+### Next (E022, the finish line for the practitioner story)
+
+- **Strong heterogeneity with a FAIR transfer baseline.** E021's i.i.d.
+  U[0,1] weights weren't heterogeneous enough. E022: heavy-tailed
+  per-edge weights (Pareto α=1.5; Exp(1) as the milder rung) where the
+  landscape shape itself varies between instances — and, critically, give
+  transfer its practitioner's fix (γ rescaled by the source/target mean
+  weight ratio) so the proxy only wins if per-instance structure beyond
+  scale matters. Same cells/machinery as E020/E021. If rescaled transfer
+  still wins, the practitioner section closes with "always transfer";
+  if the binned proxy wins, we finally have its niche, measured.
+
 ## 2026-07-05 (Sunday, early — E021: the weighted rematch; coherence pass running)
 
 ### Done
