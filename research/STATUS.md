@@ -1,6 +1,6 @@
 # Research status
 
-*Last updated: 2026-07-04. This is the one page Spencer needs to read.
+*Last updated: 2026-07-05. This is the one page Spencer needs to read.
 Everything here links to a reproducible experiment or a committed document.
 Plain-language walkthrough of all results: [explainer.md](explainer.md).
 Running journal of the autonomous work: [journal.md](journal.md).*
@@ -57,24 +57,20 @@ arXiv late August; submit April 2027. Full plan: see `research/decisions.md` and
 
 ## Where we are
 
-**Phases 1–3 complete; Phase 4 (assembly) well underway.** The paper repo
-(`papers/OverleafPaper`, branch `ClaudeResearch`, head `f10027b`) holds
-`theory_compression.tex` (standalone proofs — fate is decision 5) and
-`qce2027_paper.tex`, which as of 2026-07-04 compiles clean at 7 pp with:
-theory + the E015 V₂ lemmas, the experimental anatomy of exps 001–017
-(argmax-transfer figure, §5.3 ranking figure + regret table, the
-exps-012+017 fitted-shape paragraph, E013 pipeline costs, E016 in the
-Discussion), an honest not-a-laptop-speedup framing, and a related-work
-section built from the union of **two independent literature passes**
-(`literature_pass.md`, June: all four claimed-new items survive;
-`lit_scan_2026-07-03.md`, July: adds the Dirac–Frenkel/Zoufal lineage for
-Thm 2, Burgholzer bisimulation rescoping, Grover-mixer boundary case) —
-36 verified references. Remaining for the draft: readability pass over the
-densest paragraphs (critique T3.1), optional E015/E016 figures, a glossary
-table (existed only in the lost long draft), plain-language explainer
-sections for exps 012/014–016, author list/acknowledgments, and Spencer
-decisions 1–6 (bottom). Overleaf shows only `main`; merge the paper repo's
-ClaudeResearch branch when ready to edit there.
+**Phases 1–3 complete; Phase 4 (assembly) far along.** The paper
+(`papers/OverleafPaper`, branch `ClaudeResearch`, head `1d90d9b`) compiles
+clean at 8 pp and now contains: the theory with the V₂ lemmas; the full
+experimental anatomy of exps 001–020 (ranking figure + regret table,
+argmax-transfer figure, fitted-shape dissection with the direction-vs-size
+figure, honest E013/E018/E019 calibrations — transfer beats every proxy
+variant in every regime we could test — and E020's weighted-MaxCut binning
+extension); a glossary; a Conclusion; and a related-work section from two
+independent literature passes (36 verified references). Two adversarial
+referee passes have been applied (June 13; July 4 — the latter caught and
+fixed a false scale-stability claim). Remaining: author list +
+acknowledgments (parked per Spencer), optional E015/E016 figures, and
+whatever new experiments surface. Overleaf shows only `main`; merge the
+paper repo's ClaudeResearch branch when ready to edit there.
 
 ## What we know (established results only)
 

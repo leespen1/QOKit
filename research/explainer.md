@@ -3,7 +3,7 @@
 *A plain-language walkthrough of everything we've established so far, kept
 current as results land. One section per idea, each linked to the experiment
 that proves it. For the one-page program state, see [STATUS.md](STATUS.md).
-Last updated: 2026-07-04 (through experiment 017, including plain-language sections for the June-13 line's experiments 014–016).*
+Last updated: 2026-07-05 (through experiment 020).*
 
 ## The one-paragraph version
 
