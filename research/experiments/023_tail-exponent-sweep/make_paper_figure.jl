@@ -10,8 +10,10 @@ using CairoMakie
 
 const DIR = @__DIR__
 reg = Dict{Tuple{String, Float64, String, Int}, Vector{Float64}}()   # (fam, α, method, inst)
-for f in filter(f -> occursin(r"^results_task\d+\.csv$", f), readdir(DIR))
-    for (i, line) in enumerate(eachline(joinpath(DIR, f)))
+const DIRS = [DIR, joinpath(DIR, "..", "026_predicted-flip")]   # E023 + E026 points
+for d in DIRS, f in filter(f -> occursin(r"^results_task\d+\.csv$", f), readdir(d))
+    let joinpath_d = d
+    for (i, line) in enumerate(eachline(joinpath(joinpath_d, f)))
         i == 1 && continue
         p = split(line, ",")
         p[7] == "ceiling" && continue
@@ -20,8 +22,9 @@ for f in filter(f -> occursin(r"^results_task\d+\.csv$", f), readdir(DIR))
         key = (String(p[1]), α, String(p[7]), parse(Int, p[3]))
         push!(get!(reg, key, Float64[]), parse(Float64, p[11]))
     end
+    end
 end
-αs = [1.2, 1.5, 2.0, 3.0, 5.0]
+αs = [1.2, 1.5, 2.0, 2.2, 2.4, 2.6, 3.0, 5.0]
 fams = ["ER(0.5)", "3-regular"]
 
 "per-instance best-of-3 transfer, then cell mean"
@@ -39,7 +42,7 @@ cellmean(fam, α, m) = mean(vcat([reg[(fam, α, m, i)] for i in 1:10
 
 fig = Figure(size=(560, 360), fontsize=12)
 ax = Axis(fig[1, 1]; xlabel="Pareto tail exponent α", ylabel="regret (p = 1)",
-          xscale=log10, xticks=(αs, string.(αs)))
+          xscale=log10, xticks=([1.2, 1.5, 2.0, 2.6, 3.0, 5.0], ["1.2", "1.5", "2", "2.6", "3", "5"]))
 colors = CairoMakie.Makie.wong_colors()
 for (k, fam) in enumerate(fams)
     proxy = [cellmean(fam, α, "binned_sampled") for α in αs]
