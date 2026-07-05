@@ -58,9 +58,9 @@ arXiv late August; submit April 2027. Full plan: see `research/decisions.md` and
 ## Where we are
 
 **Phases 1–4 effectively complete.** The paper
-(`papers/OverleafPaper`, branch `ClaudeResearch`, head `7cdf80c`) compiles
+(`papers/OverleafPaper`, branch `ClaudeResearch`, head `0fa9b4a`) compiles
 clean at 10 pp with the theory (V₂ lemmas included), the full anatomy of
-experiments 001–028, eight figures (ranking, argmax-transfer,
+experiments 001–031, eight figures (ranking, argmax-transfer,
 direction-vs-size, weighted binning, α-crossover with pre-registered
 points), a glossary, a Conclusion, and 36 verified references from two
 independent literature passes. Four adversarial review passes have been
@@ -70,8 +70,10 @@ practitioner map is measured in every dimension: transfer wins
 family-concentrated regimes (unweighted, mild weights, all sizes/depths
 tested); the per-instance binned proxy wins high-dispersion weights at low
 depth (boundary at order-unity CV², pre-registered and confirmed;
-scale-checked to n=26); the deep high-dispersion corner is hard for every
-method and marked open; Max-3-XOR replicates the map. Remaining: author
+scale-checked to n=26); the deep high-dispersion corner resolved as a grid
+artifact (E029) with free guarded surrogate polishing validated in every
+regime (E030/E031); the V₂ anatomy closed in graph invariants (Lemma 6 +
+Prop 7); Max-3-XOR replicates the map. Remaining: author
 list + acknowledgments (parked per Spencer), the reviewer's optional
 length-cut menu, and Spencer's read. Overleaf shows only `main`; merge the
 paper repo's ClaudeResearch branch when ready to edit there.
