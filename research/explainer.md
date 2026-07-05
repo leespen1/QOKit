@@ -346,10 +346,10 @@ are hard for everyone (exp 028).** At depth 10–20 with high weight spread,
 borrowing from any single source becomes a lottery again (regrets up to
 0.29), and the proxy — while still the most reliable single choice under
 lognormal spread — carries 0.05–0.2 regret itself; pooling several sources
-helps on sparse graphs. Nobody wins cleanly. That's worth knowing: the
-practitioner map now says where each method works, and also names the one
-corner where none of them do — the honest boundary of the paper's advice
-and a marked spot for future methods.
+helps on sparse graphs. Nobody wins cleanly *on the grid*. (Result 29 then
+resolved this: the corner is the grid's artifact — local polish from any
+start recovers everything — so the honest boundary became constructive
+advice instead.)
 → [exp 028](experiments/028_dispersion-at-depth/README.md)
 
 **28. The open math problem fell (2026-07-05).** Since experiment 015,
