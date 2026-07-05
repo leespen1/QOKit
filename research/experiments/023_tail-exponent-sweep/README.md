@@ -4,7 +4,22 @@
 Pareto(α=1.5) and its absence at Exp(1). Is α=1.5 special, or does the
 inversion set in smoothly as tails get heavier — and where?
 
-**Answer.** *Pending — submitted 2026-07-05.*
+**Answer. The crossover sits at the infinite-variance boundary α ≈ 2.**
+At p=1 (binned-sampled proxy vs best-of-3 rescaled transfer): α=1.2 —
+proxy 0.017–0.020 vs 0.035/0.128 (single sources as bad as 0.21); α=1.5 —
+proxy 0.012–0.014 vs 0.020/0.086; α=2.0 — 3-regular flips to transfer
+(0.007 vs 0.034) while dense ER is a statistical tie (0.028 vs 0.028);
+α=3, 5 — transfer wins cleanly (0.0006–0.006 vs 0.029–0.046). The proxy's
+regret is nearly α-independent (~0.02–0.03 at p=1) — it is transfer that
+moves through it as the tail lightens. At p=3 the same pattern shifts one
+rung heavier (proxy wins only at α=1.2; the source lottery is extreme:
+same-family sources at α=1.2 range 0.035–0.212). Array 11751921, all 10
+tasks COMPLETED.
+
+Reading: for α > 2 the weight distribution has finite variance, instance
+landscapes concentrate around the family mean, and borrowing angles works;
+at α ≤ 2 single edges dominate instances individually and only a
+per-instance method tracks them. The boundary is principled, not tuned.
 
 ## Method
 
