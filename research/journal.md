@@ -7,6 +7,11 @@ this file is the working diary.*
 
 ## 2026-07-05 (Sunday, night — E023: the boundary is the infinite-variance point)
 
+- **α-crossover figure added** (`abc0127`): proxy flat, transfer sweeping
+  through it, crossing on the α=2 line — the practitioner section's
+  punchline visual. Next queued: E024, confirming the α≤2 proxy win
+  survives scale (n=22/26, GPU ceilings, Pareto 1.5 vs 3.0).
+
 ### Done
 
 - **E023 complete** (array 11751921, 10 tasks, ~2.5 min each): sweeping
