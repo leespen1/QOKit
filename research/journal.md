@@ -5,6 +5,21 @@ and questions queued for Monday. Newest entry first. Established results go in
 [STATUS.md](STATUS.md); plain-language versions in [explainer.md](explainer.md);
 this file is the working diary.*
 
+## 2026-07-05 (Monday, morning — verification pass on the E025–E031 additions)
+
+### Done
+
+- **Number-verification pass on everything added this morning: 8 findings,
+  all applied** (paper `1f7d9eb`; report `verify_pass_2026-07-05b.md`).
+  Worst was a genuine self-contradiction ("winning cleanly for α>2" vs
+  E026's α=2.2 proxy win eight lines later — now "cleanly at α≥3"); plus
+  an honest tie stated as a win (lognormal-depth best source 0.0729 vs
+  proxy 0.0731), per-stage evaluation budgets, two roundings, the
+  abstract/Conclusion moved to the dispersion framing, and Limits now
+  inventories E026 and the 5-instance refinement cells. Everything else —
+  including the V₂ Lemma/Prop against the derivation — verified correct
+  from the raw CSVs. Five review passes total have now audited the draft.
+
 ## 2026-07-05 (Monday, morning — E031: the guarded recipe, validated everywhere)
 
 ### Done
