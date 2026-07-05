@@ -5,6 +5,24 @@ and questions queued for Monday. Newest entry first. Established results go in
 [STATUS.md](STATUS.md); plain-language versions in [explainer.md](explainer.md);
 this file is the working diary.*
 
+## 2026-07-05 (Monday, morning — the open math problem falls; E029 running)
+
+### Done
+
+- **The V₂ conditioning correction is derived** (theory agent, machine-
+  verified): exact quartic split T = S² + m − R₄ (S = m − 2c) makes
+  E[T|c] exactly quadratic plus a small remainder; the quadratic
+  projection Vq = (36τ²D − 72τ²W + mW²)/(mD − 36τ²) with W = 4P₁+16q,
+  D = 2m(m−1)+24q captures 94–99% of the measured correction on every
+  instance. All three mystery constants resolved: 36 = linear regression
+  only; measured ≈60 = finite-n Vq; triangle-free residual ≈32 = W²/D;
+  ER asymptote κ(p) with κ(½) = 45. In the paper as Lemma 6 + Prop 7
+  (`19e8a96`); derivation + verification script committed. The
+  Discussion's "open and looks tractable" is now "nearly closed" with
+  only the degree-≥3 residue (4–6%) remaining.
+- **E029 running** (array 11773952): grid-artifact-vs-intrinsic test of
+  E028's hard corner via compass-search refinement.
+
 ## 2026-07-05 (Monday, morning — loop resumed on request; E028 closes the map's last cell)
 
 ### Done

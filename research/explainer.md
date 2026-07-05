@@ -3,7 +3,7 @@
 *A plain-language walkthrough of everything we've established so far, kept
 current as results land. One section per idea, each linked to the experiment
 that proves it. For the one-page program state, see [STATUS.md](STATUS.md).
-Last updated: 2026-07-05 (through experiment 028 — the practitioner map is complete in every measured dimension, including the corner where no method wins).*
+Last updated: 2026-07-05 (through experiment 028 + the V₂ conditioning derivation; E029 in flight).*
 
 ## The one-paragraph version
 
@@ -351,6 +351,21 @@ practitioner map now says where each method works, and also names the one
 corner where none of them do — the honest boundary of the paper's advice
 and a marked spot for future methods.
 → [exp 028](experiments/028_dispersion-at-depth/README.md)
+
+**28. The open math problem fell (2026-07-05).** Since experiment 015,
+the one loose thread in the theory was a single unexplained number: the
+"conditioning correction" that flattens the density law tracked
+triangles²/edges with a mysterious constant ≈60 (a crude estimate said
+36). It turns out T splits exactly as S² + m − R₄, where S is a linear
+function of the cut value — so the correction has an *exact* quadratic
+piece with a closed formula, computable from three subgraph counts
+(triangles, 4-cycles, edge pairs at a vertex). The formula reproduces
+94–99% of the measured correction on every instance, explains 36 (that's
+what you get keeping only the linear part), 60 (the finite-size value of
+the full quadratic), and even the small leftover on triangle-free graphs.
+What survives as "open" is a 4–6% residue. The density law is now a
+theorem-with-a-small-empirical-tail rather than a fit.
+→ [derivation](v2_conditioning_derivation.md)
 
 ## The June-13 line's other results, in plain language
 
