@@ -5,6 +5,37 @@ and questions queued for Monday. Newest entry first. Established results go in
 [STATUS.md](STATUS.md); plain-language versions in [explainer.md](explainer.md);
 this file is the working diary.*
 
+## 2026-07-05 (Sunday, night, last — final referee verdict applied: weak accept
+
+### Done
+
+- **Final referee pass returned: weak accept, mechanical fixes only** —
+  and all six defects are applied (paper `a73413b`, now 10 pp): the
+  falsified Limits paragraph rewritten with the honest weighted scope +
+  the lognormal and Max-k-XOR mitigations; "locates the boundary
+  precisely" softened to "consistent with α≈2" (the reviewer recomputed
+  the CSVs: 3-regular already flips at α=2 at >4σ — sharp point is
+  dense-ER-only); instance counts and SE scoping added to every E022–E024
+  claim (two headline cells are 2×SE ties and now say so); the proxy's
+  α-range quoted honestly (0.012–0.046); abstract's 2–7× gains its p=1
+  qualifier; contribution 5 gains the boundary. Review on file:
+  `research/final_referee_2026-07-05.md`.
+- **Not applied (deliberate, queued for Spencer):** the reviewer's
+  length-cut menu (drop fig:bound's right panel, fold fig:ranking to one
+  panel, compress the V₂ lemmas, single-column fig:binned) — the draft
+  fits 10 pp as-is, and those cuts trade real content for margin; a call
+  for Monday.
+
+### Night summary (for Monday's read)
+
+Since Spencer's "never idle" directive: experiments E019–E024 designed,
+run, and folded in (claimed-regimes test; weighted binning; weighted
+transfer rematch; heavy-tail crossover; α-sweep boundary; scale
+confirmation), three referee/coherence passes applied, and the paper went
+from an honest-negative story to a complete practitioner map with a
+measured positive niche at a principled boundary. Everything committed,
+pushed, reproducible; verdict on file: weak accept pending human polish.
+
 ## 2026-07-05 (Sunday, night — E024: boundary scale-confirmed; final referee pass launched)
 
 ### Done
