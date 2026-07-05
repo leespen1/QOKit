@@ -3,7 +3,7 @@
 *A plain-language walkthrough of everything we've established so far, kept
 current as results land. One section per idea, each linked to the experiment
 that proves it. For the one-page program state, see [STATUS.md](STATUS.md).
-Last updated: 2026-07-05 (through experiment 026 — dispersion boundary predicted and confirmed on dense ER; family-dependent constant).*
+Last updated: 2026-07-05 (through experiment 027 — the map replicates on Max-3-XOR; nothing but the cubic lemma is MaxCut-specific).*
 
 ## The one-paragraph version
 
@@ -329,6 +329,17 @@ structure gives angle-borrowing more to grip — so the threshold's constant
 depends on the family even though the law is the same. A predicted-then-
 confirmed result is worth more than ten post-hoc fits, and the paper now
 says it that way. → [exp 026](experiments/026_predicted-flip/README.md)
+
+**26. And it's not a MaxCut story (exp 027).** We reran the pillars on a
+different problem entirely — Max-3-XOR, the paper's other family from Sud
+et al. Everything held: the compression loses the same small amount, the
+sampled shortcut is again as good as (often better than) the exact
+distribution, angle-borrowing is again unbeatable on unweighted random
+instances (astonishingly so — near-zero regret), and leakage again scales
+with constraint density. The one thing that didn't carry over is the one
+thing the theory says shouldn't: MaxCut's special small-angle cancellation.
+The map is a property of the framework, not of the problem we happened to
+study first. → [exp 027](experiments/027_max3xor/README.md)
 
 ## The June-13 line's other results, in plain language
 

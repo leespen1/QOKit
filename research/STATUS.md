@@ -254,6 +254,12 @@ paper repo's ClaudeResearch branch when ready to edit there.
   model class, argmax location is the only usable signal; §6 recommendation is
   "don't fit shapes by MSE — use defaults or analytical N."
   → [experiments/012_fitted-shape-paradox](experiments/012_fitted-shape-paradox/README.md)
+- ~~E027 Max-3-XOR replication~~ **Done (2026-07-05, array 11757023): the
+  map generalizes — compression regret at MaxCut magnitude, sampled ≥
+  exact (4th occurrence), transfer/universal near-perfect on unweighted
+  3-XOR, λ ∝ clause density; only the cubic cancellation is
+  MaxCut-specific, as proved. Paper's Limits updated.**
+  → [experiments/027_max3xor](experiments/027_max3xor/README.md)
 - ~~E026 pre-registered prediction test~~ **Done (2026-07-05, array
   11756459): the dispersion theory's called shot lands on dense ER — flip
   at α≈2.4 (CV²≈1.0), inside the window written down before the run;

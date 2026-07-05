@@ -6,7 +6,17 @@ native classes). Do the map's pillars replicate: near-lossless p=1
 compression, sampled-N ≈ exact-N, and transfer dominance on unweighted
 instances?
 
-**Answer.** *Pending — submitted 2026-07-05.*
+**Answer. Everything replicates.** Exact-compression p=1 regret
+0.031–0.040 (MaxCut magnitude); sampled-N matches or beats exact in 7 of
+8 cells (8n, n=16, p=3: 0.044 vs 0.086 — the regularization effect's
+fourth independent occurrence); transfer and even the pooled universal
+schedule are near-perfect on unweighted 3-XOR (regret ≈ 0.000 in most
+cells — concentration stronger than MaxCut's); small-angle leakage
+doubles when clause density doubles (0.045→0.092 at n=14: the λ ∝ m
+density law again). Large-angle leakage is much higher than MaxCut's
+(0.84–0.95 at γ=1.0), consistent with 3-local phases lacking the MaxCut
+cancellation — the one genuinely MaxCut-specific piece, as the theory
+says. Array 11757023, all COMPLETED.
 
 ## Method
 

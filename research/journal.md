@@ -5,6 +5,22 @@ and questions queued for Monday. Newest entry first. Established results go in
 [STATUS.md](STATUS.md); plain-language versions in [explainer.md](explainer.md);
 this file is the working diary.*
 
+## 2026-07-05 (Monday, small hours — E027: the map is not a MaxCut story; night closed)
+
+### Done
+
+- **E027 complete** (array 11757023): Max-3-XOR replicates every pillar —
+  exactN p=1 regret 0.031–0.040, sampledN ≥ exactN (4th occurrence,
+  dramatically so at 8n/16/p=3: 0.044 vs 0.086), transfer/universal
+  near-perfect (≈0.000) on unweighted instances, λ ∝ clause density; the
+  MaxCut cubic cancellation is confirmed as the only problem-specific
+  piece (large-angle λ 0.84–0.95). Paper Limits updated; explainer 26.
+- **The loop now rests at an hourly heartbeat.** Every frontier item named
+  by any referee pass or by the Limits section has been measured
+  (E019–E027, all in one night); what remains is Spencer-facing: the
+  length-cut menu, author list, and reading the E022–E027 arc. STATUS and
+  this journal are the Monday entry points.
+
 ## 2026-07-05 (Monday, small hours — E026: the called shot lands)
 
 ### Done
