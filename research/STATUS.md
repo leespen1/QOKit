@@ -295,29 +295,26 @@ ClaudeResearch branch when ready to edit there.
   dense-sentence pass (critique T3.1), glossary table, author list,
   acknowledgments, and Spencer decisions 1–6 below.
 
-## Decisions needed from Spencer
+## Decisions (resolved autonomously 2026-07-04, per Spencer's directive)
 
-Items 1–5 surfaced in the June-13 critique (`research/paper_critique.md`);
-item 6 added 2026-07-03. None block ongoing work, but they shape the paper:
+Spencer delegated everything except administrativa ("use your best judgment,
+don't wait"). Resolutions, auditable in the journal:
 
-1. **Author list + acknowledgments** — only you can fill these.
-2. **Venue/format**: the draft header says "IEEE TQE" (a journal) but the plan says
-   QCE 2027 (a conference: IEEEtran, ~8–12 pp, different review). Which target?
-   It gates reformatting and the length budget.
-3. **Headline framing**: the leakage→regret ranking is the paper's *weakest*
-   evidence (7 points, p=1-only — collapses to ρ≈0 at p=3). Critique T1.1 recommends
-   leading with the mechanism + argmax-transfer and demoting the ranking to
-   corroboration. Agree? (The §5.3 figure scopes it honestly.)
-4. **Fold the new E014/E015/E016 results into the paper?** Ready-to-paste LaTeX
-   (with figure-copy steps) for all three is in `research/proposed_paper_additions.md`
-   (E014→§5.4 argmax-transfer-at-depth + figure; E015 V₂ lemmas→§4, also in
-   `research/v2_density_law.md`; E016→§7 Discussion). §4/§5.4/§7 left untouched —
-   the theory/framing is yours to own.
-5. **`theory_compression.tex` fate**: retire it, or keep as the "full proofs"
-   companion/appendix? It now duplicates §3–4 and can drift out of sync.
-6. **§6 framing after exps 012+017**: adopt the refined claim — "the analytical
-   proxy's values carry no *absolute* information, but their raw landscape is
-   argmax-informative; normalizing or calibrating it away discards signal" —
-   and present the fitted-shape post-mortem as `direction of error > size of
-   error`? This slightly amends the 004–006 phrasing already in the draft.
-   Also: `explainer.md` vs `paper_explainer.md` — keep both or consolidate?
+1. **Author list + acknowledgments** — parked (Spencer said not to worry
+   about these; placeholders remain in the tex).
+2. **Venue/format** — the current draft is already
+   `\documentclass[conference]{IEEEtran}`; staying with QCE 2027 conference
+   format, 8 pp of a ~8–12 pp budget. *(Decided.)*
+3. **Headline framing** — mechanism + argmax-transfer lead; the family
+   ranking is corroboration with its scope shown (Fig. ranking panel b).
+   *(Decided; implemented.)*
+4. **E014/E015/E016 fold-in** — done (all three are in the paper with
+   figures/lemmas). *(Decided; implemented.)*
+5. **`theory_compression.tex`** — retired: header now marks it superseded
+   by the paper's §III–IV; kept for proof-detail history, not maintained.
+   *(Decided; implemented.)*
+6. **§6 framing after exps 012+017** — adopted ("no *absolute* information,
+   but the raw landscape is argmax-informative"; direction > size).
+   `explainer.md` is the living results walkthrough; `paper_explainer.md`
+   kept as a frozen paper companion with a pointer header. *(Decided;
+   implemented.)*

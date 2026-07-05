@@ -5,6 +5,40 @@ and questions queued for Monday. Newest entry first. Established results go in
 [STATUS.md](STATUS.md); plain-language versions in [explainer.md](explainer.md);
 this file is the working diary.*
 
+## 2026-07-04 (Saturday, night — Spencer's new directive: never idle, decide and go)
+
+### Directive (from Spencer, verbatim intent)
+
+Skip administrativa (author list etc.); decide judgment calls (wording,
+framing) with best judgment; each loop iteration must critically review the
+paper (methodology, novelty/publishability), plan and run new experiments,
+and keep improving — never stop to wait for input. Saved to persistent
+memory so future sessions start in this mode.
+
+### Done immediately
+
+- **E019 designed, smoke-tested, submitted (GPU array 11740470, 10 tasks).**
+  The paper's biggest exposure after E013+E018: the claimed-value regimes
+  were untested. Part A pushes depth (p=10, 20 ramps; ER(0.5)/ER(0.25)/
+  3-regular; n=14–16) where transfer showed its only strain; Part B goes
+  beyond the exact-N wall (n=22, 26 — exact N impossible, ceilings still
+  GPU-computable) where only analytical/sampled N exist. Methods: ceiling,
+  exactN (A only), sampledN, paper (binP + empP), transfer×3, and a pooled
+  "universal" schedule. Either the proxy earns a regime or the honest
+  conclusion hardens — both are publishable outcomes.
+- **Fresh adversarial referee pass launched** (background agent) on the
+  CURRENT 8-pp draft — the June critique reviewed a longer, older version.
+  Focus: methodology soundness, novelty vs the newly cited neighbors,
+  coherence after the E017/E018 additions (any sentence still overselling
+  the proxy), structure, and the top unanswered referee questions. Report →
+  `research/referee_pass_2026-07-04.md`.
+- **Decisions 2–6 resolved autonomously** (see STATUS): QCE/IEEEtran stays;
+  mechanism-led framing stays; snippets already folded;
+  `theory_compression.tex` retired with a superseded header;
+  §6 refined claim adopted; `explainer.md` designated the living doc with a
+  pointer header added to `paper_explainer.md`. Author list parked per
+  Spencer.
+
 ## 2026-07-04 (Saturday, evening — E018 run and folded in; pre-Spencer backlog complete)
 
 ### Done

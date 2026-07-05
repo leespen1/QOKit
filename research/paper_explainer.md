@@ -1,5 +1,10 @@
 # A plain-language companion to the paper
 
+*(Note, 2026-07-04: this file is the frozen plain-language companion to the
+paper as of June 13. The **living** walkthrough of all results, updated with
+every new experiment, is [explainer.md](explainer.md).)*
+
+
 *Written for Spencer, 2026-06-13. Goal: explain the paper's main ideas in
 order, with intuition first and symbols second, so the dense draft
 (`papers/OverleafPaper/qce2027_paper.tex`) reads easily afterward. Nothing here
