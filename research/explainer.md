@@ -3,7 +3,7 @@
 *A plain-language walkthrough of everything we've established so far, kept
 current as results land. One section per idea, each linked to the experiment
 that proves it. For the one-page program state, see [STATUS.md](STATUS.md).
-Last updated: 2026-07-05 (through experiment 024 — the practitioner map is complete, boundary located and scale-confirmed).*
+Last updated: 2026-07-05 (through experiment 025 — practitioner map complete; boundary identified as order-unity weight dispersion).*
 
 ## The one-paragraph version
 
@@ -305,6 +305,19 @@ every cell (often 4–7×), and finite-variance weights keep transfer ahead
 in every cell. The practitioner rule from result 22 is scale-robust, and
 it's the *practical* proxy variant that delivers it.
 → [exp 024](experiments/024_heavy-tail-at-scale/README.md)
+
+**24. One more twist: it was never about infinite variance — it's about
+spread (exp 025).** We reran the sweep with lognormal weights, whose
+variance is always finite but whose *spread* (how much the biggest edges
+dominate) grows with σ. The crossover showed up anyway — and more
+dramatically: by σ=2.5, borrowed angles cost 0.16–0.35 of approximation
+ratio while the binned proxy got *better* with spread, down to 0.004. So
+the practitioner rule's boundary is really "does one instance's weight
+spread reach order-unity relative dispersion?" — Pareto crossed it by
+diverging, lognormal crosses it while staying finite. The paper's claim
+is updated accordingly (and is more useful this way: relative dispersion
+is something you can compute from your weights in one line before
+choosing a method). → [exp 025](experiments/025_lognormal-separation/README.md)
 
 ## The June-13 line's other results, in plain language
 

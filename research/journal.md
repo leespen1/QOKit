@@ -5,6 +5,24 @@ and questions queued for Monday. Newest entry first. Established results go in
 [STATUS.md](STATUS.md); plain-language versions in [explainer.md](explainer.md);
 this file is the working diary.*
 
+## 2026-07-05 (Monday, small hours — E025: the mechanism is dispersion)
+
+### Done
+
+- **E025 complete** (array 11755955, ~1.5 min/task): lognormal weights
+  reproduce the crossover with variance finite at every σ — flip at
+  σ≈1.0–1.5 (CV² ≈ 2–8), transfer collapsing to 0.16–0.35 by σ=2.5 while
+  the proxy improves to 0.004. E023's "infinite-variance boundary" was a
+  grid artifact (α-grid jumps CV² from 0.33 to ∞ between α=3 and 2). The
+  paper's quotable claim upgraded and made more practical: **the
+  transfer↔proxy boundary is order-unity weight dispersion (CV²), which a
+  practitioner can compute from the weights in one line**; infinite
+  variance is sufficient, not necessary. Paper `8337edd`; explainer 24;
+  Limits updated (lognormal no longer "untested").
+- Follow-up left open (journaled, not run): a targeted Pareto α∈(2,3)
+  mini-sweep to confirm the CV²-threshold unification on the Pareto side
+  (predicted flip near α≈2.2–2.4).
+
 ## 2026-07-05 (Sunday, night, last — final referee verdict applied: weak accept
 
 ### Done

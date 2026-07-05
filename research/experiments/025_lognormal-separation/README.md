@@ -7,7 +7,18 @@ while edge dominance (max-to-sum ratio) grows without bound. Does the
 crossover appear anyway (⇒ mechanism is effective single-edge dominance)
 or does transfer hold at every σ (⇒ the variance story sharpens)?
 
-**Answer.** *Pending — submitted 2026-07-05.*
+**Answer. The crossover appears despite finite variance — the mechanism
+is dispersion-driven edge dominance, not infinite variance.** Transfer
+degrades monotonically in σ and collapses at σ ≥ 2 (regret 0.16–0.35 at
+σ=2.5, every source) while the binned proxy *improves* with dispersion
+(ER: 0.031 → 0.004 across the sweep). The flip sits at σ ≈ 1.0–1.5,
+i.e. squared coefficient of variation ≈ 2–8 — order unity, finite.
+Unified reading across E023+E025: the transfer↔proxy boundary tracks the
+weight dispersion (CV² of order unity); Pareto's α→2 divergence reaches
+it by making CV² infinite, but infinite variance is sufficient, not
+necessary. (E023's α-grid jumped from CV²=0.33 at α=3 straight to ∞ at
+α=2, which made the boundary look like a variance-finiteness dichotomy.)
+Array 11755955, all 10 tasks COMPLETED.
 
 ## Method
 

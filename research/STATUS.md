@@ -254,6 +254,14 @@ paper repo's ClaudeResearch branch when ready to edit there.
   model class, argmax location is the only usable signal; §6 recommendation is
   "don't fit shapes by MSE — use defaults or analytical N."
   → [experiments/012_fitted-shape-paradox](experiments/012_fitted-shape-paradox/README.md)
+- ~~E025 lognormal separation~~ **Done (2026-07-05, array 11755955): the
+  mechanism is dispersion, not variance-finiteness — lognormal weights
+  (finite variance at every σ) reproduce the crossover at CV² ≈ 2–8;
+  transfer collapses to 0.16–0.35 by σ=2.5 while the proxy improves with
+  dispersion (to 0.004). Paper's boundary claim upgraded to "weight
+  dispersion of order unity; infinite variance sufficient, not
+  necessary" (`8337edd`).**
+  → [experiments/025_lognormal-separation](experiments/025_lognormal-separation/README.md)
 - ~~E024 heavy-tail at scale~~ **Done (2026-07-05, array 11754145): the
   α-boundary survives n=22/26 with the sampled-only proxy — α=1.5: proxy
   wins all cells (0.015–0.025 vs 0.030–0.130); α=3: transfer wins all.
