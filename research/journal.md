@@ -5,6 +5,21 @@ and questions queued for Monday. Newest entry first. Established results go in
 [STATUS.md](STATUS.md); plain-language versions in [explainer.md](explainer.md);
 this file is the working diary.*
 
+## 2026-07-05 (Sunday, night — E023: the boundary is the infinite-variance point)
+
+### Done
+
+- **E023 complete** (array 11751921, 10 tasks, ~2.5 min each): sweeping
+  Pareto α ∈ {1.2, 1.5, 2, 3, 5} shows the proxy's regret nearly
+  α-independent (~0.02–0.03 at p=1) while transfer moves through it —
+  cleanly winning for α>2, tying at α=2 (dense ER: 0.028 vs 0.028),
+  losing below. **The crossover coincides with the weight variance
+  becoming infinite** — a principled boundary that pre-empts the
+  "cherry-picked α" objection. At p=3 the pattern shifts one rung heavier
+  and the transfer source-lottery becomes extreme (0.035–0.212 from
+  same-family sources at α=1.2). Paper updated (`5302abc`); explainer
+  result 22; STATUS.
+
 ## 2026-07-05 (Sunday, later — E022: the crossover found; practitioner map complete)
 
 ### Done

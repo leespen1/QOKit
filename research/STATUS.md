@@ -254,6 +254,12 @@ paper repo's ClaudeResearch branch when ready to edit there.
   model class, argmax location is the only usable signal; §6 recommendation is
   "don't fit shapes by MSE — use defaults or analytical N."
   → [experiments/012_fitted-shape-paradox](experiments/012_fitted-shape-paradox/README.md)
+- ~~E023 tail-exponent sweep~~ **Done (2026-07-05, array 11751921): the
+  transfer↔proxy crossover sits at the infinite-variance boundary α ≈ 2 —
+  the proxy's regret is nearly α-independent while transfer sweeps through
+  it (wins α>2, ties α=2 on dense ER, loses α<2). Principled, not tuned;
+  in the paper (`5302abc`).**
+  → [experiments/023_tail-exponent-sweep](experiments/023_tail-exponent-sweep/README.md)
 - ~~E022 heavy-tail crossover~~ **Done (2026-07-05, array 11751040): the
   proxy's measured niche exists. Pareto(1.5) weights defeat mean-weight-
   rescaled transfer (the mean is tail-dominated) and the binned

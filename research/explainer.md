@@ -3,7 +3,7 @@
 *A plain-language walkthrough of everything we've established so far, kept
 current as results land. One section per idea, each linked to the experiment
 that proves it. For the one-page program state, see [STATUS.md](STATUS.md).
-Last updated: 2026-07-05 (through experiment 022 — the practitioner map is complete).*
+Last updated: 2026-07-05 (through experiment 023 — the practitioner map is complete, with its boundary located at the infinite-variance point).*
 
 ## The one-paragraph version
 
@@ -285,6 +285,18 @@ family, borrow angles; if heavy tails make each instance its own world,
 read the instance with the binned proxy; and the leakage calculus tells
 you which world you're in before you commit.*
 → [exp 022](experiments/022_heavy-tail-weights/README.md)
+
+**22. The boundary is a law, not a lucky number (exp 023).** Sweeping the
+tail exponent of the Pareto weights shows the proxy's regret barely moves
+(~0.02–0.03 at p=1, at every α) — it's *transfer* that sweeps through it:
+clean wins for α > 2, a dead tie at α = 2 on dense graphs, clean losses
+below. α = 2 is exactly where the weight distribution's variance becomes
+infinite. So the practitioner rule has a one-line justification: with
+finite weight variance, instances of a family look alike and you should
+borrow angles; with infinite variance, each instance belongs to its few
+giant edges and you must read it directly. The referee question "why
+α=1.5?" is answered before it's asked.
+→ [exp 023](experiments/023_tail-exponent-sweep/README.md)
 
 ## The June-13 line's other results, in plain language
 
