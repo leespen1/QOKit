@@ -57,19 +57,23 @@ arXiv late August; submit April 2027. Full plan: see `research/decisions.md` and
 
 ## Where we are
 
-**Phases 1–3 complete; Phase 4 (assembly) far along.** The paper
-(`papers/OverleafPaper`, branch `ClaudeResearch`, head `1d90d9b`) compiles
-clean at 8 pp and now contains: the theory with the V₂ lemmas; the full
-experimental anatomy of exps 001–020 (ranking figure + regret table,
-argmax-transfer figure, fitted-shape dissection with the direction-vs-size
-figure, honest E013/E018/E019 calibrations — transfer beats every proxy
-variant in every regime we could test — and E020's weighted-MaxCut binning
-extension); a glossary; a Conclusion; and a related-work section from two
-independent literature passes (36 verified references). Two adversarial
-referee passes have been applied (June 13; July 4 — the latter caught and
-fixed a false scale-stability claim). Remaining: author list +
-acknowledgments (parked per Spencer), optional E015/E016 figures, and
-whatever new experiments surface. Overleaf shows only `main`; merge the
+**Phases 1–4 effectively complete.** The paper
+(`papers/OverleafPaper`, branch `ClaudeResearch`, head `7cdf80c`) compiles
+clean at 10 pp with the theory (V₂ lemmas included), the full anatomy of
+experiments 001–028, eight figures (ranking, argmax-transfer,
+direction-vs-size, weighted binning, α-crossover with pre-registered
+points), a glossary, a Conclusion, and 36 verified references from two
+independent literature passes. Four adversarial review passes have been
+applied (June 13 critique; July 4 referee; July 5 coherence; July 5 final
+verdict: **weak accept, mechanical fixes only — all applied**). The
+practitioner map is measured in every dimension: transfer wins
+family-concentrated regimes (unweighted, mild weights, all sizes/depths
+tested); the per-instance binned proxy wins high-dispersion weights at low
+depth (boundary at order-unity CV², pre-registered and confirmed;
+scale-checked to n=26); the deep high-dispersion corner is hard for every
+method and marked open; Max-3-XOR replicates the map. Remaining: author
+list + acknowledgments (parked per Spencer), the reviewer's optional
+length-cut menu, and Spencer's read. Overleaf shows only `main`; merge the
 paper repo's ClaudeResearch branch when ready to edit there.
 
 ## What we know (established results only)
