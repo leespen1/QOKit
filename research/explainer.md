@@ -3,7 +3,7 @@
 *A plain-language walkthrough of everything we've established so far, kept
 current as results land. One section per idea, each linked to the experiment
 that proves it. For the one-page program state, see [STATUS.md](STATUS.md).
-Last updated: 2026-07-05 (through experiment 028 + the V₂ conditioning derivation; E029 in flight).*
+Last updated: 2026-07-05 (through experiment 029 + the V₂ conditioning derivation — program complete).*
 
 ## The one-paragraph version
 
@@ -366,6 +366,18 @@ the full quadratic), and even the small leftover on triangle-free graphs.
 What survives as "open" is a 4–6% residue. The density law is now a
 theorem-with-a-small-empirical-tail rather than a fit.
 → [derivation](v2_conditioning_derivation.md)
+
+**29. Good news about the bad corner (exp 029).** The one place where no
+method looked good (deep circuits, wild weights) turns out to be the
+grid's fault, not the landscape's: starting from *any* of the methods'
+choices and letting a simple local search polish the angles on the true
+objective recovers essentially the full value — everyone converges to the
+same optimum, and even our "ceiling" grid was sitting 2–3 points below
+it. The landscape there is sharp (best angles fall between grid points),
+not treacherous. So the final advice line: if you can afford ~2000 true
+evaluations, initialize anywhere sensible and polish; the corner only
+stays hard when evaluations are precious.
+→ [exp 029](experiments/029_corner-refinement/README.md)
 
 ## The June-13 line's other results, in plain language
 

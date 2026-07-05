@@ -5,6 +5,18 @@ and questions queued for Monday. Newest entry first. Established results go in
 [STATUS.md](STATUS.md); plain-language versions in [explainer.md](explainer.md);
 this file is the working diary.*
 
+## 2026-07-05 (Monday, morning — E029: the hard corner was the grid's fault)
+
+### Done
+
+- **E029 complete** (array 11773952): compass refinement from any of four
+  grid starts converges to essentially one optimum in both E028 worst
+  cells (full-2p residual 0.000–0.006); continuous ramp endpoints alone
+  recover most of it; the 8⁴ grid ceilings themselves were 0.02–0.03 low.
+  E028's corner reframed in the paper: sharp landscape, not traps —
+  local refinement erases it wherever true evaluations are affordable;
+  it remains hard only in the zero-refinement (shots-limited) setting.
+
 ## 2026-07-05 (Monday, morning — the open math problem falls; E029 running)
 
 ### Done

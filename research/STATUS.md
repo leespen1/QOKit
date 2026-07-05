@@ -258,6 +258,13 @@ paper repo's ClaudeResearch branch when ready to edit there.
   model class, argmax location is the only usable signal; §6 recommendation is
   "don't fit shapes by MSE — use defaults or analytical N."
   → [experiments/012_fitted-shape-paradox](experiments/012_fitted-shape-paradox/README.md)
+- ~~E029 corner refinement~~ **Done (2026-07-05, array 11773952): E028's
+  hard corner is a GRID ARTIFACT — full-angle compass refinement from any
+  start (proxy/transfer/universal/grid-ceiling) converges to one optimum
+  (residual 0.000–0.006); even the 8⁴ ceilings sat 0.02–0.03 low. The
+  deep high-dispersion landscape is sharp, not trap-riddled: cheap local
+  refinement erases the corner wherever true evaluations are affordable.**
+  → [experiments/029_corner-refinement](experiments/029_corner-refinement/README.md)
 - ~~E028 dispersion at depth~~ **Done (2026-07-05, array 11770562): the
   niche narrows at depth but survives under lognormal (proxy 0.05–0.11
   vs every single source 0.07–0.29; pooled sources recover on sparse);
