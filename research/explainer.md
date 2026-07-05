@@ -3,7 +3,7 @@
 *A plain-language walkthrough of everything we've established so far, kept
 current as results land. One section per idea, each linked to the experiment
 that proves it. For the one-page program state, see [STATUS.md](STATUS.md).
-Last updated: 2026-07-05 (through experiment 021).*
+Last updated: 2026-07-05 (through experiment 022 — the practitioner map is complete).*
 
 ## The one-paragraph version
 
@@ -267,6 +267,24 @@ enough to flip the ranking. If a practical setting exists where the proxy
 is the right tool, it has heavy-tailed or structured weights — that's now a
 precise open question rather than a hope.
 → [exp 021](experiments/021_weighted-transfer/README.md)
+
+**21. Found it: the proxy's home turf is heavy-tailed weights (exp 022).**
+We turned the heterogeneity dial to its honest maximum: Pareto-distributed
+edge weights, where a couple of giant edges dominate every instance and
+the "rescale by average weight" trick — which we gave transfer for free —
+stops working, because an average means little when one edge carries a
+third of the total. Result: at p=1 the binned per-instance proxy beats
+every transfer source in every cell, by 2–7× (0.012 vs 0.087–0.111 on
+dense graphs at n=16). At p=3 the best of three transfer sources still
+sneaks ahead in most cells — but which source works is a lottery (same
+family, regrets from 0.02 to 0.14), while the proxy sits stably around
+0.05. Exponential weights, by contrast, are still transfer territory. So
+after four straight losses, the proxy earns a real, measured niche, and
+the paper's practitioner map is complete: *if your instances share a
+family, borrow angles; if heavy tails make each instance its own world,
+read the instance with the binned proxy; and the leakage calculus tells
+you which world you're in before you commit.*
+→ [exp 022](experiments/022_heavy-tail-weights/README.md)
 
 ## The June-13 line's other results, in plain language
 

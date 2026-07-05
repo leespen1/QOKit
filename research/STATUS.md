@@ -254,6 +254,15 @@ paper repo's ClaudeResearch branch when ready to edit there.
   model class, argmax location is the only usable signal; §6 recommendation is
   "don't fit shapes by MSE — use defaults or analytical N."
   → [experiments/012_fitted-shape-paradox](experiments/012_fitted-shape-paradox/README.md)
+- ~~E022 heavy-tail crossover~~ **Done (2026-07-05, array 11751040): the
+  proxy's measured niche exists. Pareto(1.5) weights defeat mean-weight-
+  rescaled transfer (the mean is tail-dominated) and the binned
+  per-instance proxy wins every p=1 cell by 2–7× (0.012–0.022 vs
+  0.031–0.111), staying stable at p=3 while transfer sources become a
+  lottery (0.021–0.140). Exp(1) stays transfer territory. Practitioner
+  map complete; paper's abstract/contribution 5/practical/Conclusion all
+  updated (`7613c37`).**
+  → [experiments/022_heavy-tail-weights](experiments/022_heavy-tail-weights/README.md)
 - ~~E021 weighted transfer rematch~~ **Done (2026-07-05, array 11748691):
   no crossover — weights erode transfer 3–10× (and collapse the
   zero-knowledge universal schedule on dense ER at p=3) but same-family

@@ -5,6 +5,37 @@ and questions queued for Monday. Newest entry first. Established results go in
 [STATUS.md](STATUS.md); plain-language versions in [explainer.md](explainer.md);
 this file is the working diary.*
 
+## 2026-07-05 (Sunday, later — E022: the crossover found; practitioner map complete)
+
+### Done
+
+- **E022 complete in minutes** (array 11751040, 8 tasks). **The headline
+  the whole calibration arc was missing: under Pareto(α=1.5) weights the
+  binned per-instance proxy WINS** — every p=1 cell by 2–7×; stable at
+  p=3 (0.046–0.067) against lottery-like transfer sources (0.021–0.140).
+  Exp(1) remains transfer territory, confirming the heterogeneity dial:
+  U[0,1] < Exp(1) ≪ Pareto(1.5). Mechanism: mean-weight rescaling fails
+  when the mean is tail-dominated; quantile bins absorb giant edges per
+  instance. Third independent observation of sampled-N ≥ exact-N.
+- **Paper updated end-to-end** (`7613c37`, 9 pp clean): abstract,
+  contribution 5, the practitioner section (E021 paragraph now flows into
+  the E022 inversion), and a Conclusion that names the completed map —
+  family concentration ⇒ transfer; rescaling-defeating heterogeneity ⇒
+  per-instance binned proxy; the calculus tells you which regime you're
+  in. Explainer result 21; STATUS updated.
+- With E022, the story arc is genuinely complete: theory (Thms 1–3 +
+  V₂ anatomy + binning extension), anatomy (density law, argmax
+  transfer), honest calibrations (E013/018/019/021), and a real positive
+  niche (E020+E022). Twenty-two experiments, all reproducible.
+
+### Open questions for Monday (standing)
+
+- Author list + acknowledgments (parked per Spencer).
+- Optional next experiments if the loop continues: E015/E016 optional
+  figures; a Pareto-α sweep to locate the crossover boundary; n=22–26
+  heavy-tail confirmation (GPU); a fresh full referee pass on the final
+  9-pp draft.
+
 ## 2026-07-05 (Sunday — coherence pass applied; E022 queued)
 
 ### Done
