@@ -5,6 +5,18 @@ and questions queued for Monday. Newest entry first. Established results go in
 [STATUS.md](STATUS.md); plain-language versions in [explainer.md](explainer.md);
 this file is the working diary.*
 
+## 2026-07-05 (Monday, morning — E030: the proxy's second job is free polishing)
+
+### Done
+
+- **E030 complete** (array 11779172): compass refinement on the binned
+  proxy's own landscape — free — lifts true AR +0.05–0.12 in the hard
+  corner within the ramp family (one confirmation eval), while full-2p
+  surrogate refinement overfits model error under extreme tails (Pareto:
+  0.83 < 0.88). The practitioner section now ends constructively:
+  initialize from the map, polish on the surrogate within the schedule
+  family, confirm once. Paper + docs updated; range E001–E030.
+
 ## 2026-07-05 (Monday, morning — E029: the hard corner was the grid's fault)
 
 ### Done

@@ -258,6 +258,14 @@ paper repo's ClaudeResearch branch when ready to edit there.
   model class, argmax location is the only usable signal; §6 recommendation is
   "don't fit shapes by MSE — use defaults or analytical N."
   → [experiments/012_fitted-shape-paradox](experiments/012_fitted-shape-paradox/README.md)
+- ~~E030 proxy-side refinement~~ **Done (2026-07-05, array 11779172):
+  free polish works within the ramp family — refining the 4 endpoints on
+  the proxy's own landscape lifts true AR +0.05–0.12 with one
+  confirmation evaluation (logn 0.80→0.92; Pareto 0.84→0.88) — but
+  freeing all 2p angles overfits the surrogate's model error (Pareto
+  full-2p 0.83 < ramp4 0.88). Rule: surrogate polish, low-dimensional
+  family, confirm once.**
+  → [experiments/030_proxy-side-refinement](experiments/030_proxy-side-refinement/README.md)
 - ~~E029 corner refinement~~ **Done (2026-07-05, array 11773952): E028's
   hard corner is a GRID ARTIFACT — full-angle compass refinement from any
   start (proxy/transfer/universal/grid-ceiling) converges to one optimum

@@ -7,7 +7,15 @@ is continuous and free. If compass refinement on the *proxy's* predicted
 objective transfers its gains to the true objective, the proxy earns a
 new role: free continuous polish where evaluations are precious.
 
-**Answer.** *Pending — submitted 2026-07-05.*
+**Answer. Yes within the ramp family; no beyond it.** Free compass
+refinement of the 4 ramp endpoints on the proxy's landscape lifts true AR
+by +0.05–0.12 with a single confirmation evaluation (lognormal:
+0.799 → 0.915; Pareto: 0.837 → 0.884). Freeing all 2p angles on the
+surrogate, however, *overfits its model error* under extreme tails —
+Pareto full-2p falls to 0.829, below its own ramp4 result and the grid
+start. Practitioner rule: polish on the surrogate, but stay in the
+low-dimensional schedule family; spend true evaluations only to confirm.
+Array 11779172, all COMPLETED (~21 min/task).
 
 ## Method
 

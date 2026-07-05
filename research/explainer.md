@@ -3,7 +3,7 @@
 *A plain-language walkthrough of everything we've established so far, kept
 current as results land. One section per idea, each linked to the experiment
 that proves it. For the one-page program state, see [STATUS.md](STATUS.md).
-Last updated: 2026-07-05 (through experiment 029 + the V₂ conditioning derivation — program complete).*
+Last updated: 2026-07-05 (through experiment 030 — program complete, ending on a constructive recipe).*
 
 ## The one-paragraph version
 
@@ -378,6 +378,18 @@ not treacherous. So the final advice line: if you can afford ~2000 true
 evaluations, initialize anywhere sensible and polish; the corner only
 stays hard when evaluations are precious.
 → [exp 029](experiments/029_corner-refinement/README.md)
+
+**30. The proxy's second job: free polishing (exp 030).** Result 29's
+catch was that polishing needs ~2000 real evaluations. But the proxy's
+own landscape is free — so let *it* do the polishing and spend one real
+evaluation to check. Within the 4-parameter ramp family this works
+beautifully: +0.05–0.12 approximation ratio for free in the hard corner.
+One warning came with it: give the surrogate all 40 angles to play with
+and it starts optimizing its own quirks instead of the truth (on the
+wildest weights the result got *worse* than not polishing). So the final
+practitioner sentence: initialize from the map, polish on the surrogate
+within the schedule family, confirm with one real evaluation.
+→ [exp 030](experiments/030_proxy-side-refinement/README.md)
 
 ## The June-13 line's other results, in plain language
 
