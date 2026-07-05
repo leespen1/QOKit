@@ -19,4 +19,5 @@ export JULIA_NUM_THREADS=$SLURM_CPUS_PER_TASK
 echo "Node: $(hostname)  Date: $(date)  Task: $SLURM_ARRAY_TASK_ID"
 
 REPO=/mnt/home/leespen1/GRIPS/QOKit
-julia --project="$REPO" "$REPO/research/experiments/020_binned-weighted/run.jl"
+# --gcthreads=1: task 3 hit a parallel-GC-marking abort under allocation churn
+julia --gcthreads=1 --project="$REPO" "$REPO/research/experiments/020_binned-weighted/run.jl"

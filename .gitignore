@@ -221,3 +221,4 @@ data/data_generation/Nc_Distributions/HPC_Copy
 # Paper repo (papers/OverleafPaper) is a separate, nested git repository
 # (GitHub-backed) intentionally not tracked by QOKit.
 papers/OverleafPaper/
+core.*

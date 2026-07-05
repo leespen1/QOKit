@@ -114,25 +114,45 @@ Returns the argmax index over the schedule list.
 =#
 function binned_proxy_argmax(N, binmeans, binsizes, n, schedules)
     K = length(binmeans)
+    # memoize the (few distinct) mixer-factor vectors serially, then run an
+    # allocation-free hot loop with per-thread buffers (static chunking)
+    βset = Dict{Float64, Vector{ComplexF64}}()
+    for (γs, βs) in schedules, β in βs
+        haskey(βset, β) || (βset[β] = vec(get_β_factors([β], n)))
+    end
     vals = zeros(length(schedules))
-    @threads for k in eachindex(schedules)
-        γs, βs = schedules[k]
-        Q = fill(ComplexF64(1 / sqrt(2.0^n)), K)
-        for ℓ in eachindex(γs)
-            f = vec(get_β_factors([βs[ℓ]], n))          # (n+1)
-            phase = [cis(-γs[ℓ] * c / 2) for c in binmeans]
-            Qsrc = phase .* Q
-            Qnew = zeros(ComplexF64, K)
-            for b in 1:K, d in 0:n
-                w = f[d + 1] * Qsrc[b]
-                w == 0 && continue
-                for b′ in 1:K
-                    Qnew[b′] += w * N[b′, d + 1, b]
+    nt = Threads.nthreads()
+    @threads :static for t in 1:nt
+        Q = zeros(ComplexF64, K)
+        Qsrc = zeros(ComplexF64, K)
+        Qnew = zeros(ComplexF64, K)
+        for k in t:nt:length(schedules)
+            γs, βs = schedules[k]
+            fill!(Q, ComplexF64(1 / sqrt(2.0^n)))
+            for ℓ in eachindex(γs)
+                f = βset[βs[ℓ]]
+                γ = γs[ℓ]
+                @inbounds for b in 1:K
+                    Qsrc[b] = cis(-γ * binmeans[b] / 2) * Q[b]
                 end
+                fill!(Qnew, zero(ComplexF64))
+                @inbounds for b in 1:K
+                    w0 = Qsrc[b]
+                    for d in 0:n
+                        w = f[d + 1] * w0
+                        for b′ in 1:K
+                            Qnew[b′] += w * N[b′, d + 1, b]
+                        end
+                    end
+                end
+                Q, Qnew = Qnew, Q
             end
-            Q = Qnew
+            s = 0.0
+            @inbounds for b in 1:K
+                s += binsizes[b] * abs2(Q[b]) * binmeans[b]
+            end
+            vals[k] = s
         end
-        vals[k] = sum(binsizes[b] * abs2(Q[b]) * binmeans[b] for b in 1:K)
     end
     argmax(vals)
 end
