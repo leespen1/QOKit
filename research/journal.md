@@ -5,6 +5,41 @@ and questions queued for Monday. Newest entry first. Established results go in
 [STATUS.md](STATUS.md); plain-language versions in [explainer.md](explainer.md);
 this file is the working diary.*
 
+## 2026-07-04 (Saturday, night, latest — E019 lands: both claimed regimes go to transfer)
+
+### Done
+
+- **E019 complete and folded in** (array 11740470 all COMPLETED; paper
+  `c346ad2`; STATUS + explainer result 18 updated). Depth p=10/20: every
+  proxy variant collapses (exact 0.07–0.14, sampled 0.11–0.21, analytical
+  0.18–0.37) while transfer reaches 0.001–0.03 — the exact compression
+  misplaces the argmax by ~0.1 AR at fidelities of 0.7–0.8, the cleanest
+  argmax-transfer demonstration we have. Beyond the exact-N wall (n=22/26):
+  transfer wins every cell; dense-ER p=3 worsens with n (0.047→0.061) but
+  stays ahead of sampled (0.078–0.081) and analytical (0.083–0.106); the
+  pooled universal schedule beats the proxies almost everywhere. Positives
+  worth keeping: the analytical argmax improves with n on sparse regular
+  graphs (asymptotic derivation, now measured) and its binomial P is
+  load-bearing (empirical P degrades 3-regular p=3 from 0.05 to 0.27).
+- The referee's #2 risk ("advertised regimes untested") is closed with
+  data; the p=3 depth gap is closed (comparisons now span p=1–20,
+  n=12–26).
+
+### Next experiment (E020, designing now)
+
+- **Binned compression for weighted MaxCut** — converts the referee's #1
+  risk (integer costs are load-bearing; singleton classes trivialize the
+  compression) into a new contribution. Random U[0,1] edge weights make
+  every cost class a singleton; quantile-bin the costs into K integer
+  labels and drive the existing machinery with them (projector = bin
+  averaging; proxy phases use bin-mean costs; true evolution uses true
+  weights). Measure per-layer leakage vs K (predicted: compression term +
+  binning term shrinking in K) and binned-proxy parameter-setting regret
+  vs true ceilings, n=14–16, p=1 and p=3. Theorems 2–3 apply to any fixed
+  partition, so the calculus extends verbatim — the question is whether
+  the binning term is small enough at modest K for the proxy to remain
+  usable, and how the K-tradeoff looks.
+
 ## 2026-07-04 (Saturday, night, later — fresh referee pass applied)
 
 ### Done

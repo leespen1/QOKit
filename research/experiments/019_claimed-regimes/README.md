@@ -7,7 +7,29 @@ where transfer showed its only strain, and sizes beyond the O(4ⁿ) exact-N
 wall where only the analytical/sampled models exist. Does any proxy variant
 earn its keep there?
 
-**Answer.** *Pending — Slurm array 11740470 running (submitted 2026-07-04).*
+**Answer. No — both claimed regimes go to transfer, with no asterisks.**
+All 10 tasks COMPLETED (array 11740470; n=26 tasks ~30 min each). Full
+table: [analysis.txt](analysis.txt).
+
+1. **Depth (p=10, 20; n=14–16):** E018's dense-ER strain closes in
+   *transfer's* favor. Single-source transfer regret is 0.001–0.03
+   (best-of-3 ≤ 0.007 in every cell) while every proxy variant collapses:
+   exact compression 0.07–0.14, sampled-N 0.11–0.21, analytical 0.18–0.37.
+   The zero-model-error compression itself misplaces the argmax by ~0.1 AR
+   at these depths — the argmax-transfer failure mode in pure form (its
+   fidelity there is still 0.7–0.8 per E011; the landscape peak drifts even
+   while the state stays decent).
+2. **Beyond the exact-N wall (n=22, 26):** transfer still wins every cell.
+   Its one soft spot (dense ER, p=3) worsens with n (0.047 → 0.061) yet
+   stays ahead of sampled-N (0.078–0.081) and the analytical model
+   (0.083–0.106). The "universal" pooled schedule is competitive with the
+   proxies almost everywhere — even zero instance knowledge beats them.
+3. **One positive for the analytical model:** on sparse regular graphs its
+   argmax *improves* with n (p=1 regret 0.019 → 0.017 from n=22 → 26),
+   consistent with its class-level derivation being asymptotic; and its
+   native binomial P is load-bearing (with empirical P instead: 0.27 vs
+   0.05 at 3-regular p=3 — the self-consistency effect the P(c')
+   investigation and E017 both saw).
 
 ## Method
 

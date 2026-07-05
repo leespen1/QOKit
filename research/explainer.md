@@ -217,6 +217,27 @@ costs money. The theory contribution — knowing *why* and *when*, with error
 bars — is untouched.
 → [exp 018](experiments/018_transfer-calibration/README.md)
 
+**18. We went looking for the proxy's last refuge — and transfer was
+already there (exp 019, 2026-07-04).** Two regimes remained untested: high
+depth (where transfer had shown its only weakness) and graphs too big for
+the exact N (n=22–26, where only the sampled/analytical models exist). At
+depth p=10–20, transfer becomes nearly perfect (regret ≤0.007 with three
+sources) while *every* proxy variant falls apart — even the exact,
+zero-model-error compression picks angles ~0.1 worse than the best, at
+depths where its state is still 70–80% faithful: the clearest demonstration
+yet that a good state and a good *peak location* are different things. On
+the big graphs, transfer wins every cell too; its dense-ER weakness grows
+with size but stays ahead of everything else, and even a single pooled
+"universal" schedule — zero knowledge of the instance — beats the proxies
+almost everywhere. Two consolation findings: the analytical formula's peak
+gets *better* as graphs grow on sparse regular families (its math is
+asymptotic, so this is expected and now measured), and it must be used with
+its own binomial cost distribution — swapping in the true one wrecks it
+(0.05 → 0.27), the same self-consistency effect we've now seen three times.
+The paper states all of this plainly; the honest conclusion is that the
+proxy's durable contribution is the error calculus, not the parameter
+setting. → [exp 019](experiments/019_claimed-regimes/README.md)
+
 ## The June-13 line's other results, in plain language
 
 **14. At depth, what matters is where the peak is, not how good the state is.**

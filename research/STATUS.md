@@ -258,6 +258,17 @@ ClaudeResearch branch when ready to edit there.
   model class, argmax location is the only usable signal; §6 recommendation is
   "don't fit shapes by MSE — use defaults or analytical N."
   → [experiments/012_fitted-shape-paradox](experiments/012_fitted-shape-paradox/README.md)
+- ~~E019 claimed-regimes test~~ **Done (2026-07-04, GPU array 11740470):
+  both untested regimes go to transfer. At p=10/20 ramps every proxy
+  variant collapses (exact 0.07–0.14, sampled 0.11–0.21, analytical
+  0.18–0.37) while transfer reaches 0.001–0.03 — even the zero-model-error
+  compression misplaces the argmax by ~0.1 AR while its fidelity is still
+  0.7–0.8. At n=22/26 (beyond exact N) transfer wins every cell including
+  dense-ER p=3 (0.061 vs sampled 0.078+). Positives: analytical argmax
+  improves with n on sparse regular graphs; its binomial P is load-bearing
+  (empirical P: 0.05 → 0.27). Paper's practitioner section and Conclusion
+  updated; the referee's "untested regimes" objection is closed.**
+  → [experiments/019_claimed-regimes](experiments/019_claimed-regimes/README.md)
 - ~~E018 transfer calibration (critique T2.4)~~ **Done (2026-07-04, job
   11677649): plain within-family angle transfer from one n=10 source beats
   every proxy variant on all 28 cells, usually by ~10× (pooled regret 0.007
