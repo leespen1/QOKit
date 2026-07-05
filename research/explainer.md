@@ -3,7 +3,7 @@
 *A plain-language walkthrough of everything we've established so far, kept
 current as results land. One section per idea, each linked to the experiment
 that proves it. For the one-page program state, see [STATUS.md](STATUS.md).
-Last updated: 2026-07-05 (through experiment 030 — program complete, ending on a constructive recipe).*
+Last updated: 2026-07-05 (through experiment 031 — the guarded recipe validated in every regime).*
 
 ## The one-paragraph version
 
@@ -390,6 +390,16 @@ wildest weights the result got *worse* than not polishing). So the final
 practitioner sentence: initialize from the map, polish on the surrogate
 within the schedule family, confirm with one real evaluation.
 → [exp 030](experiments/030_proxy-side-refinement/README.md)
+
+**31. The recipe, assembled and tested (exp 031).** Put it all together —
+start from the map's recommended initializer, let the proxy polish the
+ramp for free, spend two real evaluations (the start and the polish), keep
+the better. Tested in all three worlds: where borrowing angles is already
+perfect, polishing would have hurt but the guard makes it harmless; in the
+proxy's niche it adds 5 points; in the hard corner it adds 9–12 and the
+guarded result reaches 0.92–0.95. Two evaluations, no tuning, never worse
+than the initializer. That's the paper's final practical sentence, now
+with numbers in every regime. → [exp 031](experiments/031_composed-recipe/README.md)
 
 ## The June-13 line's other results, in plain language
 

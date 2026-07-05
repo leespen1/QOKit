@@ -5,6 +5,21 @@ and questions queued for Monday. Newest entry first. Established results go in
 [STATUS.md](STATUS.md); plain-language versions in [explainer.md](explainer.md);
 this file is the working diary.*
 
+## 2026-07-05 (Monday, morning — E031: the guarded recipe, validated everywhere)
+
+### Done
+
+- **E031 complete** (array 11782218): the composed recipe with the
+  two-evaluation guard — map-init, surrogate ramp-polish, keep the
+  better — never hurts (guard recovers the unweighted case where polish
+  degrades a ceiling-level init) and gains +0.05 (proxy niche) to
+  +0.09–0.12 (hard corner, best-of-two 0.92–0.95). Paper's closing
+  recipe updated to the guarded form with per-regime numbers; range
+  E001–E031. The morning arc: E028 (last map cell) → V₂ derivation
+  (open problem closed) → E029 (corner = grid artifact) → E030 (free
+  surrogate polish) → E031 (guarded recipe validated). The program is
+  now complete *and* ends on a fully quantified, deployable procedure.
+
 ## 2026-07-05 (Monday, morning — E030: the proxy's second job is free polishing)
 
 ### Done

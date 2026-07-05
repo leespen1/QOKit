@@ -7,7 +7,15 @@ surrogate within the ramp family (E030); confirm with one true
 evaluation. Does the fully deployable composition — zero target
 evaluations except the confirmation — actually deliver in each regime?
 
-**Answer.** *Pending — submitted 2026-07-05.*
+**Answer. Yes, with a two-evaluation guard.** Unweighted (transfer's
+home): inits already sit at the ceiling (0.897) and polish *degrades*
+them (0.837) — the guard (evaluate init and polished, keep the better)
+recovers fully. Proxy's niche (Pareto p=3): polish +0.05 (0.76–0.77 →
+0.82). Hard corner (lognormal p=20): polish +0.09–0.12 (0.77–0.80 →
+0.90), best-of-two 0.92–0.95. The deployable recipe — map-init,
+surrogate ramp-polish, two true evaluations, keep the better — never
+hurts and gains exactly where the map says the surrogate has signal.
+Array 11782218, all COMPLETED (~4–6 min/task).
 
 ## Method
 

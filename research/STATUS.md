@@ -258,6 +258,13 @@ paper repo's ClaudeResearch branch when ready to edit there.
   model class, argmax location is the only usable signal; §6 recommendation is
   "don't fit shapes by MSE — use defaults or analytical N."
   → [experiments/012_fitted-shape-paradox](experiments/012_fitted-shape-paradox/README.md)
+- ~~E031 composed recipe~~ **Done (2026-07-05, array 11782218): the
+  guarded recipe validated end-to-end in all three regimes — polish
+  degrades already-perfect inits (unweighted: 0.897→0.837, guard
+  recovers), gains +0.05 in the proxy's niche, +0.09–0.12 in the hard
+  corner (best-of-two 0.92–0.95). Final form: map-init → surrogate
+  ramp-polish → two evaluations, keep the better.**
+  → [experiments/031_composed-recipe](experiments/031_composed-recipe/README.md)
 - ~~E030 proxy-side refinement~~ **Done (2026-07-05, array 11779172):
   free polish works within the ramp family — refining the 4 endpoints on
   the proxy's own landscape lifts true AR +0.05–0.12 with one
