@@ -254,6 +254,12 @@ paper repo's ClaudeResearch branch when ready to edit there.
   model class, argmax location is the only usable signal; §6 recommendation is
   "don't fit shapes by MSE — use defaults or analytical N."
   → [experiments/012_fitted-shape-paradox](experiments/012_fitted-shape-paradox/README.md)
+- ~~E024 heavy-tail at scale~~ **Done (2026-07-05, array 11754145): the
+  α-boundary survives n=22/26 with the sampled-only proxy — α=1.5: proxy
+  wins all cells (0.015–0.025 vs 0.030–0.130); α=3: transfer wins all.
+  The positive niche is scale-robust and delivered by the practical
+  variant.**
+  → [experiments/024_heavy-tail-at-scale](experiments/024_heavy-tail-at-scale/README.md)
 - ~~E023 tail-exponent sweep~~ **Done (2026-07-05, array 11751921): the
   transfer↔proxy crossover sits at the infinite-variance boundary α ≈ 2 —
   the proxy's regret is nearly α-independent while transfer sweeps through

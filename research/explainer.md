@@ -3,7 +3,7 @@
 *A plain-language walkthrough of everything we've established so far, kept
 current as results land. One section per idea, each linked to the experiment
 that proves it. For the one-page program state, see [STATUS.md](STATUS.md).
-Last updated: 2026-07-05 (through experiment 023 — the practitioner map is complete, with its boundary located at the infinite-variance point).*
+Last updated: 2026-07-05 (through experiment 024 — the practitioner map is complete, boundary located and scale-confirmed).*
 
 ## The one-paragraph version
 
@@ -297,6 +297,14 @@ borrow angles; with infinite variance, each instance belongs to its few
 giant edges and you must read it directly. The referee question "why
 α=1.5?" is answered before it's asked.
 → [exp 023](experiments/023_tail-exponent-sweep/README.md)
+
+**23. The heavy-tail rule holds at sizes where it matters (exp 024).** At
+n=22–26 — where the exact binned distribution is impossible and only the
+sampled proxy exists — infinite-variance weights keep the proxy ahead in
+every cell (often 4–7×), and finite-variance weights keep transfer ahead
+in every cell. The practitioner rule from result 22 is scale-robust, and
+it's the *practical* proxy variant that delivers it.
+→ [exp 024](experiments/024_heavy-tail-at-scale/README.md)
 
 ## The June-13 line's other results, in plain language
 

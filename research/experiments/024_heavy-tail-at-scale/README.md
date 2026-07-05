@@ -6,7 +6,12 @@ persist at n=22 and 26 — sizes where the exact binned homodist is
 O(4ⁿ)-impossible and the proxy side is necessarily the *sampled* binned
 variant (K=64, S=10), i.e. the practical method whose niche is claimed?
 
-**Answer.** *Pending — submitted 2026-07-05.*
+**Answer. Yes — the boundary survives scale with the practical method.**
+At α=1.5 (infinite variance) the sampled binned proxy wins all four
+(family, n) cells: 0.015–0.025 vs 0.030–0.130 for every transfer source
+(universal 0.051–0.111). At α=3.0 (finite variance) transfer wins all
+four (0.001–0.024 vs proxy 0.043–0.080). Array 11754145, all COMPLETED
+(n=26 tasks ~7–10 min).
 
 ## Method
 

@@ -5,6 +5,19 @@ and questions queued for Monday. Newest entry first. Established results go in
 [STATUS.md](STATUS.md); plain-language versions in [explainer.md](explainer.md);
 this file is the working diary.*
 
+## 2026-07-05 (Sunday, night — E024: boundary scale-confirmed; final referee pass launched)
+
+### Done
+
+- **E024 complete** (GPU array 11754145): at n=22/26 with the sampled-only
+  binned proxy, α=1.5 keeps the proxy ahead in every cell (0.015–0.025 vs
+  0.030–0.130 all transfer sources) and α=3 keeps transfer ahead in every
+  cell. The infinite-variance rule is scale-robust and delivered by the
+  practical method. Paper sentence added; explainer result 23; STATUS.
+- **Final full referee pass launched** on the completed 9-pp draft
+  (E022–E024 additions included) — last substantive quality gate before
+  Spencer's Monday read.
+
 ## 2026-07-05 (Sunday, night — E023: the boundary is the infinite-variance point)
 
 - **α-crossover figure added** (`abc0127`): proxy flat, transfer sweeping
