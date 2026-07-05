@@ -254,6 +254,13 @@ paper repo's ClaudeResearch branch when ready to edit there.
   model class, argmax location is the only usable signal; §6 recommendation is
   "don't fit shapes by MSE — use defaults or analytical N."
   → [experiments/012_fitted-shape-paradox](experiments/012_fitted-shape-paradox/README.md)
+- ~~E028 dispersion at depth~~ **Done (2026-07-05, array 11770562): the
+  niche narrows at depth but survives under lognormal (proxy 0.05–0.11
+  vs every single source 0.07–0.29; pooled sources recover on sparse);
+  under Pareto at p=10–20 all methods degrade toward parity — the deep
+  high-dispersion corner is hard for everything tested. Map complete in
+  all dimensions measured.**
+  → [experiments/028_dispersion-at-depth](experiments/028_dispersion-at-depth/README.md)
 - ~~E027 Max-3-XOR replication~~ **Done (2026-07-05, array 11757023): the
   map generalizes — compression regret at MaxCut magnitude, sampled ≥
   exact (4th occurrence), transfer/universal near-perfect on unweighted

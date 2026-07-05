@@ -6,7 +6,21 @@ every proxy variant collapses at p=10–20 ramps while transfer excels
 (E019). The (high dispersion × depth) cell is unmeasured: does the niche
 extend to depth, or do the argmax-drift losses of E019 overwhelm it?
 
-**Answer.** *Pending — submitted 2026-07-05.*
+**Answer. The niche narrows at depth but does not vanish — and the
+(dispersion × depth) corner is hard for every method.** Under lognormal
+σ=2.5 at p=10/20 the binned proxies (0.05–0.11) beat every single
+transfer source (0.07–0.29; sources are again a lottery), though the
+pooled universal schedule recovers on 3-regular (0.035) and the proxy
+leads outright on dense ER at p=20 (0.059 vs 0.087 best source). Under
+Pareto α=1.5 at depth everything degrades toward parity (proxy
+0.11–0.20, best sources 0.03–0.13 with huge spread) — no method is good.
+Array 11770562, all COMPLETED (~6 min/task).
+
+Reading: depth compounds the E019 argmax-drift for proxies AND breaks
+source-to-target alignment for transfer; under dispersion the proxy
+remains the most *reliable* single-shot choice (lognormal), but the deep
+heavy-tail corner is honestly open — plausibly needing finer schedule
+grids or adaptive methods beyond this paper's scope.
 
 ## Method
 

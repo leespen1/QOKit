@@ -5,6 +5,19 @@ and questions queued for Monday. Newest entry first. Established results go in
 [STATUS.md](STATUS.md); plain-language versions in [explainer.md](explainer.md);
 this file is the working diary.*
 
+## 2026-07-05 (Monday, morning — loop resumed on request; E028 closes the map's last cell)
+
+### Done
+
+- Spencer said "continue the research loop" — resumed full pace.
+- **E028 complete** (array 11770562): (dispersion × depth), the last
+  unmeasured cell. Under lognormal σ=2.5 at p=10/20 the proxy remains the
+  most reliable single-shot method (0.05–0.11 vs single sources 0.07–0.29,
+  a lottery; pooled sources recover on sparse); under Pareto 1.5 at depth
+  every method degrades toward parity. The honest completion: the map now
+  also names the corner where nothing tested works well — a marked target
+  for future methods, stated as such in the paper.
+
 ## 2026-07-05 (Monday, small hours — E027: the map is not a MaxCut story; night closed)
 
 ### Done

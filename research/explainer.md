@@ -3,7 +3,7 @@
 *A plain-language walkthrough of everything we've established so far, kept
 current as results land. One section per idea, each linked to the experiment
 that proves it. For the one-page program state, see [STATUS.md](STATUS.md).
-Last updated: 2026-07-05 (through experiment 027 — the map replicates on Max-3-XOR; nothing but the cubic lemma is MaxCut-specific).*
+Last updated: 2026-07-05 (through experiment 028 — the practitioner map is complete in every measured dimension, including the corner where no method wins).*
 
 ## The one-paragraph version
 
@@ -340,6 +340,17 @@ with constraint density. The one thing that didn't carry over is the one
 thing the theory says shouldn't: MaxCut's special small-angle cancellation.
 The map is a property of the framework, not of the problem we happened to
 study first. → [exp 027](experiments/027_max3xor/README.md)
+
+**27. The last cell of the map: deep circuits on wildly weighted graphs
+are hard for everyone (exp 028).** At depth 10–20 with high weight spread,
+borrowing from any single source becomes a lottery again (regrets up to
+0.29), and the proxy — while still the most reliable single choice under
+lognormal spread — carries 0.05–0.2 regret itself; pooling several sources
+helps on sparse graphs. Nobody wins cleanly. That's worth knowing: the
+practitioner map now says where each method works, and also names the one
+corner where none of them do — the honest boundary of the paper's advice
+and a marked spot for future methods.
+→ [exp 028](experiments/028_dispersion-at-depth/README.md)
 
 ## The June-13 line's other results, in plain language
 
