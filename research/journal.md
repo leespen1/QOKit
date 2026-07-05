@@ -5,6 +5,18 @@ and questions queued for Monday. Newest entry first. Established results go in
 [STATUS.md](STATUS.md); plain-language versions in [explainer.md](explainer.md);
 this file is the working diary.*
 
+## 2026-07-05 (Monday, small hours — E026: the called shot lands)
+
+### Done
+
+- **E026 complete** (array 11756459): pre-registered prediction (flip in
+  α ∈ (2.2, 2.6) on Pareto, from CV² ≈ 1) **confirmed on dense ER** —
+  proxy wins at 2.2, exact tie at 2.4, transfer at 2.6. 3-regular keeps
+  transfer throughout (its flip is below α=2): the order-unity dispersion
+  law holds with a family-dependent constant. Paper sentence + README +
+  explainer 25 + STATUS updated. The E022–E026 arc is now: niche found →
+  boundary located → mechanism identified → prediction confirmed.
+
 ## 2026-07-05 (Monday, small hours — E025: the mechanism is dispersion)
 
 ### Done

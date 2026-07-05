@@ -254,6 +254,12 @@ paper repo's ClaudeResearch branch when ready to edit there.
   model class, argmax location is the only usable signal; §6 recommendation is
   "don't fit shapes by MSE — use defaults or analytical N."
   → [experiments/012_fitted-shape-paradox](experiments/012_fitted-shape-paradox/README.md)
+- ~~E026 pre-registered prediction test~~ **Done (2026-07-05, array
+  11756459): the dispersion theory's called shot lands on dense ER — flip
+  at α≈2.4 (CV²≈1.0), inside the window written down before the run;
+  3-regular keeps transfer at α≥2.2 (its flip is below α=2), so the
+  order-unity threshold has a family-dependent constant.**
+  → [experiments/026_predicted-flip](experiments/026_predicted-flip/README.md)
 - ~~E025 lognormal separation~~ **Done (2026-07-05, array 11755955): the
   mechanism is dispersion, not variance-finiteness — lognormal weights
   (finite variance at every σ) reproduce the crossover at CV² ≈ 2–8;

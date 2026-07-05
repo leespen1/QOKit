@@ -3,7 +3,7 @@
 *A plain-language walkthrough of everything we've established so far, kept
 current as results land. One section per idea, each linked to the experiment
 that proves it. For the one-page program state, see [STATUS.md](STATUS.md).
-Last updated: 2026-07-05 (through experiment 025 — practitioner map complete; boundary identified as order-unity weight dispersion).*
+Last updated: 2026-07-05 (through experiment 026 — dispersion boundary predicted and confirmed on dense ER; family-dependent constant).*
 
 ## The one-paragraph version
 
@@ -318,6 +318,17 @@ diverging, lognormal crosses it while staying finite. The paper's claim
 is updated accordingly (and is more useful this way: relative dispersion
 is something you can compute from your weights in one line before
 choosing a method). → [exp 025](experiments/025_lognormal-separation/README.md)
+
+**25. We called the shot, then took it (exp 026).** The dispersion theory
+says the flip should happen where the weights' relative spread reaches
+about 1 — on Pareto graphs, around α ≈ 2.2–2.4, in the gap our first sweep
+skipped. We wrote that prediction down, then ran it: on dense ER the flip
+landed at α ≈ 2.4 exactly (a statistical tie there; proxy wins at 2.2,
+transfer at 2.6). Sparse 3-regular graphs hold out longer — their regular
+structure gives angle-borrowing more to grip — so the threshold's constant
+depends on the family even though the law is the same. A predicted-then-
+confirmed result is worth more than ten post-hoc fits, and the paper now
+says it that way. → [exp 026](experiments/026_predicted-flip/README.md)
 
 ## The June-13 line's other results, in plain language
 
