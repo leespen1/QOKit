@@ -238,6 +238,22 @@ The paper states all of this plainly; the honest conclusion is that the
 proxy's durable contribution is the error calculus, not the parameter
 setting. → [exp 019](experiments/019_claimed-regimes/README.md)
 
+**19. Weighted graphs were supposed to be the framework's wall — they
+aren't (exp 020).** With real-valued edge weights, no two bitstrings share
+a cost, so "group by cost value" groups nothing and the whole compression
+seems to die. But the theorems never cared *what* the groups are — so we
+grouped into K equal-population bins of the cost instead. Result: the
+leakage splits cleanly into the structural part we already understand plus
+a binning penalty that shrinks like 1/K (in λ²), and by K ≈ 64–128 bins the
+binned proxy picks parameters exactly as well as the integer-cost version
+does on unweighted graphs (e.g. 0.103 vs 0.105 regret on 3-regular at
+p=3). Bonus: the binned proxy's cost depends on K, not the edge count, so
+it's *cheaper* than the original on dense graphs. The paper's biggest
+stated limitation just became a section with numbers. One footnote for
+honesty: the run also crashed Julia's garbage collector twice before we
+made the inner loop allocation-free — the numbers are from the fixed,
+bit-identical code. → [exp 020](experiments/020_binned-weighted/README.md)
+
 ## The June-13 line's other results, in plain language
 
 **14. At depth, what matters is where the peak is, not how good the state is.**

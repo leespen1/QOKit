@@ -258,6 +258,13 @@ ClaudeResearch branch when ready to edit there.
   model class, argmax location is the only usable signal; §6 recommendation is
   "don't fit shapes by MSE — use defaults or analytical N."
   → [experiments/012_fitted-shape-paradox](experiments/012_fitted-shape-paradox/README.md)
+- ~~E020 binned weighted MaxCut~~ **Done (2026-07-04, jobs 11744099 +
+  11745830): the top referee risk became a result. Quantile-binned classes
+  obey λ² ≈ λ_struct² + O(1/K); the K-dim binned proxy recovers
+  integer-cost regret by K≈64–128 (3-regular n=16 p=3: 0.103 vs 0.105
+  unweighted) at O(K²n) cost independent of m. In the paper (abstract,
+  practitioner section, Limits rescoped).**
+  → [experiments/020_binned-weighted](experiments/020_binned-weighted/README.md)
 - ~~E019 claimed-regimes test~~ **Done (2026-07-04, GPU array 11740470):
   both untested regimes go to transfer. At p=10/20 ramps every proxy
   variant collapses (exact 0.07–0.14, sampled 0.11–0.21, analytical

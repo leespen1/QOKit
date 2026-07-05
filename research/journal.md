@@ -5,6 +5,26 @@ and questions queued for Monday. Newest entry first. Established results go in
 [STATUS.md](STATUS.md); plain-language versions in [explainer.md](explainer.md);
 this file is the working diary.*
 
+## 2026-07-05 (Sunday, early — E020 lands: weighted MaxCut via binning works)
+
+### Done
+
+- **E020 complete** (tasks 1/2/4 in job 11744099; task 3 rerun as 11745830
+  after two Julia-1.12 GC aborts — root-caused to allocation churn in the
+  threaded sweep, fixed by memoized factors + per-thread buffers,
+  bit-identical smoke, and 3× faster). **Headline: the framework's
+  integer-cost "wall" is gone.** λ² ≈ λ_struct² + O(1/K) measured across
+  both families and sizes; binned-proxy regret saturates by K≈64–128 at
+  the unweighted exact-compression levels (ER(0.5) n=16 p=1: 0.038 vs
+  ~0.032; 3-regular n=16 p=3: 0.103 vs 0.105). Folded into the paper
+  (`1d90d9b`): practitioner-section paragraph, abstract clause, Limits
+  rescoped from "not analyzed" to measured scope. Explainer result 19.
+- **Ops notes:** two core dumps from the GC crashes were nearly committed
+  by a background `git add` (multi-GB, slow hash over NFS — looked like a
+  hang; an index.lock removal race followed). Cleaned up: core dumps
+  deleted, `core.*` gitignored, waiters now use sacct state checks instead
+  of squeue emptiness.
+
 ## 2026-07-04 (Saturday, night, latest — E019 lands: both claimed regimes go to transfer)
 
 ### Done
