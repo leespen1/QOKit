@@ -3,7 +3,7 @@
 *A plain-language walkthrough of everything we've established so far, kept
 current as results land. One section per idea, each linked to the experiment
 that proves it. For the one-page program state, see [STATUS.md](STATUS.md).
-Last updated: 2026-07-05 (through experiment 020).*
+Last updated: 2026-07-05 (through experiment 021).*
 
 ## The one-paragraph version
 
@@ -253,6 +253,20 @@ stated limitation just became a section with numbers. One footnote for
 honesty: the run also crashed Julia's garbage collector twice before we
 made the inner loop allocation-free — the numbers are from the fixed,
 bit-identical code. → [exp 020](experiments/020_binned-weighted/README.md)
+
+**20. And the rematch on weighted graphs? Transfer wins again — but now we
+can see the finish line (exp 021).** Random weights make every instance's
+best angles its own, so borrowing angles should suffer. It does: transfer's
+regret grows 3–10× compared to unweighted graphs, and the
+zero-instance-knowledge "universal" schedule outright collapses on dense
+graphs at depth (to the proxy's level). But same-family sources with their
+own random weights still carry enough statistical similarity to beat the
+binned proxy in every cell. Verdict: the proxy's steadiness under
+heterogeneity is real, but i.i.d. uniform weights aren't heterogeneous
+enough to flip the ranking. If a practical setting exists where the proxy
+is the right tool, it has heavy-tailed or structured weights — that's now a
+precise open question rather than a hope.
+→ [exp 021](experiments/021_weighted-transfer/README.md)
 
 ## The June-13 line's other results, in plain language
 

@@ -5,6 +5,23 @@ and questions queued for Monday. Newest entry first. Established results go in
 [STATUS.md](STATUS.md); plain-language versions in [explainer.md](explainer.md);
 this file is the working diary.*
 
+## 2026-07-05 (Sunday, early — E021: the weighted rematch; coherence pass running)
+
+### Done
+
+- **E021 complete in minutes** (array 11748691; reused E020 targets and
+  the allocation-free kernel). Weights erode transfer 3–10× and destroy
+  the universal schedule on dense ER at depth, but same-family weighted
+  sources still win every cell against binned exact/sampled proxies.
+  Direction (heterogeneity → per-instance methods) confirmed; crossover
+  not reached at i.i.d. U[0,1]. Folded into the paper (`9beec01`),
+  explainer result 20, STATUS.
+- **Next open question made precise:** the proxy's viable niche, if any,
+  is strong weight heterogeneity (heavy tails, mixed scales, structured
+  weights) — a concrete follow-up experiment, not a vague hope.
+- Coherence-only referee pass on the heavily-edited draft is running in
+  the background; findings get applied when it reports.
+
 ## 2026-07-05 (Sunday, early — E020 lands: weighted MaxCut via binning works)
 
 ### Done

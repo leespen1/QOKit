@@ -7,7 +7,19 @@ source's angles need not fit a weighted target — while the binned proxy
 (E020) reads each instance's own cost structure. Is the heterogeneous
 weighted setting the proxy's first genuine win?
 
-**Answer.** *Pending — submitted 2026-07-05.*
+**Answer. No crossover yet — weights erode transfer (3–10×) but it still
+wins every cell; only the zero-knowledge universal schedule collapses to
+proxy level (dense ER, p=3: 0.069–0.085).**
+
+Array 11748691, all COMPLETED (0:36–2:35 per task). Cell means:
+best single-source transfer 0.003–0.022 vs binned proxies 0.033–0.111;
+binned_sampled ≈ binned_exact (sampling regularizes again, echoing E010).
+Direction confirmed: i.i.d. U[0,1] weights individualize instances enough
+to hurt concentration-based methods — universal loses its unweighted
+near-perfection entirely on dense ER at depth — but same-family weighted
+sources retain distribution-level concentration and keep winning. The
+crossover to per-instance surrogates, if it exists, needs stronger
+heterogeneity (heavy tails, mixed scales, structured weights).
 
 ## Method
 

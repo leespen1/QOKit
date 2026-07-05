@@ -254,6 +254,14 @@ paper repo's ClaudeResearch branch when ready to edit there.
   model class, argmax location is the only usable signal; §6 recommendation is
   "don't fit shapes by MSE — use defaults or analytical N."
   → [experiments/012_fitted-shape-paradox](experiments/012_fitted-shape-paradox/README.md)
+- ~~E021 weighted transfer rematch~~ **Done (2026-07-05, array 11748691):
+  no crossover — weights erode transfer 3–10× (and collapse the
+  zero-knowledge universal schedule on dense ER at p=3) but same-family
+  weighted sources still beat the binned proxies in every cell
+  (0.003–0.022 vs 0.033–0.111). The proxy's per-instance steadiness is
+  real; i.i.d. U[0,1] weights aren't heterogeneous enough to flip the
+  ranking. In the paper alongside E020.**
+  → [experiments/021_weighted-transfer](experiments/021_weighted-transfer/README.md)
 - ~~E020 binned weighted MaxCut~~ **Done (2026-07-04, jobs 11744099 +
   11745830): the top referee risk became a result. Quantile-binned classes
   obey λ² ≈ λ_struct² + O(1/K); the K-dim binned proxy recovers
