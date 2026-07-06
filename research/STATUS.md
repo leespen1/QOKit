@@ -9,7 +9,7 @@
 > removed; abstract/contrib-5/§5.4/Conclusion/Limits corrected. Core theory
 > (Thms 1–3, error calculus, V₂, unweighted transfer-beats-proxy, E020 binning
 > machinery, Max-3-XOR) unaffected.
-*Last updated: 2026-07-05. This is the one page Spencer needs to read.
+*Venue chosen: QCE 2027 (IEEE Quantum Week), contributed. Last updated: 2026-07-06. This is the one page Spencer needs to read.
 Everything here links to a reproducible experiment or a committed document.
 Plain-language walkthrough of all results: [explainer.md](explainer.md).
 Running journal of the autonomous work: [journal.md](journal.md).*
@@ -67,8 +67,7 @@ arXiv late August; submit April 2027. Full plan: see `research/decisions.md` and
 ## Where we are
 
 **Phases 1–4 effectively complete.** The paper
-(`papers/OverleafPaper`, branch `ClaudeResearch`, head `0fa9b4a`) compiles
-clean at 10 pp with the theory (V₂ lemmas included), the full anatomy of
+(`papers/OverleafPaper`, branch `ClaudeResearch`, head at the QCE length cut) compiles clean at 9 pp with the theory (V₂ lemmas included), the full anatomy of
 experiments 001–031, eight figures (ranking, argmax-transfer,
 direction-vs-size, weighted binning, α-crossover with pre-registered
 points), a glossary, a Conclusion, and 36 verified references from two
