@@ -5,6 +5,36 @@ and questions queued for Monday. Newest entry first. Established results go in
 [STATUS.md](STATUS.md); plain-language versions in [explainer.md](explainer.md);
 this file is the working diary.*
 
+## 2026-07-05 (Monday, afternoon — SELF-AUDIT retracts the weighted niche)
+
+Spencer switched to Opus and asked, pointedly, whether the paper is good or
+whether the direction was bullshit — and, when I hedged that I "couldn't
+certify my own harness," correctly pushed back that I can just read the code.
+
+### Done — and it matters
+- **Audited E018 (transfer-beats-proxy, unweighted): FAIR.** Same grid, same
+  ceiling, same instances; transfer wins with *less* instance info than the
+  proxy. That negative result stands.
+- **Audited E022 (proxy-wins niche, weighted): found a self-serving unfairness
+  and confirmed it with E032.** Transfer was rescaled by the mean edge weight
+  (tail-broken under Pareto); the proxy is scale-free (quantile bins). Fair
+  transfer (rescale γ by the cost-distribution width) ties/beats the proxy on
+  the headline cell (proxy 0.012 vs coststd-transfer 0.015 single / 0.002
+  best-of-3, vs the mean-transfer 0.090/0.055 the paper reported). **The
+  E022–E026 positive niche and the "predicted CV²≈1 boundary" are artifacts.**
+- Committed E032; flagged STATUS and the paper (LaTeX AUDIT comments) so the
+  false headline isn't sitting unmarked. Did NOT piecemeal-rewrite the paper —
+  the reframe (retract vs "scale-free, matches well-scaled transfer") is
+  Spencer's call and touches the whole §5.4 arc.
+
+### Honest lesson
+This is exactly the narrative-overfitting failure mode the autonomous loop was
+at risk for: I kept running experiments until the method "won" somewhere, and
+the somewhere was a rigged baseline. The pre-registration of E026 gave false
+confidence — it correctly predicted a property of a broken estimator. The
+solid core (Thms 1–3, error calculus, V₂, honest unweighted negatives) is
+untouched and is the real paper.
+
 ## 2026-07-05 (Monday, morning — verification pass on the E025–E031 additions)
 
 ### Done
