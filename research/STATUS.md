@@ -1,21 +1,14 @@
 # Research status
 
-> ⚠️ **AUDIT FLAG (2026-07-05, E032): the weighted-niche positive result is an
-> artifact — do not submit as-is.** The E022–E026 claim "the binned proxy beats
-> transfer under heavy-tailed weights (2–7×), boundary at CV²≈1" rescaled the
-> transfer baseline by the *mean edge weight*, a tail-broken scale. Rescaling
-> transfer by the cost-distribution width instead makes it tie the proxy
-> (single-source) and beat it (best-of-3) on the exact headline cell
-> (→ experiments/032_transfer-scale-audit). The niche evaporates; the CV²≈1
-> boundary is tautological. The paper's abstract, contribution 5, §5 weighted
-> paragraph, §5.4 (E022–E026), figure `alpha_crossover`, and Conclusion all
-> assert this artifact and must be retracted/reframed before submission.
-> **Unaffected:** Theorems 1–3, the error calculus, the V₂ derivation, the
-> unweighted transfer-beats-proxy results (E018/E019), E020's binning
-> machinery, Max-3-XOR. This is a decision for Spencer (retract entirely, or
-> reframe as "the proxy is scale-free and *matches* well-scaled transfer").
-
-
+> **Resolved (E032 audit → reframed 2026-07-05):** the E022–E026 "proxy wins
+> under heavy-tailed weights (2–7×), boundary at CV²≈1" was an artifact of
+> rescaling the transfer baseline by the mean edge weight; cost-width-rescaled
+> transfer ties/beats the proxy (→ experiments/032). Per Spencer, the whole arc
+> is collapsed to one honest paragraph in the paper: the binned proxy is
+> *scale-free* and *matches* (does not beat) well-scaled transfer. fig:alpha
+> removed; abstract/contrib-5/§5.4/Conclusion/Limits corrected. Core theory
+> (Thms 1–3, error calculus, V₂, unweighted transfer-beats-proxy, E020 binning
+> machinery, Max-3-XOR) unaffected.
 *Last updated: 2026-07-05. This is the one page Spencer needs to read.
 Everything here links to a reproducible experiment or a committed document.
 Plain-language walkthrough of all results: [explainer.md](explainer.md).
