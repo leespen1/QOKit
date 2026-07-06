@@ -5,6 +5,36 @@ and questions queued for Monday. Newest entry first. Established results go in
 [STATUS.md](STATUS.md); plain-language versions in [explainer.md](explainer.md);
 this file is the working diary.*
 
+## 2026-07-05 (Monday, afternoon — reconciled with Sud et al.; fairer framing)
+
+Spencer asked whether Sud et al. actually claim superiority, and whether we
+missed a regime where their proxy genuinely wins. Read their source
+(papers/References/ParameterSettingHeuristicLatexSource/main.tex).
+
+- **Sud did NOT overclaim.** At p<=3 they report the proxy *statistically
+  indistinguishable* from median-parameter transfer (their own per-instance
+  diffs: -0.004/+0.016/+0.010, all within noise). We agree with this, not
+  contradict it.
+- **Their "transfer fails at p=20" = no p=20 transfer table existed (2022),
+  not ramp-transfer being inferior.** They optimize the proxy over 4-param
+  linear ramps at high depth; there was simply no source of p=20 transfer
+  parameters. They never ran a p=20 head-to-head.
+- **Their "monotonically increasing AR to p=20" is ABSOLUTE AR** (true, and
+  we don't dispute it). Our E019 measures regret vs the *best* p=20 ramp;
+  the proxy's ramp is good in absolute AR yet leaves 0.07-0.37 on the table
+  that transferred ramps capture. Both hold — different metrics.
+- **So we missed nothing, but were being unfair.** Reframed the paper to
+  "competitive with, not superior to, transfer at all depths — extending
+  Sud's own low-depth parity to high depth once ramp transfer (Montanez-
+  Barrera 2025, postdating Sud) is available." Background, transfer paras,
+  abstract, conclusion all updated. This repositions our contribution as the
+  exact characterization + the completed comparison, not a debunking.
+- Net: Sud's proxy IS good and correctly claimed; our value is the theory
+  (compression + error calculus) and finishing the empirical picture fairly.
+  The one genuinely negative result that stands is our OWN fitted-shape
+  proxy (E012/E017), representationally too weak — that's a GRIPS-specific
+  negative, not a Sud one.
+
 ## 2026-07-05 (Monday, afternoon — SELF-AUDIT retracts the weighted niche)
 
 Spencer switched to Opus and asked, pointedly, whether the paper is good or
