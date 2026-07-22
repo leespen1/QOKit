@@ -476,7 +476,9 @@ don't wait"). Resolutions, auditable in the journal:
    format, 8 pp of a ~8–12 pp budget. *(Decided.)*
 3. **Headline framing** — mechanism + argmax-transfer lead; the family
    ranking is corroboration with its scope shown (Fig. ranking panel b).
-   *(Decided; implemented.)*
+   Implemented 2026-07-22: rewritten abstract, E017-hardened statistics, the
+   certificate, and the "So when does it work?" Discussion opener; the ranking
+   carries CIs and the pre-committed criterion. *(Decided; implemented.)*
 4. **E014/E015/E016 fold-in** — done (all three are in the paper with
    figures/lemmas: E014→§5.4 + figure; E015 lemmas→§4; E016→§7; paper repo
    commit `e09a5dc`). With Spencer's approval to edit the paper freely, the

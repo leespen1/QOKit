@@ -1,3 +1,11 @@
+# SUPERSEDED (2026-07-22)
+
+*All three snippets below were folded into `qce2027_paper.tex` by the
+improvement loop on 2026-07-22 (paper commits e09a5dc and later), with
+Spencer's approval to edit the paper directly. This file is kept for the
+history of the proposals only; the paper is the authoritative text, and the
+snippets below no longer match it (post-audit numbers changed).*
+
 # Proposed paper additions from the overnight results (E014/E015/E016)
 
 *Written 2026-06-13. These are **ready-to-paste** LaTeX snippets for the three
