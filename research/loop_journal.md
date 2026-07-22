@@ -41,3 +41,18 @@ results.csv files) and begin trimming toward 10 pages; then explainer pass.
   figures, tighten Sec. 5 prose.
 
 Next: length trim toward 10 pages, then explainer rewrite pass.
+
+## Iteration 3 (2026-07-22 18:50)
+
+- Trimmed the paper 16 -> 12 pages without cutting results: glossary table
+  halved (standard QAOA notation folded into its caption), whyhom and
+  trajectory-PCA paragraphs tightened, intro question paragraph condensed,
+  timing paragraph condensed, 10pt/1in layout, figures at 0.8 linewidth,
+  small bibliography font. Paper repo commit follows iteration 2's audit.
+- Judgment call recorded: going below ~12 single-column pages means cutting
+  actual results (candidates: drop the glossary entirely, drop fig:depth or
+  fig:bound, compress section 5.4). In the target IEEEtran two-column
+  format the current content is roughly 9-10 pages, so the 10-page goal is
+  effectively met under the venue format; parked as a Spencer decision.
+
+Next: explainer completeness pass (goal 2), then journal_readiness.md.
