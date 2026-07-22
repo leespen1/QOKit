@@ -188,6 +188,26 @@ paper repo's ClaudeResearch branch when ready to edit there.
   → [experiments/012_fitted-shape-paradox](experiments/012_fitted-shape-paradox/README.md),
   [experiments/017_error-directions](experiments/017_error-directions/README.md)
 
+- **The regret metric is validated, and parameter transfer beats the proxy on
+  the tested ensembles (exp 018, 2026-07-22).** Grid ceilings are tight (p=1
+  gap ≤0.0007 AR; p=3 ramp-grid gap ~0.002; the linear-ramp restriction itself
+  costs ~0.007 mean, up to 0.05 sparse). New external baseline: transferring
+  the mean true argmax of ten brute-forced ER(0.5) n=12 instances beats the
+  exact-compression proxy on 134/140 instances at p=1 and 140/140 at p=3
+  (transfer regret ~0.014/~0.008 vs proxy 0.032/0.083). On concentrated random
+  ensembles, per-instance parameter setting adds little over transfer; the
+  proxy's niche is where concentration fails or nothing can be simulated. Now
+  stated in the paper's abstract, §5.1, §5.3.
+  → [experiments/018_ceiling-validation](experiments/018_ceiling-validation/README.md)
+- **The headline correlations survive uncertainty quantification, with one
+  honest correction (exp 017, 2026-07-22).** Argmax displacement predicts
+  regret under every control (pooled/cluster/within-cell/demeaned, rho
+  0.56-0.74 both depths). The fidelity-regret correlations were family-
+  confounded in both directions (p=1 pooled 0.39 → 0.07 within cells; p=3
+  pooled -0.02 hides within-cell 0.46); paper restated. Ranking rhos now carry
+  bootstrap CIs; 1.505 carries per-instance spread 1.54±0.26; 26/28 carries
+  p=1.5e-6. → [experiments/017_statistics-hardening](experiments/017_statistics-hardening/README.md)
+
 ## Working hypotheses (NOT established — from the deleted research log or intuition)
 
 - H1: The proxy's usefulness is governed by leakage out of the cost-class subspace,

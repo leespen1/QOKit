@@ -379,6 +379,19 @@ only **argmax displacement** does ($\rho\approx0.7$). Lesson: parameter setting
 is an *argmax-transfer* problem, not a *state-approximation* problem. (This is
 Theorem 3's wrong-norm point, confirmed from the empirical side.)
 
+**Q: how does the proxy compare to plain parameter transfer? (E018 — new)**
+→ **Transfer wins on these ensembles.** The grid ceilings themselves are
+validated (continuous refinement gains at most 0.0007 at $p=1$ and ~0.002 on
+the $p=3$ ramp grid; dropping the linear-ramp restriction gains another
+~0.007). But taking the mean true-optimal angles of ten brute-forced
+ER(0.5) $n=12$ instances and applying them verbatim to every instance,
+family, and size beats the exact-compression proxy on 134/140 instances at
+$p=1$ and 140/140 at $p=3$. Parameter concentration is that strong on random
+ensembles. The honest conclusion (now in the paper): instance-specific
+parameter setting pays only where concentration fails (structured,
+heterogeneous instances) or where nothing can be simulated (then only the
+analytical $N$ exists anyway).
+
 **Q: so what should a practitioner actually do?**
 → **Sampled $N$ ($S\approx10$ bitstrings per cost class) + the empirical cost
 distribution.** Matches exact parameter setting within $0.02$ AR, regret no
