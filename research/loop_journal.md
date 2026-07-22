@@ -287,3 +287,12 @@ theory (hard), HPC crossover demo (parked).
 
 Next: overnight idle stretch; final comprehensive re-audit and Spencer
 wrap-up digest in the last hours of the window.
+
+## Iteration 17 (2026-07-22 ~22:25)
+
+- Repo health check: full JuliaQAOA test suite passes (exit 0, all test
+  summaries Pass) after the day's additions. No source changes were made by
+  the loop (experiments are self-contained), as expected.
+- Entering overnight idle cadence: hourly heartbeats; the final
+  comprehensive audit and the Spencer wrap-up digest are scheduled for the
+  last hours of the window (~14:00-18:00 JST on 2026-07-23).
