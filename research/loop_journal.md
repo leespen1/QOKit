@@ -276,3 +276,14 @@ full-paper audit + wrap-up summary for Spencer.
 Next: overnight; near end of window, final full re-audit + wrap-up
 summary. Science backlog now: correlated-error/selection-aware regret
 theory (hard), HPC crossover demo (parked).
+
+## Iteration 16 (2026-07-23 ~01:30)
+
+- E024 (n=16 stability, 35 instances): all three parameter-space findings
+  replicate one size up (displacement-regret rho 0.84/0.76; normalization
+  rule 0.090->0.060 at p=3, better 32/35, p=1 keeps unnormalized edge;
+  signed anatomy 69/70 overprediction, winner's curse 4-9x). Two stability
+  sentences added to the paper (commit 24a1e1b); range E001-E024.
+
+Next: overnight idle stretch; final comprehensive re-audit and Spencer
+wrap-up digest in the last hours of the window.

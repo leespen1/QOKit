@@ -258,6 +258,13 @@ paper repo's ClaudeResearch branch when ready to edit there.
   effect invisible to pointwise corrections. One sentence in §5.4.
   → [experiments/023_bias-corrected-objective](experiments/023_bias-corrected-objective/README.md)
 
+- **The parameter-space findings persist at n=16 (exp 024, 2026-07-23).**
+  35 instances: displacement-regret ρ 0.84/0.76; normalization rule
+  replicates (p=3: 0.090→0.060, better 32/35; p=1 keeps the unnormalized
+  edge); signed anatomy replicates (overprediction 69/70, winner's curse
+  4-9×, margin ~0.04). Stability sentences added to §5.4.
+  → [experiments/024_n16-stability](experiments/024_n16-stability/README.md)
+
 ## Working hypotheses (NOT established — from the deleted research log or intuition)
 
 - H1: The proxy's usefulness is governed by leakage out of the cost-class subspace,
