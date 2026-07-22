@@ -9,10 +9,12 @@
 > removed; abstract/contrib-5/§5.4/Conclusion/Limits corrected. Core theory
 > (Thms 1–3, error calculus, V₂, unweighted transfer-beats-proxy, E020 binning
 > machinery, Max-3-XOR) unaffected.
-*Venue chosen: QCE 2027 (IEEE Quantum Week), contributed. Last updated: 2026-07-06. This is the one page Spencer needs to read.
+*Venue chosen: QCE 2027 (IEEE Quantum Week), contributed. Last updated: 2026-07-22
+(24-hour improvement loop). This is the one page Spencer needs to read.
 Everything here links to a reproducible experiment or a committed document.
 Plain-language walkthrough of all results: [explainer.md](explainer.md).
-Running journal of the autonomous work: [journal.md](journal.md).*
+Running journal of the autonomous work: [journal.md](journal.md);
+per-iteration loop progress: [loop_journal.md](loop_journal.md).*
 
 ## ⚠ Branch reconciliation (2026-07-03)
 
@@ -415,7 +417,11 @@ don't wait"). Resolutions, auditable in the journal:
    ranking is corroboration with its scope shown (Fig. ranking panel b).
    *(Decided; implemented.)*
 4. **E014/E015/E016 fold-in** — done (all three are in the paper with
-   figures/lemmas). *(Decided; implemented.)*
+   figures/lemmas: E014→§5.4 + figure; E015 lemmas→§4; E016→§7; paper repo
+   commit `e09a5dc`). With Spencer's approval to edit the paper freely, the
+   old convention of leaving §4/§5.4/§7 untouched is superseded: Claude edits
+   directly and Spencer reviews via git diff. Target length ~10 pp.
+   *(Decided; implemented.)*
 5. **`theory_compression.tex`** — retired: header now marks it superseded
    by the paper's §III–IV; kept for proof-detail history, not maintained.
    *(Decided; implemented.)*
