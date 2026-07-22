@@ -296,3 +296,12 @@ wrap-up digest in the last hours of the window.
 - Entering overnight idle cadence: hourly heartbeats; the final
   comprehensive audit and the Spencer wrap-up digest are scheduled for the
   last hours of the window (~14:00-18:00 JST on 2026-07-23).
+
+## Iteration 18 (2026-07-22 ~23:00)
+
+- Explainer coherence pass: the ladder subsection relabeled (it follows the
+  certificate section, matching the paper's order); the certificate's "how
+  to read it" now carries the E022 signed anatomy, the E023 negative, and
+  the E024 n=16 stability in prose (they were table-only).
+- Overnight: idle heartbeats; final audit + Spencer digest in the last
+  hours of the window.
