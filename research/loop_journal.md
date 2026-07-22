@@ -22,3 +22,22 @@ Target paper length: roughly 10 pages (was 14 before fold-in).*
 
 Next: full error-hunt pass (verify every number in the paper against
 results.csv files) and begin trimming toward 10 pages; then explainer pass.
+
+## Iteration 2 (2026-07-22 18:32)
+
+- Ran a three-agent number audit of the whole paper against the experiment
+  records (every claim, every table cell, plus re-derivation of all proofs).
+- All mathematics re-derived correctly, including the new V2 lemmas. Most
+  numbers confirmed exactly (regret table byte-identical to E004's, slack
+  5.8x max, ratio 1.505, all timing entries, all fitted-shape stats).
+- One real error found and fixed: "slice sums up to ~1e8" was wrong twice
+  over (E012 truth: mean of per-instance maxima 9.2e8, absolute max 2.3e10;
+  STATUS's "9e8" was a mean mislabeled as an "up to").
+- Applied 15 precision/scoping fixes (see paper commit `b47de04`), including
+  adding the two missing lemma proofs and fixing a notation collision
+  (s_2 vs spin s_j, spins now sigma_j).
+- Paper compiles clean; 16 pages now (proofs added). Trimming to ~10 pages
+  is the next major chunk, likely: cut the full-page glossary table, merge
+  figures, tighten Sec. 5 prose.
+
+Next: length trim toward 10 pages, then explainer rewrite pass.
