@@ -239,6 +239,16 @@ paper repo's ClaudeResearch branch when ready to edit there.
   weighted-ready).
   → [experiments/021_weighted-maxcut](experiments/021_weighted-maxcut/README.md)
 
+- **The certificate's slack has an exact anatomy (exp 022, 2026-07-22).**
+  regret = Δe − margin exactly (asserted 280/280). Measured: the normalized
+  proxy overpredicts essentially everywhere (e = F−F̂ < 0 at 277/280 argmax
+  points), a winner's curse makes |e| 4-5× larger at the proxy's own argmax
+  than at the true optimum, the two errors partially cancel (median factor
+  0.6), and the proxy's internal margin absorbs a third of the rest. Sharp
+  regret theory must model selection, not pointwise error, which is exactly
+  why no pointwise norm predicts regret. Refined paragraph in §4.
+  → [experiments/022_signed-regret-decomposition](experiments/022_signed-regret-decomposition/README.md)
+
 ## Working hypotheses (NOT established — from the deleted research log or intuition)
 
 - H1: The proxy's usefulness is governed by leakage out of the cost-class subspace,

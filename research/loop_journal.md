@@ -240,3 +240,20 @@ rewrite, decision rule, certificate), then final wrap-up.
 Next: overnight cadence. Remaining productive options: attempt sharpening
 the certificate (correlated-error analysis, E022); a final full-paper
 re-audit near the end of the window; keep STATUS decisions current.
+
+## Iteration 14 (2026-07-22 ~23:30)
+
+- E022: exact signed decomposition regret = Delta-e - margin (identity
+  asserted 280/280). The certificate's 10x slack has three named parts:
+  uniform overprediction by the normalized proxy (e<0 at 277/280 argmax
+  points, so signed errors partially cancel, median factor 0.6), a winner's
+  curse concentrating error at the proxy's own argmax (4-5x the error at
+  the true optimum), and the proxy's internal margin absorbing a third of
+  the residual tilt. Paper's certificate paragraph now states this
+  (commit 430027f); experiment range E001-E022.
+- Sharp insight for future theory: regret bounds must model the selection
+  effect, not pointwise error. This is the mechanistic reason no pointwise
+  norm predicts regret (E012/E014).
+
+Next: overnight lower-intensity cadence; near end of window, final
+full-paper audit + wrap-up summary for Spencer.
