@@ -284,16 +284,145 @@ are also edges, i.e. triangles, feel the conditioning) and that fraction also
 grows with density. The two nearly cancel, leaving the measured flat law
 $\sqrt{V_2}\propto m$. Empirically the removed piece
 $\mathrm{Var}(T)-V_2$ tracks $\tau^2/m$ ($\tau$ = triangle count) at Pearson
-$0.994$. What remains open is only the exact prefactor of that conditioning
-correction, $\mathrm{Var}(\mathbb{E}[T\mid c])$ — pin it per ensemble and the
-density law becomes a theorem. Slogan for the paper: *"density drives
+$0.994$. That correction is no longer an open prefactor: the quadratic
+projection bound of §4f pins it rigorously (it captures 90–100%, mean 97%,
+of the exact correction, gives an explicit $G(n,p)$ limit formula, and
+leaves at most a 10% residual). The operative identity is
+$\mathrm{Cov}(T,S^2)=\mathrm{Var}(T)$, also recorded in §7 item 2; the
+triangle channel alone is only part of the story, which is exactly why the
+crude linear estimate undershot. Slogan for the paper: *"density drives
 compression error" sharpens to "squared codegrees, conditioned on cost, drive
 it."*
 
-### 4d. The §4.3 "ladder" — why homogeneity happens at all
+### 4f. The quadratic conditioning bound (Proposition, E019)
 
-§4.3 assembles the above into a narrative answer to "why do equal-cost
-bitstrings end up with equal amplitudes?":
+This is the piece that turns the density law from an observation into a
+formula. Everything runs through the **edge sum** $S = m - 2c$, a linear
+function of the cost, so conditioning on $c$ is the same as conditioning on
+$S$. Four exact identities over uniform bitstrings (with $\tau$ the triangle
+count and $c_4$ the 4-cycle count):
+
+$$\mathbb{E}[S^3]=6\tau,\quad \mathrm{Var}(S^2)=2m^2-2m+24c_4,\quad
+\mathrm{Cov}(T,S)=6\tau,\quad \mathrm{Cov}(T,S^2)=\mathrm{Var}(T).$$
+
+The last one is the operative one: it is a **quadratic channel present even
+in triangle-free graphs**, which is why the crude linear estimate
+($36\tau^2/m$) undershot the correction so badly (it captures only 18–64%).
+
+**The Gram bound.** Project $T$ onto $\mathrm{span}\{S,\,S^2-m\}$. The
+variance of that $L^2$ projection is $v^\top G^{-1} v$ with
+$v = (6\tau,\ \mathrm{Var}(T))$ and $G$ the Gram matrix built from
+$\mathrm{Var}(S)=m$, $\mathbb{E}[S^3]=6\tau$, and $\mathrm{Var}(S^2)$. Since
+any projection onto a subspace is dominated by the projection onto *all*
+functions of $S$, which is exactly $\mathrm{Var}(\mathbb{E}[T\mid S]) =
+\mathrm{Var}(\mathbb{E}[T\mid c])$, we get
+
+$$\mathrm{Var}\bigl(\mathbb{E}[T\mid c]\bigr) \ge v^\top G^{-1} v,
+\qquad\text{equivalently}\qquad
+V_2 \le \mathrm{Var}(T) - v^\top G^{-1} v.$$
+
+**Proof idea.** Expand $T - 2m = 2\sum_{j<k}A_{jk}\sigma_j\sigma_k$ (the
+codegree form) and $S = \sum_{(a,b)\in E}\sigma_a\sigma_b$ in spin
+variables; over uniform spins **only even monomials survive**, so every
+moment is a graph count. $\mathbb{E}[\sigma_j\sigma_k S]$ is an edge
+indicator, and summing $A_{jk}$ over edges counts each **triangle at each
+of its three edges**, twice per orientation, giving $6\tau$.
+$\mathbb{E}[\sigma_j\sigma_k S^2] = 2A_{jk}$ (**ordered two-edge paths**
+from $j$ to $k$), and the $A_{jk}$-weighted sum of that is exactly
+$4\sum_{j<k}A_{jk}^2 = \mathrm{Var}(T)$. $\mathbb{E}[S^3]$ counts ordered
+triangles; $\mathbb{E}[S^4]$ counts edge pairings plus oriented 4-cycles.
+
+**Why it matters practically:** every ingredient ($m$, $\tau$, $c_4$,
+codegrees) is computable from the graph in **polynomial time**; no $2^n$
+enumeration anywhere. Across 140 instances of the seven families the bound
+captures 90–100% (mean 97%) of the exact conditioning correction. For
+$G(n,p)$ it evaluates asymptotically to
+
+$$V_2/\mathrm{Var}(T) \;\to\; 1 - \frac{p(1+4p-2p^2)}{1+6p^2-4p^3},$$
+
+giving $0.375$ at $p=\tfrac12$ against $0.352$ measured at $n=12$–$14$. The
+empirical density law becomes an explicit formula, up to a residual of at
+most 10%.
+
+### 4g. Weighted MaxCut: the theory travels, the object doesn't
+
+All of §4c–4f extends verbatim to integer-weighted MaxCut under mechanical
+substitutions (Remark "Weighted MaxCut" in the paper, E021):
+
+- **Neighbor-sum Lemma:** $m \to W$ (total weight).
+- **Second moments:** replace $m$ by $\sum_e w_e^2$ and pick up a
+  $\sum_e w_e^4$ term: $\mathbb{E}[T] = 2\sum_e w_e^2$,
+  $\mathrm{Var}(S) = \sum_e w_e^2$, and
+  $\mathrm{Var}(S^2) = 2\bigl(\sum_e w_e^2\bigr)^2 - 2\sum_e w_e^4 + 24c_4^w$.
+- **Codegrees:** $A_{jk} \to \sum_i w_{ij}w_{ik}$.
+- **Triangle and 4-cycle counts** $\to$ the corresponding weight products.
+
+All identities were machine re-verified to $10^{-9}$ on 140 weighted
+instances (bound capture again 93–99.6%, cubic law to 0.5%). The caveat that
+delimits the whole enterprise: generic **continuous** weights collapse every
+cost class to a bitstring-complement pair, so the compression itself becomes
+vacuous. Cost degeneracy is a requirement of the *object*, not of the
+theory.
+
+### 4h. From state error to parameter error: the two-point regret certificate (E020)
+
+Everything so far bounds the **state** error, but parameter setting consumes
+an **argmax**. The paper bridges the two with a certificate evaluated at
+just two points (the subsection "From state error to parameter error",
+Proposition "Two-point regret certificate").
+
+**Statement.** Let $F(\theta) = \langle\psi_p|C|\psi_p\rangle /
+c_{\mathrm{opt}}$ be the true objective and $\hat F$ the proxy objective
+computed from the **normalized** compressed state
+$\chi = \phi_p/\lVert\phi_p\rVert$. If $\hat\theta$ maximizes $\hat F$ over
+a candidate set containing a true maximizer $\theta^*$, then
+
+$$\text{regret} \;=\; F(\theta^*) - F(\hat\theta) \;\le\;
+\varepsilon(\theta^*) + \varepsilon(\hat\theta),$$
+
+where for every $\theta$
+
+$$\varepsilon(\theta) \le \frac{\lVert\psi-\chi\rVert}{c_{\mathrm{opt}}}
+\Bigl(\sigma_\psi + \sqrt{\sigma_\chi^2 + \delta^2}\Bigr),
+\qquad
+\lVert\psi-\chi\rVert \le 2\sum_\ell \lambda_\ell(\theta),$$
+
+with $\sigma_\psi, \sigma_\chi$ the cost standard deviations in the two
+states and $\delta$ their mean-cost difference. Leakage is needed at only
+the two relevant points, and both sit in the low-leakage corner in practice.
+
+**Proof idea (three moves).** (1) Decompose the regret into three terms,
+$[F-\hat F](\theta^*) + [\hat F(\theta^*)-\hat F(\hat\theta)] +
+[\hat F-F](\hat\theta)$; the **middle term is nonpositive** because
+$\hat\theta$ maximizes $\hat F$. (2) For the two survivors, use the identity
+(valid for normalized states and any scalar $a$)
+$\langle\psi|C|\psi\rangle - \langle\chi|C|\chi\rangle =
+\langle\psi-\chi|(C-a)\psi\rangle + \langle\chi|(C-a)(\psi-\chi)\rangle$;
+**center at $a=\langle C\rangle_\psi$** and apply Cauchy–Schwarz, using
+$\lVert(C-a)\chi\rVert^2 = \sigma_\chi^2+\delta^2$. (3) Bound the distance
+via **Theorem 2**: $\lVert\psi-\phi\rVert \le \sum_\ell\lambda_\ell$, and
+normalizing $\phi$ costs at most another
+$1-\lVert\phi\rVert \le \lVert\psi-\phi\rVert$, hence the factor 2.
+
+**The unnormalized variant.** The certificate as stated covers the
+normalized proxy objective, which is also the convention recommended at
+depth (§5). For the unnormalized objective preferred at $p=1$ it acquires
+one extra term, $|a|\,(1-\lVert\phi\rVert^2) = |a|\sum_\ell\lambda_\ell^2$
+with $a = \langle C\rangle_\psi$.
+
+**How to read it.** The certificate holds on all 280 instance-depth pairs
+tested (machine-checked) but is honestly loose: median tightness is
+$10$–$11\times$ over the actual regret, informative only where accumulated
+leakage is a few percent. And that looseness *is* the argmax-transfer story
+of §5, quantified: regret is small not because the proxy landscape is
+pointwise accurate, but because its errors at $\theta^*$ and $\hat\theta$
+nearly cancel, a cancellation a triangle inequality cannot see. Sharpening
+it (a correlated-error bound) is the natural next theory question.
+
+### 4d. The "why homogeneity happens" ladder
+
+The paper's closing §4 subsection assembles the above into a narrative
+answer to "why do equal-cost bitstrings end up with equal amplitudes?":
 
 1. The initial state $\ket{+}^{\otimes n}$ is **exactly** homogeneous.
 2. The phase separator preserves homogeneity **exactly** (Step 1).
@@ -304,9 +433,9 @@ bitstrings end up with equal amplitudes?":
    on any graph** (it's 2-locality, not randomness).
 5. Randomness buys only the *next* rung: $V_2$ self-averages over the
    exponentially large cost classes for random-like instances. **This is the
-   one rung that is measured, not proved** — though §4e's lemmas have now
-   shrunk the open piece to a single quantity (the triangle conditioning
-   correction).
+   one rung that is measured, not proved** — though §4e–4f now pin the
+   density law to within a few percent, leaving only the small residual and
+   a rigorous self-averaging statement.
 6. Finally it's partly self-fulfilling: QAOA's good schedules shrink $\gamma$
    with density, so the angles worth running are precisely the low-leakage ones.
 
@@ -349,9 +478,15 @@ because those schedules equalize leakage across families.
 → **No — it is an argmax-transfer problem, and fidelity decouples.**
 Recomputing true-landscape geometry over 140 instances at both depths:
 regret correlates with the proxy's **argmax displacement** from the true
-optimum at both depths ($\rho=0.76$ at $p=1$, $0.63$ at $p=3$), but with the
-state-fidelity deficit only at $p=1$ ($\rho=0.39\to-0.02$ at $p=3$).
-Landscape flat-peak robustness predicts nothing ($\rho=-0.18/+0.10$). So the
+optimum at both depths (pooled Spearman $\rho=0.74$, 95% CI $0.64$–$0.82$,
+at $p=1$; $0.65$, CI $0.54$–$0.74$, at $p=3$; and robustly
+$\rho=0.56$–$0.74$ under every control: family-and-size demeaning,
+within-cell averaging, cluster bootstrap). The state-fidelity deficit is
+**family-confounded both ways**: its pooled $\rho=0.39$ at $p=1$ drops to
+$0.07$ within family-size cells, while the $p=3$ pooled value of $-0.02$
+hides a moderate within-cell $0.46$ (proxy-chosen schedules compress
+fidelity into a narrow band across families). Landscape flat-peak
+robustness predicts nothing ($|\rho|\le0.24$ under all controls). So the
 leakage calculus bounds the *state* error while parameter quality lives in
 *parameter space* — which is exactly why a lower-fidelity model with a
 better-placed argmax (the analytical $N$ off-ER) beats the exact
@@ -392,15 +527,50 @@ parameter setting pays only where concentration fails (structured,
 heterogeneous instances) or where nothing can be simulated (then only the
 analytical $N$ exists anyway).
 
+**Q: why normalize the proxy objective at depth? (E020 — new)**
+→ **Because the unnormalized objective carries a leakage bias.** Along the
+depth grid the compressed norm varies substantially from schedule to
+schedule, so the unnormalized objective **conflates "high predicted value"
+with "low leakage"** and systematically favors small-angle schedules.
+Dividing by the tracked compressed norm (free, from Theorem 2's norm
+bookkeeping) removes the bias exactly where leakage accumulates. Effect:
+pooled $p=3$ regret drops $0.080\to0.044$ (better on 134/140 instances); at
+$p=1$ the unnormalized convention keeps a mild edge ($0.031$ vs $0.047$),
+so the rule is: **normalize at depth, keep unnormalized at $p=1$.**
+
 **Q: so what should a practitioner actually do?**
-→ **Sampled $N$ ($S\approx10$ bitstrings per cost class) + the empirical cost
-distribution.** Matches exact parameter setting within $0.02$ AR, regret no
-worse, family-agnostic, no dense-graph artifact. **Honest scope:** its cost is
-$O(S\,m\,2^n)$ — still exponential, useful only where statevector passes are
-affordable but the $O(4^n)$ exact distribution is not (roughly $n\lesssim30$).
-Whether $N$ has a polynomial Monte-Carlo estimator is open; beyond classical
-reach, the analytical model is the only option, and there you lean on its argmax
-robustness and avoid dense graphs.
+→ **Follow the three-branch decision rule** (stated verbatim in the paper's
+"How to set parameters" paragraph at the end of §5.4):
+
+1. **If the ensemble concentrates and a solved source instance exists** (the
+   random families tested here, at simulable sizes): **transfer** its
+   angles. Transfer beat every per-instance method tested (E018).
+2. **Otherwise, where statevector passes are affordable:** the recipe is
+   **sampled $N$ ($S\approx10$ bitstrings per cost class) + the empirical
+   cost distribution, with the normalized objective at depth.** It matches
+   exact parameter setting within $0.02$ AR, regret no worse,
+   family-agnostic, no dense-graph artifact. **Honest scope:** its cost is
+   $O(S\,m\,2^n)$, still exponential, useful only where statevector passes
+   are affordable but the $O(4^n)$ exact distribution is not (roughly
+   $n\lesssim30$). Whether $N$ has a polynomial Monte-Carlo estimator is
+   open.
+3. **Beyond classical reach, the analytical $N$ is the only option:** trust
+   its argmax, never its values, and distrust it on dense Erdős–Rényi
+   graphs.
+
+**Q: stepping back, when does the proxy work at all?**
+→ This is the three-part answer that now *opens* the paper's Discussion
+("So when does it work?"):
+
+1. The **compression** is faithful whenever density-controlled leakage is
+   small at the schedules worth running, which the argmax's self-selection
+   makes generic (the §4 ladder).
+2. Its **parameter setting** works whenever the argmax transfers, which held
+   on every tested family and failed only for the analytical $N$ on dense
+   Erdős–Rényi.
+3. It **adds value over the cheapest alternative** (transferring angles from
+   one solved instance) only where concentration fails or no solved source
+   exists: structured, heterogeneous, or beyond-classical instances.
 
 ---
 
@@ -448,7 +618,7 @@ robustness and avoid dense graphs.
    identities; the crucial one is $\mathrm{Cov}(T, S^2)=\mathrm{Var}(T)$, a
    quadratic channel present even in triangle-free graphs, which is exactly
    why the crude linear estimate ($36\tau^2/m$) undershot. The bound
-   captures 91-100% (mean 97%) of the exact correction on 140 instances,
+   captures 90-100% (mean 97%) of the exact correction on 140 instances,
    and for $G(n,p)$ evaluates to
    $V_2/\mathrm{Var}(T)\to 1-p(1+4p-2p^2)/(1+6p^2-4p^3)$ (0.375 at $p=1/2$
    vs. 0.352 measured). Remaining open: only the few-percent residual and a
@@ -502,6 +672,18 @@ robustness and avoid dense graphs.
 The draft (`qce2027_paper.tex`, ~12 pages single-column) is organized so that
 each section owns one move. If you rewrite, this is the load-bearing order:
 
+**The abstract** (~200 words) is shaped thesis-first, no suspense: (i) the
+thesis in the first two sentences (the proxy is an *exact orthogonal
+compression*, not a substitution heuristic); (ii) the error calculus it
+yields (leakage, the telescoping bound with its median $4\times$ slack, the
+variance identity, and the two-point certificate transferring state error to
+regret); (iii) the density law, derived within ten percent from exact
+codegree and cycle identities; (iv) four experimental headlines (regret
+tracks argmax displacement and no distribution- or amplitude-space norm;
+sampled $N$ matches exact within $0.02$ AR; parameter transfer beats every
+per-instance method on concentrated ensembles; normalizing the objective
+nearly halves depth regret at no cost).
+
 1. **Introduction.** The hook is the two open questions (what is the proxy /
    when does it work), quoted against Sud et al.'s own "no longer unitary,
    analogues of amplitudes" language. Contributions list: exactness, error
@@ -518,7 +700,11 @@ each section owns one move. If you rewrite, this is the load-bearing order:
    parameter transfer (Brandao, Galda, Sureshbabu, utility-scale 2026) as the
    competing strategy, and Kruger-Mauerer as the closest landscape-surrogate
    neighbor (they approximate the landscape; we ask which error norms certify
-   argmax transfer).
+   argmax transfer). Three references deliberately live *not* here but in
+   §5.4 (khairy2020, shaffer2023, grips2024): the fitted-shape paradox
+   re-tests the collaboration's documented G-RIPS 2024 proposal, framed as
+   the surrogate-fit pattern of khairy2020/shaffer2023 transplanted into
+   distribution space.
 3. **Section 3: exactness.** Setup ($S_v$, $M_v$, class states, $P$), the
    empirical $N$, Theorem 1 (one proxy step = layer + projection; proof is a
    two-line induction: group the mixer sum by distance and cost, class-average
@@ -530,19 +716,32 @@ each section owns one move. If you rewrite, this is the load-bearing order:
    the "leakage is an instrument, $O(2^n)$" paragraph, Theorem 3 (variance
    identity + the wrong-norm warning it implies), then MaxCut small-angle
    structure: neighbor-sum Lemma, cubic Corollary, the two $V_2$ lemmas with
-   proofs, the conditioning remark, and the "why homogeneity happens" ladder.
+   proofs, the conditioning remark, the Proposition "Quadratic conditioning
+   bound" (`prop:quadcond`; §4f here), the Remark "Weighted MaxCut"
+   (`rem:weighted`; §4g here), the subsection "From state error to parameter
+   error" with the Proposition "Two-point regret certificate"
+   (`prop:certreg`; §4h here), and the "why homogeneity happens" ladder.
 5. **Section 5: experimental anatomy.** Setup (7 families, $n=12$–$20$,
-   grids, regret/value-added/ceiling definitions, SE discipline). 5.2:
+   grids, regret/value-added/ceiling definitions, SE discipline; now also
+   the ceiling validation (Nelder–Mead refinement gains $\le0.0007$ AR at
+   $p=1$ and $\approx0.002$ on the $p=3$ ramp grid, releasing the ramp
+   restriction a further $\approx0.007$) and the normalization convention
+   (argmaxes use the unnormalized objective unless stated; normalized drops
+   pooled $p=3$ regret $0.080\to0.044$)). 5.2:
    leakage maps, density law, bound tightness, depth scaling, trajectory PCA.
    5.3: regret table, mild-$n$ growth, the $p=1$ leakage-regret ranking
-   (honestly scoped), 5.4: model error (analytical robustness + dense-ER
+   (honestly scoped), ending with the transfer-baseline paragraph (E018).
+   5.4: model error (analytical robustness + dense-ER
    artifact, filter negatives, fitted-shape paradox table, E014
-   argmax-vs-fidelity, sampled-$N$ recipe, timing table).
-6. **Discussion.** What the compression view buys; limits; E016 (the rotating
-   subspace kills cheap instance-adapted frames); the remaining $V_2$ open
-   piece.
+   argmax-vs-fidelity, the normalization-rule paragraph, sampled-$N$ recipe,
+   the "How to set parameters" decision rule, timing table).
+6. **Discussion.** Opens with "So when does it work?" (the three-part answer,
+   see the last Q of §5); then what the compression view buys; limits; E016
+   (the rotating subspace kills cheap instance-adapted frames); the $V_2$
+   open piece is now only the small residual plus a rigorous self-averaging
+   statement.
 7. **Code and data availability.** Everything traces to
-   `research/experiments/E001–E016`; claim-to-experiment mapping is in LaTeX
+   `research/experiments/E001–E021`; claim-to-experiment mapping is in LaTeX
    comments (`% E00x` next to each claim).
 
 Style rules the draft follows: every quantitative sentence carries a `% E00x`
@@ -572,11 +771,11 @@ theorem's scope (any graph vs. random-like) is stated where it is used.
 | Gaussian fit inert | median MSE $10\times$ better, argmax moves 0/140 | E012 |
 | Norms vs. regret | MSE $\rho\approx-0.1$; amplitude $-0.2$; landscape $+0.1$; argmax displacement $\approx0.7$ | E012 |
 | Raw analytical slice sums | mean $\sim10^9$, up to $2\times10^{10}$ (vs. $2^n$) | E012 |
-| Argmax vs. fidelity at depth | displacement $\rho=0.76/0.63$; fidelity $0.39/-0.02$; robustness $-0.18/+0.10$ | E014 |
+| Argmax vs. fidelity at depth | displacement pooled $\rho=0.74$ (CI $0.64$–$0.82$) at $p=1$, $0.65$ (CI $0.54$–$0.74$) at $p=3$, robust $0.56$–$0.74$ under all controls; fidelity pooled $0.39\to0.07$ within cells ($p{=}1$), $-0.02$ pooled hiding within-cell $0.46$ ($p{=}3$); robustness $\lvert\rho\rvert\le0.24$ | E014, E017 |
 | $V_2$ lemmas verified | $10^{-10}$, 280 instances; cubic law $<0.3\%$ | E015 |
 | Conditioning correction | $\propto\tau^2/m$, Pearson $0.994$ | E015 |
 | Prefix-frame failure | principal angle $71°$–$88°$; oracle captures $0.99$ | E016 |
-| Quadratic conditioning bound | captures 91–100% (mean 97%) of $\mathrm{Var}(\mathbb{E}[T\mid c])$; ER limit $0.375$ at $p=1/2$ | E019 |
+| Quadratic conditioning bound | captures 90–100% (mean 97%) of $\mathrm{Var}(\mathbb{E}[T\mid c])$; ER limit $0.375$ at $p=1/2$ | E019 |
 | Ceiling validation | $p=1$ gap $\le0.0007$; ramp gap $\approx0.002$; ramp restriction $\approx0.007$ | E018 |
 | Transfer baseline | beats proxy 134/140 ($p1$), 140/140 ($p3$); regret $\approx0.014/0.008$ | E018 |
 | Statistics hardening | argmax $\rho$ 0.56–0.74 under all controls; fidelity family-confounded both ways | E017 |
@@ -600,6 +799,12 @@ theorem's scope (any graph vs. random-like) is stated where it is used.
 4. **At small angles, compression error is third order ($\beta\gamma^2$)**
    because the phase separator never leaks and the mixer's first-order leak
    cancels by a MaxCut identity. Density (edge count) sets the constant.
-5. **Parameter setting is argmax-transfer, not state-approximation.** That's why
-   fitting $N$ by MSE backfires, why the analytical model works far outside its
-   domain, and why "sampled $N$ + empirical $P$" is the recommended recipe.
+5. **Parameter setting is argmax-transfer, not state-approximation, and the
+   decision rule has three branches.** Transfer angles from one solved
+   instance wherever the ensemble concentrates and such a source exists
+   (transfer won on every tested random family); otherwise use sampled $N$ +
+   the empirical cost distribution, with the normalized objective at depth;
+   beyond classical reach the analytical $N$ is the only option (trust its
+   argmax, never its values, avoid dense ER). Argmax-transfer is also why
+   fitting $N$ by MSE backfires and why the analytical model works far
+   outside its derivation domain.
