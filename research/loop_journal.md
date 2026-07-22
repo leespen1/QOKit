@@ -134,3 +134,20 @@ published fixed-angle baseline), local CPU at n=12-14.
 Next: attempt gap 5 (exact conditioning correction Var(E[T|c]) for G(n,p)),
 the most tractable remaining science; if it stalls, do gap 8 (vector
 figures).
+
+## Iteration 8 (2026-07-22 ~20:00)
+
+- E019: closed the density-law open problem in substance (readiness gap 5).
+  Derived and machine-verified four exact moment identities; the key one is
+  Cov(T, S^2) = Var(T) (a quadratic channel the crude 36 tau^2/m estimate
+  missed, alive even in triangle-free graphs). The resulting L2-projection
+  bound V2 <= Var(T) - v'G^{-1}v is rigorous, polynomial-time, and captures
+  91-100% (mean 97%) of the exact conditioning correction over 140
+  instances; ER asymptotic V2/Var(T) -> 1 - p(1+4p-2p^2)/(1+6p^2-4p^3)
+  (0.375 at p=1/2 vs 0.352 measured). All identities asserted to 1e-9.
+- Paper: new Proposition (quadratic conditioning bound) with proof in
+  section 4; Discussion open problem narrowed; abstract upgraded to
+  "derive to within a few percent". Commit 24a1c7f; 13 pp; compiles clean.
+
+Next: digest E019 into STATUS/explainer, then remaining gaps: theory-regret
+bound (gap 3, hard) or vector figures (gap 8, mechanical).
