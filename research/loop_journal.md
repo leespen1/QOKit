@@ -187,3 +187,20 @@ referee verdict near the end of the 24 h window.
 Next: digest E020 into STATUS/explainer; then re-run the referee panel for
 a refreshed verdict, and a final consistency pass (page count crept to 14;
 one more trim).
+
+## Iteration 11 (2026-07-22 ~21:15)
+
+- Refreshed referee review returned: verdict upgraded to MINOR REVISION.
+  All three original objections judged addressed (the reframe from method
+  to anatomy accepted; certificate closes the wrong-error objection; the
+  statistics now "referee-proof in structure").
+- Applied its five desk edits (paper commit follows): abstract rewritten to
+  ~200 words; "How to set parameters" decision rule placed beside the
+  recipe; normalization convention pinned in setup, Table 2 caption, and a
+  certificate remark; "So when does it work?" boxed answer opens the
+  Discussion; glossary cell + wording hygiene.
+- journal_readiness.md verdict updated; only Spencer-owned items block
+  submission (author list, acknowledgments, frozen archive/DOI, venue).
+
+Next: sweep the explainer for consistency with today's paper changes
+(abstract, decision rule), then final wrap-up passes within the window.

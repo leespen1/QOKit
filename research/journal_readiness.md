@@ -8,8 +8,16 @@ everything actionable is distilled here.*
 
 ## Verdict
 
-**Major revision at a low-to-mid journal (IEEE TQE, QST); not yet
-submission-ready, but no referee expected the conclusions to reverse.**
+**MINOR REVISION as of the refreshed review (2026-07-22 evening), upgraded
+from major revision after E017-E020.** The re-review found all three
+decisive objections addressed (theory now predicts via the density-law
+Proposition and reaches regret via the two-point certificate; empirics
+"referee-proof in structure"; remaining defects presentational) and its
+five ranked desk edits have been applied (abstract ~200 words, decision
+guide, normalization convention pinned, boxed answer, hygiene). What blocks
+submission now is only the Spencer-owned items below.
+
+Original (morning) verdict for the record: **major revision;**
 Consensus strengths: a genuinely new and productive identification
 (proxy = exact compression) of a well-cited heuristic; an unusually
 rigorous, reproducible empirical program (fixed seeds, SEs, claim-to-
