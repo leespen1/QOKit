@@ -108,3 +108,29 @@ local CPU) to close the biggest statistics gap.
 
 Next: E018 (grid-ceiling validation vs. continuous optimization + a
 published fixed-angle baseline), local CPU at n=12-14.
+
+## Iteration 7 (2026-07-22 19:45)
+
+- E018 (ceiling validation + transfer baseline) run on 140 instances:
+  ceilings are tight (p=1 gap <= 0.0007; p=3 ramp gap ~0.002; the linear-
+  ramp restriction itself costs ~0.007 mean, up to 0.05 sparse). The new
+  parameter-transfer baseline (mean true argmax of ten brute-forced
+  ER(0.5) n=12 instances, applied verbatim everywhere) BEATS the exact
+  compression on 134/140 instances at p=1 and 140/140 at p=3 (pooled
+  transfer regret ~0.014 / ~0.008 vs proxy 0.032 / 0.083). The paper now
+  validates its ceilings in the setup, reports the baseline in section 5.3,
+  and delimits the proxy's niche in the abstract. Honest but significant
+  reframing: on concentrated random ensembles, per-instance parameter
+  setting adds little over transfer.
+- Literature agent (gap 7): no peer-reviewed instance of entrywise
+  N-fitting exists; the documented origin is the collaboration's own public
+  G-RIPS 2024 report, now cited (with Khairy 2020 / Shaffer 2023 for the
+  general surrogate-fit pattern). Table 3 framing rewritten.
+- Paper commit fb036e1; experiment range E001-E018; 13 pp; compiles clean.
+- journal_readiness gaps 2 and 7 marked done. Remaining open: theory-regret
+  bound (gap 3), HPC crossover demo (gap 4, parked), Var(E[T|c]) (gap 5),
+  vector figures (gap 8).
+
+Next: attempt gap 5 (exact conditioning correction Var(E[T|c]) for G(n,p)),
+the most tractable remaining science; if it stalls, do gap 8 (vector
+figures).
