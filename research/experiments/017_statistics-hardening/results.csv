@@ -1,0 +1,35 @@
+statistic,value,ci_lo,ci_hi,detail
+e014_p1_rho_argmax_disp,0.7373,0.6364,0.8202,pooled n=140 instance-bootstrap
+e014_p1_rho_argmax_disp_cluster,0.7373,0.556,0.8711,cluster bootstrap over 14 family-n cells
+e014_p1_rho_argmax_disp_withincell,0.6474,0.5632,0.7316,mean of 13 within-cell rhos (10 inst each)
+e014_p1_rho_argmax_disp_demeaned,0.6343,NaN,NaN,cell-demeaned pooled Spearman
+e014_p1_rho_fidelity_deficit,0.3933,0.2431,0.5271,pooled n=140 instance-bootstrap
+e014_p1_rho_fidelity_deficit_cluster,0.3933,0.0865,0.5715,cluster bootstrap over 14 family-n cells
+e014_p1_rho_fidelity_deficit_withincell,0.0659,-0.0641,0.1959,mean of 14 within-cell rhos (10 inst each)
+e014_p1_rho_fidelity_deficit_demeaned,0.0102,NaN,NaN,cell-demeaned pooled Spearman
+e014_p1_rho_robust_frac,-0.2097,-0.3784,-0.041,pooled n=140 instance-bootstrap
+e014_p1_rho_robust_frac_cluster,-0.2097,-0.5094,0.1285,cluster bootstrap over 14 family-n cells
+e014_p1_rho_robust_frac_withincell,-0.2014,-0.4328,0.03,mean of 14 within-cell rhos (10 inst each)
+e014_p1_rho_robust_frac_demeaned,-0.2346,NaN,NaN,cell-demeaned pooled Spearman
+e014_p3_rho_argmax_disp,0.653,0.5368,0.7406,pooled n=140 instance-bootstrap
+e014_p3_rho_argmax_disp_cluster,0.653,0.5217,0.7355,cluster bootstrap over 14 family-n cells
+e014_p3_rho_argmax_disp_withincell,0.5615,0.4006,0.7224,mean of 14 within-cell rhos (10 inst each)
+e014_p3_rho_argmax_disp_demeaned,0.6732,NaN,NaN,cell-demeaned pooled Spearman
+e014_p3_rho_fidelity_deficit,-0.0164,-0.1753,0.1475,pooled n=140 instance-bootstrap
+e014_p3_rho_fidelity_deficit_cluster,-0.0164,-0.1962,0.2548,cluster bootstrap over 14 family-n cells
+e014_p3_rho_fidelity_deficit_withincell,0.4621,0.2083,0.7159,mean of 14 within-cell rhos (10 inst each)
+e014_p3_rho_fidelity_deficit_demeaned,0.3578,NaN,NaN,cell-demeaned pooled Spearman
+e014_p3_rho_robust_frac,0.1043,-0.0771,0.2771,pooled n=140 instance-bootstrap
+e014_p3_rho_robust_frac_cluster,0.1043,-0.1529,0.3206,cluster bootstrap over 14 family-n cells
+e014_p3_rho_robust_frac_withincell,0.0882,-0.1897,0.3661,mean of 14 within-cell rhos (10 inst each)
+e014_p3_rho_robust_frac_demeaned,0.061,NaN,NaN,cell-demeaned pooled Spearman
+e012_rho_mse_entry,0.0291,-0.0245,0.0812,pooled over 1260 (instance,model) rows
+e012_rho_mse_entry_withincell,0.0162,-0.0706,0.103,mean of 14 within-cell rhos
+e012_rho_mse_entry_demeaned,0.0042,NaN,NaN,cell-demeaned pooled Spearman
+e012_rho_eps_raw_argmax,-0.26,-0.3199,-0.2014,pooled over 1260 (instance,model) rows
+e012_rho_eps_raw_argmax_withincell,-0.2062,-0.4361,0.0236,mean of 14 within-cell rhos
+e012_rho_eps_raw_argmax_demeaned,-0.2951,NaN,NaN,cell-demeaned pooled Spearman
+e004_p1_ranking_rho_n12,0.9643,0.6429,0.9643,7 family means, instance bootstrap within family
+e004_p1_ranking_rho_n14,0.8571,0.6071,0.9286,7 family means, instance bootstrap within family
+e011_ratio_p30_p20_small,1.5356,1.2733,1.798,per-instance ratio over 70 matched n=16 small-ramp runs (CI cols = +-1 SD)
+e010_sampled_lower_cells,26,28,1.516193151474001e-6,one-sided binomial p in ci_hi col; cells with lower sampled regret out of total

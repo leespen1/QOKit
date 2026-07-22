@@ -91,3 +91,20 @@ Next: journal_readiness.md (goal 3), via adversarial referee agents.
 
 Next: E017 (bootstrap CIs + within-family correlations, analysis-only,
 local CPU) to close the biggest statistics gap.
+
+## Iteration 6 (2026-07-22 19:30)
+
+- E017 (statistics hardening) run and committed: bootstrap CIs, cluster
+  bootstrap, within-cell and demeaned Spearman for E012/E014; CI-carrying
+  7-point ranking rhos (E004); per-instance depth ratio 1.54 +- 0.26 (E011
+  vs E003, 70 matched runs); 26/28 sign test p = 1.5e-6 (E010).
+- Substantive finding: the fidelity-regret correlations were family-
+  confounded in both directions (p=1 pooled 0.39 is mostly between-family,
+  within-cell 0.07; p=3 pooled -0.02 hides within-cell 0.46). Paper's E014
+  paragraph and figure caption rewritten honestly; argmax-displacement claim
+  survives every control and is now the paper's most robust statistic.
+- Paper commit 8418bd9; experiment range now E001-E017; 13 pp.
+- journal_readiness gaps 1 and 6 marked done.
+
+Next: E018 (grid-ceiling validation vs. continuous optimization + a
+published fixed-angle baseline), local CPU at n=12-14.

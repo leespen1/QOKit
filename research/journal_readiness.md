@@ -40,12 +40,12 @@ The three decisive objections:
 
 | # | Gap | Fix | Cost | Status |
 |---|---|---|---|---|
-| 1 | Pooled rho confound | Family-demeaned (within-family) re-analysis of E012/E014 correlations + bootstrap CIs on every reported rho; state E004's pre-committed gate | Re-analysis of existing CSVs | **planned: E017** |
+| 1 | Pooled rho confound | Family-demeaned (within-family) re-analysis of E012/E014 correlations + bootstrap CIs on every reported rho; state E004's pre-committed gate | Re-analysis of existing CSVs | **DONE: E017** (argmax claim survives all controls; fidelity claim restated; see below) |
 | 2 | Grid ceiling unvalidated | Continuous refinement (Nelder-Mead/BFGS) from grid argmax on a subsample; report ceiling gap; add a published-fixed-angle baseline row | CPU statevector at n<=14, minutes | **planned: E018** |
 | 3 | Theory-regret gap | Any bound linking landscape sup-error (via leakage) to regret through peak flatness, even p=1-only | Theory, hard; highest impact | open |
 | 4 | Crossover extrapolated | Demonstrate the pipeline actually winning at n=24-28 (sampled N + proxy sweep vs. GPU grid search) | Needs HPC GPU (local has none) | parked for Spencer/HPC |
 | 5 | Density law empirical | Exact Var(E[T|c]) per ensemble (E015 reduced it to this) | Theory, "open and looks tractable" | open |
-| 6 | Naked point estimates | 1.505 +- spread (E011 CSV); binomial p for 26/28 sign claim; single-instance hedge on timing caption | One evening | **planned: E017** |
+| 6 | Naked point estimates | 1.505 +- spread (E011 CSV); binomial p for 26/28 sign claim; single-instance hedge on timing caption | One evening | **DONE: E017** (1.54 +- 0.26; p = 1.5e-6; hedges in paper) |
 | 7 | Fitted-shape target is internal practice | Either cite a published instance of entrywise N-fitting or present Table 3 explicitly as a cautionary internal replication | Literature check, small | open |
 | 8 | Figure production | Re-export all six figures as vector PDFs, publication fonts, drop the "gate criterion" annotation, unify Gaussian/Normal naming | Re-run make_figure.jl scripts | open |
 
@@ -63,6 +63,17 @@ The three decisive objections:
 - Self-description tics removed ("honest(ly)" x2, duplicated PCA
   disclaimer); E004 gate pre-commitment now stated in Sec. 5.3.
 - Timing caption marks the crossover as a single-instance extrapolation.
+
+## E017 outcome (2026-07-22, later the same day)
+
+Gap 1 and gap 6 are closed. The re-analysis strengthened the paper's central
+claim (argmax displacement predicts regret under every control: pooled,
+cluster bootstrap, within-cell, demeaned; rho 0.56-0.74 at both depths) and
+forced one honest correction: the E014 "fidelity decouples at depth" story
+was family-confounded in BOTH directions (p=1 pooled 0.39 -> 0.07 within
+cells; p=3 pooled -0.02 hides within-cell 0.46). The paper now states the
+decomposition; the conclusion (fidelity is not a stable predictor, argmax
+displacement is) stands. Details: research/experiments/017_statistics-hardening/.
 
 ## Submission-blocking placeholders (Spencer)
 
