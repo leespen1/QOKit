@@ -204,3 +204,19 @@ one more trim).
 
 Next: sweep the explainer for consistency with today's paper changes
 (abstract, decision rule), then final wrap-up passes within the window.
+
+## Iteration 12 (2026-07-22 ~21:45)
+
+- E021: proved-by-verification that the whole section-4 theory extends
+  verbatim to integer-weighted MaxCut (weighted codegrees, triangle and
+  4-cycle weight products): all identities to 1e-9 on 140 weighted
+  instances, quadratic bound capture 93-100% (mean 0.975), cubic law to
+  0.4%. Also established the structural boundary: continuous weights
+  collapse every cost class to a bitstring-complement pair, so the
+  compression itself becomes vacuous (checked on all 7 families).
+- Paper: new weighted-MaxCut remark in section 4; Limits rescoped
+  (experiments unweighted, theory weighted-ready). Commit 953d914; 14 pp.
+- STATUS and explainer digested.
+
+Next: explainer consistency sweep vs. today's paper changes (abstract
+rewrite, decision rule, certificate), then final wrap-up.

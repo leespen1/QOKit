@@ -229,6 +229,16 @@ paper repo's ClaudeResearch branch when ready to edit there.
   §5.4 rule).
   → [experiments/020_regret-certificate](experiments/020_regret-certificate/README.md)
 
+- **The §4 theory extends verbatim to integer-weighted MaxCut (exp 021,
+  2026-07-22).** All identities re-verified (1e-9) under weighted codegrees
+  and cycle weight products on 140 weighted instances; quadratic bound
+  capture again 93-100%; cubic law to 0.4%. Continuous weights collapse
+  every cost class to a bitstring-complement pair, making the compression
+  vacuous: cost degeneracy is a requirement of the object, not the theory.
+  Now a remark in §4; Limits rescoped (experiments unweighted, theory
+  weighted-ready).
+  → [experiments/021_weighted-maxcut](experiments/021_weighted-maxcut/README.md)
+
 ## Working hypotheses (NOT established — from the deleted research log or intuition)
 
 - H1: The proxy's usefulness is governed by leakage out of the cost-class subspace,

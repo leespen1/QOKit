@@ -419,7 +419,9 @@ robustness and avoid dense graphs.
 - **The honest seams** (the paper states all of these):
   - The leakage→regret ranking is a **7-point Spearman** that is only resolvable
     at $p=1$/small $n$; it fades at scale. Don't oversell it.
-  - Everything is **unweighted MaxCut**, $n\le20$.
+  - Experiments are **unweighted MaxCut**, $n\le20$; the theory itself is
+    weighted-ready (E021), but continuous weights dissolve the compression
+    (cost classes collapse to complement pairs).
   - Trajectory PCA is a *diagnostic*, not a method (it needs the states the proxy
     exists to avoid computing).
   - The recipe's cost is still exponential.
@@ -580,6 +582,7 @@ theorem's scope (any graph vs. random-like) is stated where it is used.
 | Statistics hardening | argmax $\rho$ 0.56–0.74 under all controls; fidelity family-confounded both ways | E017 |
 | Regret certificate | holds on 280/280; median tightness 10–11x | E020 |
 | Depth normalization rule | $p=3$ regret 0.080→0.044 (134/140 better); $p=1$: 0.031 vs 0.047 | E020 |
+| Weighted MaxCut extension | all identities hold; capture 93–100%; cubic law to 0.4%; continuous weights collapse classes to complement pairs | E021 |
 | Sampled-$N$ ($S=10$) match | within $0.011$ ($p1$) / $0.016$ ($p3$) AR; regret lower in 26/28 cells | E010 |
 | Sampled leakage ($S=5$) | median $3.2\%$ relative error | E008 |
 | Timing wall | exact $N$: $21.8$ s at $n=20$; sampled: $0.44$ s; brute-force ceiling: $0.48$ s | E013 |
