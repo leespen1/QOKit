@@ -220,3 +220,23 @@ Next: sweep the explainer for consistency with today's paper changes
 
 Next: explainer consistency sweep vs. today's paper changes (abstract
 rewrite, decision rule, certificate), then final wrap-up.
+
+## Iteration 13 (2026-07-22 ~22:45)
+
+- Fresh two-agent verification of everything added today: all new math
+  re-derives correctly (including the exact identity 1-||phi||^2 = sum of
+  lambda^2 for the unnormalized certificate term). Eight paper fixes
+  applied (commit 1b6358d): grips2024 collaborator initials corrected
+  (S. Kakuta, K. Sakurai); weighted-remark replacement dictionary made
+  precise (second moments map to sum w^2 / sum w^4, not W); contributions
+  list synced with the certificate, conditioning bound, transfer baseline,
+  and normalization rule; transfer p=3 regret restated as 0.006 under the
+  stated ceiling convention; capture/residual ranges harmonized.
+- Explainer fully synced with today's paper (QOKit commit 723dc139):
+  new sections for the conditioning bound, weighted extension, and regret
+  certificate with proof ideas; corrected E014/E017 numbers; skeleton and
+  decision-rule/"So when does it work?" content; abstract-shape note.
+
+Next: overnight cadence. Remaining productive options: attempt sharpening
+the certificate (correlated-error analysis, E022); a final full-paper
+re-audit near the end of the window; keep STATUS decisions current.
