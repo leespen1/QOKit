@@ -168,3 +168,22 @@ bound (gap 3, hard) or vector figures (gap 8, mechanical).
 Next: attempt gap 3 (a p=1 landscape-error -> regret bound through peak
 flatness), the last open science this loop can reach; then a refreshed
 referee verdict near the end of the 24 h window.
+
+## Iteration 10 (2026-07-22 ~20:45)
+
+- E020: closed the last open science gap this loop can reach (gap 3). Proved
+  a two-point regret certificate connecting the leakage calculus to regret
+  (regret <= eps(theta*) + eps(theta-hat), eps controlled by leakage and
+  cost variances), machine-verified on 280 instance-depth pairs, honest
+  tightness median 10-11x; the looseness is the quantitative form of the
+  argmax-transfer thesis. New Proposition + proof in paper section 4.
+- Bonus practical finding: the certificate's normalized proxy objective
+  changes the selected grid point on 140/140 instances and HALVES depth
+  regret (p=3: 0.080 -> 0.044, better on 134/140) at zero cost; p=1 mildly
+  prefers the unnormalized convention. New paragraph + bolded rule in
+  section 5.4; abstract updated. Paper commit 514b221; 14 pp.
+- All eight journal_readiness gaps now closed or parked (gap 4 needs HPC).
+
+Next: digest E020 into STATUS/explainer; then re-run the referee panel for
+a refreshed verdict, and a final consistency pass (page count crept to 14;
+one more trim).
