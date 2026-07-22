@@ -71,3 +71,23 @@ Next: explainer completeness pass (goal 2), then journal_readiness.md.
   regret 0.028-0.055).
 
 Next: journal_readiness.md (goal 3), via adversarial referee agents.
+
+## Iteration 5 (2026-07-22 19:10)
+
+- Ran three adversarial referee reviews (novelty/significance, statistics/
+  methodology, claims/presentation). Consensus: MAJOR REVISION at IEEE
+  TQE/QST tier; no referee expected conclusions to reverse. Verdict and
+  ranked gap list written to research/journal_readiness.md.
+- Top gaps: (1) family-demeaned re-analysis + bootstrap CIs for all pooled
+  Spearman rhos (E017, planned next); (2) grid-ceiling validation vs.
+  continuous optimization + a literature fixed-angle baseline (E018);
+  (3) any theory bound linking leakage to regret (hard, highest impact);
+  (4) demonstrated (not extrapolated) crossover at n=24-28 (needs HPC GPU,
+  parked); (5) exact Var(E[T|c]) for the density law.
+- Applied all mechanical claim-discipline fixes the presentation referee
+  found (paper commit 3e767d7), including scoping "never vacuous" (Fig. 2's
+  extreme-ramp points exceed the trivial bound), the abstract's norm claim,
+  and the 9-vs-6 model count.
+
+Next: E017 (bootstrap CIs + within-family correlations, analysis-only,
+local CPU) to close the biggest statistics gap.
