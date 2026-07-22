@@ -257,3 +257,22 @@ re-audit near the end of the window; keep STATUS decisions current.
 
 Next: overnight lower-intensity cadence; near end of window, final
 full-paper audit + wrap-up summary for Spencer.
+
+## Iteration 15 (2026-07-23 ~00:15)
+
+- Housekeeping: proposed_paper_additions.md marked superseded;
+  theory_compression.tex flagged out-of-sync (Spencer decision 5);
+  STATUS decision 3 (headline framing) marked resolved-in-effect.
+- E023 (negative): the E022 overprediction is not predictable from norm
+  loss (per-instance rho -0.26 to 0.60) and a pooled linear correction
+  worsens regret on every moved instance (0/126 better, both depths).
+  Third confirmation of "never calibrate values to fix argmaxes"; the
+  winner's-curse remainder is a selection effect. One sentence added to
+  the paper's normalization paragraph (commit dab97cd); range E001-E023.
+- Page count 15 after all additions; the venue-format argument (two-column
+  IEEE ~10-11 pp) still applies; further single-column trimming would cut
+  results, parked as Spencer's call.
+
+Next: overnight; near end of window, final full re-audit + wrap-up
+summary. Science backlog now: correlated-error/selection-aware regret
+theory (hard), HPC crossover demo (parked).

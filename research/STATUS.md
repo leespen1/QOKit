@@ -249,6 +249,15 @@ paper repo's ClaudeResearch branch when ready to edit there.
   why no pointwise norm predicts regret. Refined paragraph in §4.
   → [experiments/022_signed-regret-decomposition](experiments/022_signed-regret-decomposition/README.md)
 
+- **A norm-loss bias correction is a dead end (exp 023, 2026-07-22,
+  NEGATIVE).** The E022 overprediction is only weakly correlated with the
+  free observable 1−‖φ‖² (per-instance ρ −0.26 to 0.60) and a pooled linear
+  correction worsens regret on every instance it moves (0/126 better at
+  both depths). Third independent confirmation that calibrating proxy
+  VALUES harms the ARGMAX; the winner's-curse component is a selection
+  effect invisible to pointwise corrections. One sentence in §5.4.
+  → [experiments/023_bias-corrected-objective](experiments/023_bias-corrected-objective/README.md)
+
 ## Working hypotheses (NOT established — from the deleted research log or intuition)
 
 - H1: The proxy's usefulness is governed by leakage out of the cost-class subspace,

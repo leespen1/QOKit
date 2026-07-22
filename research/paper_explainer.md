@@ -781,6 +781,7 @@ theorem's scope (any graph vs. random-like) is stated where it is used.
 | Statistics hardening | argmax $\rho$ 0.56–0.74 under all controls; fidelity family-confounded both ways | E017 |
 | Regret certificate | holds on 280/280; median tightness 10–11x | E020 |
 | Signed regret anatomy | overprediction everywhere (277/280); winner's curse 4–5x at proxy argmax; margin absorbs a third | E022 |
+| Norm-loss correction (negative) | bias not norm-visible; pooled correction worse on 0/126 better | E023 |
 | Depth normalization rule | $p=3$ regret 0.080→0.044 (134/140 better); $p=1$: 0.031 vs 0.047 | E020 |
 | Weighted MaxCut extension | all identities hold; capture 93–100%; cubic law to 0.4%; continuous weights collapse classes to complement pairs | E021 |
 | Sampled-$N$ ($S=10$) match | within $0.011$ ($p1$) / $0.016$ ($p3$) AR; regret lower in 26/28 cells | E010 |
