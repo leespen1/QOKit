@@ -439,12 +439,18 @@ robustness and avoid dense graphs.
    across depth, so it cannot be discovered from a cheap prefix. Any frame
    that beats the compression must model that rotation explicitly. This is a
    measured obstacle, reported as future-work guidance, not a method.
-2. **The last piece of the $V_2$ density law.** §4e's lemmas reduce the open
-   problem to one quantity: the exact conditioning correction
-   $\mathrm{Var}(\mathbb{E}[T\mid c])$ per random-graph ensemble (empirically
-   $\propto \tau^2/m$ at Pearson $0.994$, constant $\approx 60$ on dense
-   families vs. the crude analytic $36$). Pin it and the density law is a
-   theorem.
+2. **The $V_2$ density law — now pinned (E019, new Proposition in §4).**
+   The missing piece was found: projecting $T$ onto $\{S, S^2\}$ of the edge
+   sum $S=m-2c$ gives a rigorous, polynomial-time bound
+   $V_2 \le \mathrm{Var}(T) - v^\top G^{-1} v$ built from four exact
+   identities; the crucial one is $\mathrm{Cov}(T, S^2)=\mathrm{Var}(T)$, a
+   quadratic channel present even in triangle-free graphs, which is exactly
+   why the crude linear estimate ($36\tau^2/m$) undershot. The bound
+   captures 91-100% (mean 97%) of the exact correction on 140 instances,
+   and for $G(n,p)$ evaluates to
+   $V_2/\mathrm{Var}(T)\to 1-p(1+4p-2p^2)/(1+6p^2-4p^3)$ (0.375 at $p=1/2$
+   vs. 0.352 measured). Remaining open: only the few-percent residual and a
+   rigorous self-averaging statement.
 3. **A polynomial-time estimator of $N$** (or of leakage) would extend the
    recipe beyond the classically simulable regime; nothing rules it out.
 
@@ -557,6 +563,10 @@ theorem's scope (any graph vs. random-like) is stated where it is used.
 | $V_2$ lemmas verified | $10^{-10}$, 280 instances; cubic law $<0.3\%$ | E015 |
 | Conditioning correction | $\propto\tau^2/m$, Pearson $0.994$ | E015 |
 | Prefix-frame failure | principal angle $71°$–$88°$; oracle captures $0.99$ | E016 |
+| Quadratic conditioning bound | captures 91–100% (mean 97%) of $\mathrm{Var}(\mathbb{E}[T\mid c])$; ER limit $0.375$ at $p=1/2$ | E019 |
+| Ceiling validation | $p=1$ gap $\le0.0007$; ramp gap $\approx0.002$; ramp restriction $\approx0.007$ | E018 |
+| Transfer baseline | beats proxy 134/140 ($p1$), 140/140 ($p3$); regret $\approx0.014/0.008$ | E018 |
+| Statistics hardening | argmax $\rho$ 0.56–0.74 under all controls; fidelity family-confounded both ways | E017 |
 | Sampled-$N$ ($S=10$) match | within $0.011$ ($p1$) / $0.016$ ($p3$) AR; regret lower in 26/28 cells | E010 |
 | Sampled leakage ($S=5$) | median $3.2\%$ relative error | E008 |
 | Timing wall | exact $N$: $21.8$ s at $n=20$; sampled: $0.44$ s; brute-force ceiling: $0.48$ s | E013 |

@@ -208,6 +208,16 @@ paper repo's ClaudeResearch branch when ready to edit there.
   bootstrap CIs; 1.505 carries per-instance spread 1.54±0.26; 26/28 carries
   p=1.5e-6. → [experiments/017_statistics-hardening](experiments/017_statistics-hardening/README.md)
 
+- **The density law is now derived, not just measured (exp 019, 2026-07-22).**
+  Four new exact moment identities (machine-verified 1e-9 on 140 instances);
+  the key one is Cov(T, S²) = Var(T) with S = m−2c, a quadratic channel the
+  crude 36τ²/m estimate missed (alive even in triangle-free graphs). The L²
+  projection of T onto span{S, S²} gives a rigorous polynomial-time bound
+  V₂ ≤ Var(T) − vᵀG⁻¹v that captures 91–100% (mean 97%) of the exact
+  conditioning correction; ER asymptotic V₂/Var(T) → 1−p(1+4p−2p²)/(1+6p²−4p³)
+  (0.375 at p=½ vs 0.352 measured). Now a Proposition with proof in §4.
+  → [experiments/019_conditioning-correction](experiments/019_conditioning-correction/README.md)
+
 ## Working hypotheses (NOT established — from the deleted research log or intuition)
 
 - H1: The proxy's usefulness is governed by leakage out of the cost-class subspace,
