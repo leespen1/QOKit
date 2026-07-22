@@ -453,6 +453,17 @@ robustness and avoid dense graphs.
    rigorous self-averaging statement.
 3. **A polynomial-time estimator of $N$** (or of leakage) would extend the
    recipe beyond the classically simulable regime; nothing rules it out.
+4. **The theory-to-regret bridge exists but is loose (E020, new §4
+   Proposition).** A two-point certificate
+   (regret $\le \varepsilon(\theta^*)+\varepsilon(\hat\theta)$, each
+   $\varepsilon$ controlled by leakage and cost variances) is proved and
+   machine-verified; median tightness is only 10-11x, and that looseness IS
+   the argmax-transfer story quantified: the proxy's landscape errors at the
+   two relevant points nearly cancel, which a triangle inequality cannot
+   see. Sharpening it (a correlated-error bound) is the natural next theory
+   question. Bonus practical rule discovered on the way: **normalize the
+   proxy objective at depth** (divide by the tracked compressed norm; halves
+   p=3 regret at zero cost; keep unnormalized at p=1).
 
 ---
 
@@ -567,6 +578,8 @@ theorem's scope (any graph vs. random-like) is stated where it is used.
 | Ceiling validation | $p=1$ gap $\le0.0007$; ramp gap $\approx0.002$; ramp restriction $\approx0.007$ | E018 |
 | Transfer baseline | beats proxy 134/140 ($p1$), 140/140 ($p3$); regret $\approx0.014/0.008$ | E018 |
 | Statistics hardening | argmax $\rho$ 0.56–0.74 under all controls; fidelity family-confounded both ways | E017 |
+| Regret certificate | holds on 280/280; median tightness 10–11x | E020 |
+| Depth normalization rule | $p=3$ regret 0.080→0.044 (134/140 better); $p=1$: 0.031 vs 0.047 | E020 |
 | Sampled-$N$ ($S=10$) match | within $0.011$ ($p1$) / $0.016$ ($p3$) AR; regret lower in 26/28 cells | E010 |
 | Sampled leakage ($S=5$) | median $3.2\%$ relative error | E008 |
 | Timing wall | exact $N$: $21.8$ s at $n=20$; sampled: $0.44$ s; brute-force ceiling: $0.48$ s | E013 |

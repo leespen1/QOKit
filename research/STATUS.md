@@ -218,6 +218,17 @@ paper repo's ClaudeResearch branch when ready to edit there.
   (0.375 at p=½ vs 0.352 measured). Now a Proposition with proof in §4.
   → [experiments/019_conditioning-correction](experiments/019_conditioning-correction/README.md)
 
+- **The leakage calculus now bounds regret, and normalization halves depth
+  regret (exp 020, 2026-07-22).** Two-point certificate proved and machine-
+  verified on 280 instance-depth pairs: regret ≤ ε(θ*)+ε(θ̂) with ε
+  controlled by leakage and cost variances. Honestly loose (median 10-11×);
+  the looseness is the quantitative argmax-transfer thesis. Bonus zero-cost
+  rule: computing the proxy objective from the normalized compressed state
+  halves p=3 regret (0.080→0.044, better on 134/140) while p=1 mildly
+  prefers unnormalized (0.031 vs 0.047). Both in the paper (§4 Proposition,
+  §5.4 rule).
+  → [experiments/020_regret-certificate](experiments/020_regret-certificate/README.md)
+
 ## Working hypotheses (NOT established — from the deleted research log or intuition)
 
 - H1: The proxy's usefulness is governed by leakage out of the cost-class subspace,
