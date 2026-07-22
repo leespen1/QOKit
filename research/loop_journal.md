@@ -151,3 +151,20 @@ figures).
 
 Next: digest E019 into STATUS/explainer, then remaining gaps: theory-regret
 bound (gap 3, hard) or vector figures (gap 8, mechanical).
+
+## Iteration 9 (2026-07-22 ~20:15)
+
+- Digested E019 into STATUS.md and the explainer (new density-law entry,
+  key-numbers rows for E017/E018/E019).
+- Figure-production pass (readiness gap 8) done via subagent: all six paper
+  figures re-emitted as vector PDFs at print font sizes; "gate criterion"
+  annotation removed from the ranking figure; "Normal" renamed "Gaussian" in
+  the fitted-shape figure. QOKit commit cb12e3cf, paper commit 44b8dd7;
+  paper still 13 pp, compiles clean.
+- Readiness gaps now: 3 (theory bound linking leakage to regret; hard) and
+  4 (HPC crossover demo; parked for Spencer) remain open; 1, 2, 5, 6, 7, 8
+  closed.
+
+Next: attempt gap 3 (a p=1 landscape-error -> regret bound through peak
+flatness), the last open science this loop can reach; then a refreshed
+referee verdict near the end of the 24 h window.

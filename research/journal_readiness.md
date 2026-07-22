@@ -47,7 +47,7 @@ The three decisive objections:
 | 5 | Density law empirical | Exact Var(E[T|c]) per ensemble (E015 reduced it to this) | Theory, "open and looks tractable" | **DONE in substance: E019** (rigorous quadratic projection bound captures 97% of the correction; explicit ER asymptotic; new Proposition in section 4) |
 | 6 | Naked point estimates | 1.505 +- spread (E011 CSV); binomial p for 26/28 sign claim; single-instance hedge on timing caption | One evening | **DONE: E017** (1.54 +- 0.26; p = 1.5e-6; hedges in paper) |
 | 7 | Fitted-shape target is internal practice | Either cite a published instance of entrywise N-fitting or present Table 3 explicitly as a cautionary internal replication | Literature check, small | **DONE** (no peer-reviewed precedent; documented origin is the public G-RIPS 2024 report, now cited; Table 3 reframed as testing the surrogate-fit pattern transplanted to distribution space, citing Khairy 2020 and Shaffer 2023) |
-| 8 | Figure production | Re-export all six figures as vector PDFs, publication fonts, drop the "gate criterion" annotation, unify Gaussian/Normal naming | Re-run make_figure.jl scripts | open |
+| 8 | Figure production | Re-export all six figures as vector PDFs, publication fonts, drop the "gate criterion" annotation, unify Gaussian/Normal naming | Re-run make_figure.jl scripts | **DONE** (all six figures now vector PDFs, fontsize 16, gate-criterion annotation removed, Gaussian naming unified; paper commit 44b8dd7) |
 
 ## Mechanical claim-discipline fixes (applied by the loop, 2026-07-22)
 
