@@ -413,13 +413,27 @@ with $a = \langle C\rangle_\psi$.
 **How to read it.** The certificate holds on all 280 instance-depth pairs
 tested (machine-checked) but is honestly loose: median tightness is
 $10$–$11\times$ over the actual regret, informative only where accumulated
-leakage is a few percent. And that looseness *is* the argmax-transfer story
-of §5, quantified: regret is small not because the proxy landscape is
-pointwise accurate, but because its errors at $\theta^*$ and $\hat\theta$
-nearly cancel, a cancellation a triangle inequality cannot see. Sharpening
-it (a correlated-error bound) is the natural next theory question.
+leakage is a few percent. The slack has an exact anatomy (E022): with the
+signed error field $e = F - \hat F$, regret decomposes exactly as
+$[e(\theta^*) - e(\hat\theta)]$ minus the proxy's own margin
+$[\hat F(\hat\theta) - \hat F(\theta^*)]$, and measurement shows three
+stacked effects. The normalized proxy *overpredicts* essentially everywhere
+($e<0$ at 277/280 argmax points), so the two errors share a sign and
+partially cancel (median cancellation factor 0.6); a **winner's curse**
+concentrates the error at the proxy's own argmax
+($|e(\hat\theta)| \approx 4$–$5\times |e(\theta^*)|$, because maximizing
+$\hat F$ selects points of maximal overprediction); and the margin absorbs
+a third of what remains. Regret is small because of this selection
+structure, which no pointwise norm, and no triangle inequality, can see.
+Two follow-ups sharpen the picture: the residual overprediction is NOT
+predictable from the norm loss (E023, negative: a pooled linear norm-loss
+correction worsens regret on every instance it moves, the third
+confirmation that calibrating values harms argmaxes), and the whole
+geometry replicates at $n=16$ (E024: displacement $\rho$ 0.84/0.76,
+normalization rule and anatomy intact). Sharpening the certificate means
+modeling the selection effect, the natural next theory question.
 
-### 4d. The "why homogeneity happens" ladder
+### 4i. The "why homogeneity happens" ladder (closing subsection of the paper's section 4)
 
 The paper's closing §4 subsection assembles the above into a narrative
 answer to "why do equal-cost bitstrings end up with equal amplitudes?":
