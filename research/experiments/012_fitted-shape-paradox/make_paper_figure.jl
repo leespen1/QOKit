@@ -40,8 +40,8 @@ function main()
         ("analytical",        ["paper"],                          :black,      :diamond),
         ("Triangle, unfitted", ["tri_init"],                      :lightsalmon, :circle),
         ("Triangle, fitted",  ["tri_25", "tri_50", "tri_fit"],    :darkred,    :circle),
-        ("Normal, unfitted",  ["norm_init"],                      :lightskyblue, :utriangle),
-        ("Normal, fitted",    ["norm_25", "norm_50", "norm_fit"], :navy,       :utriangle),
+        ("Gaussian, unfitted", ["norm_init"],                      :lightskyblue, :utriangle),
+        ("Gaussian, fitted",   ["norm_25", "norm_50", "norm_fit"], :navy,       :utriangle),
     ]
     bymodel = Dict(m => (Float64[], Float64[], Float64[])  # mse, disp, regret
                    for (_, ms, _, _) in groups for m in ms)
@@ -76,6 +76,9 @@ function main()
     out = joinpath(DIR, "fitted_shape_paradox.png")
     save(out, fig)
     println("wrote $out")
+    outpdf = joinpath(DIR, "fitted_shape_paradox.pdf")
+    save(outpdf, fig)
+    println("wrote $outpdf")
 end
 
 main()

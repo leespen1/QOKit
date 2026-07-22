@@ -21,7 +21,7 @@ fin = [r for r in rows if r[col("layer")] == "20"]
 ramps = ["small", "moderate", "large", "extreme"]
 ramp_colors = Dict(zip(ramps, Makie.wong_colors()[1:4]))
 
-fig = Figure(size=(1100, 450))
+fig = Figure(size=(1100, 450), fontsize=16)
 
 ax1 = Axis(fig[1, 1]; xlabel="accumulated leakage Σλ_ℓ", ylabel="‖ψ₂₀ − φ₂₀‖",
            title="Theorem-2 bound at p = 20 (840 runs)")
@@ -42,7 +42,9 @@ for (i, f) in enumerate(sort(fams))
     med = [median(gf(r, "distance") for r in sel if r[col("layer")] == string(ℓ)) for ℓ in 1:20]
     lines!(ax2, 1:20, med; label=f, color=Makie.wong_colors()[mod1(i, 7)])
 end
-axislegend(ax2; position=:lt, labelsize=10)
+axislegend(ax2; position=:lt, labelsize=13)
 
 save(joinpath(dir, "bound_tightness.png"), fig; px_per_unit=2)
 println("saved → ", joinpath(dir, "bound_tightness.png"))
+save(joinpath(dir, "bound_tightness.pdf"), fig)
+println("saved → ", joinpath(dir, "bound_tightness.pdf"))

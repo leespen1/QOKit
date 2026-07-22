@@ -109,7 +109,7 @@ function main()
 
     colors = Makie.wong_colors()[1:7]
 
-    fig = Figure(size = (1150, 470), fontsize = 15)
+    fig = Figure(size = (1150, 470), fontsize = 16)
 
     # ---- panel (a): p=1 leakage vs regret, n=12 & 14 ----
     axa = Axis(fig[1, 1];
@@ -160,10 +160,7 @@ function main()
     end
     barcolors = [:seagreen, :seagreen, :firebrick, :firebrick, :firebrick, :firebrick]
     barplot!(axb, 1:6, rhos; color = barcolors)
-    hlines!(axb, [0.8]; color = :gray40, linestyle = :dash)
     hlines!(axb, [0.0]; color = :black, linewidth = 0.8)
-    text!(axb, 2.55, 0.9; text = "gate criterion ρ ≳ 0.8", align = (:left, :bottom),
-          fontsize = 12, color = :gray40)
     ylims!(axb, -0.2, 1.05)
     for (i, r) in enumerate(rhos)
         text!(axb, i, r + (r ≥ 0 ? 0.03 : -0.03); text = string(round(r, digits = 2)),
@@ -173,6 +170,9 @@ function main()
     out = joinpath(DIR, "ranking.png")
     save(out, fig)
     println("wrote $out")
+    outpdf = joinpath(DIR, "ranking.pdf")
+    save(outpdf, fig)
+    println("wrote $outpdf")
 
     # ---- regret table (LaTeX fragment) ----
     fmt(x) = @sprintf("%.3f", x)

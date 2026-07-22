@@ -80,6 +80,9 @@ function main()
     out = joinpath(DIR, "depth_scaling.png")
     save(out, fig)
     println("wrote $out")
+    outpdf = joinpath(DIR, "depth_scaling.pdf")
+    save(outpdf, fig)
+    println("wrote $outpdf")
 end
 
 main()

@@ -22,7 +22,7 @@ gf(r, name) = parse(Float64, r[col(name)])
 βvals = sort(unique(gf(r, "beta") for r in rows))
 fams = unique(r[1] for r in rows)
 
-fig = Figure(size=(1150, 460))
+fig = Figure(size=(1150, 460), fontsize=16)
 
 # Left: ER(0.5) n=14 heatmap of mean λ_uniform
 er = [r for r in rows if r[1] == "ER(0.5)" && r[2] == "14"]
@@ -36,7 +36,7 @@ scatter!(ax1, [0.403], [0.282]; color=:cyan, marker=:star5, markersize=18,
          label="exact-compression argmax")
 scatter!(ax1, [0.644], [1.168]; color=:red, marker=:xcross, markersize=16,
          label="analytical proxy's spurious peak")
-axislegend(ax1; position=:rt, labelsize=10, backgroundcolor=(:white, 0.7))
+axislegend(ax1; position=:rt, labelsize=13, backgroundcolor=(:white, 0.7))
 
 # Right: small-angle scaling, λ vs γ at fixed small β, all families (n=14)
 β0 = βvals[3]
@@ -51,7 +51,9 @@ end
 # slope-2 guide
 g = γvals[1:6]
 lines!(ax2, g, 0.8 .* (g ./ g[1]) .^ 2 .* 1e-3; color=:black, linestyle=:dash, label="slope 2")
-axislegend(ax2; position=:rb, labelsize=9)
+axislegend(ax2; position=:rb, labelsize=12)
 
 save(joinpath(dir, "leakage_anatomy.png"), fig; px_per_unit=2)
 println("saved → ", joinpath(dir, "leakage_anatomy.png"))
+save(joinpath(dir, "leakage_anatomy.pdf"), fig)
+println("saved → ", joinpath(dir, "leakage_anatomy.pdf"))

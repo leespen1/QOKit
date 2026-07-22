@@ -33,7 +33,7 @@ function main()
     fdef = 1 .- fcol(c, "overlap"); disp = fcol(c, "argmax_disp")
     s1 = p .== 1; s3 = p .== 3
 
-    fig = Figure(size = (1100, 470), fontsize = 15)
+    fig = Figure(size = (1100, 470), fontsize = 16)
     axa = Axis(fig[1, 1]; xlabel = "fidelity deficit  1 − |⟨ψ|φ⟩|²",
         ylabel = "regret  (ceiling − proxy AR)",
         title = "(a) fidelity stops predicting regret at depth")
@@ -54,5 +54,7 @@ function main()
 
     out = joinpath(DIR, "argmax_vs_fidelity.png")
     save(out, fig); println("wrote $out")
+    outpdf = joinpath(DIR, "argmax_vs_fidelity.pdf")
+    save(outpdf, fig); println("wrote $outpdf")
 end
 main()
