@@ -1,15 +1,16 @@
 # A plain-language companion to the paper
 
-*(Note, 2026-07-04: this file is the frozen plain-language companion to the
-paper as of June 13. The **living** walkthrough of all results, updated with
-every new experiment, is [explainer.md](explainer.md).)*
+*(Note: this file is the companion to the **paper draft** specifically. The
+living walkthrough of all results, including experiments not yet folded into
+the paper, is [explainer.md](explainer.md).)*
 
-
-*Written for Spencer, 2026-06-13. Goal: explain the paper's main ideas in
-order, with intuition first and symbols second, so the dense draft
-(`papers/OverleafPaper/qce2027_paper.tex`) reads easily afterward. Nothing here
-is new science — it is the same content as the paper, unpacked. Where the paper
-compresses three ideas into one sentence, this expands them back out.*
+*Written for Spencer, 2026-06-13; updated 2026-07-22 after E014/E015/E016 were
+folded into the draft and every number was re-audited against the experiment
+records. Goal: explain the paper's ideas in order, intuition first and symbols
+second, completely enough that you could rewrite the paper from scratch from
+this document alone. Nothing here is new science; it is the paper's content,
+unpacked. Section 9 gives the paper's skeleton and section 10 the key-numbers
+table with experiment provenance.*
 
 ---
 
@@ -40,10 +41,23 @@ that have the *same cost* tend to pick up *nearly the same amplitude* during
 QAOA. If that were exactly true, you wouldn't need $2^n$ amplitudes — you'd need
 only **one amplitude per distinct cost value** (at most $m+1$ of them for an
 $m$-edge MaxCut graph). The proxy tracks exactly that: a short vector
-$Q_\ell(v)$, one complex number per cost $v$, evolved by a recursion
-(Eq. 2/8) whose coefficients are the **cost-and-distance distribution**
-$N(v';d,v)$ — "starting from a typical bitstring of cost $v'$, how many
-bitstrings of cost $v$ sit at Hamming distance $d$?"
+$Q_\ell(v)$, one complex number per cost $v$, evolved by a recursion whose
+coefficients are the **cost-and-distance distribution** $N(v';d,v)$ —
+"starting from a typical bitstring of cost $v'$, how many bitstrings of cost
+$v$ sit at Hamming distance $d$?"
+
+For the rewrite you need the recursion itself. With mixer matrix elements
+$f_d(\beta)=(\cos\beta)^{n-d}(-i\sin\beta)^d$ depending only on Hamming
+distance $d$:
+
+$$Q_\ell(v') = \sum_{d,v} f_d(\beta_\ell)\, e^{-i\gamma_\ell v/2}\,
+Q_{\ell-1}(v)\, N(v';d,v), \qquad Q_0 \equiv 2^{-n/2},$$
+
+and the empirical $N$ is the class average
+$N(v';d,v)=\frac{1}{M_{v'}}\sum_{x\in S_{v'}} n(x;d,v)$. After $p$ layers the
+predicted objective is $\langle C\rangle \approx \sum_{v} M_v\,|Q_p(v)|^2\,v$
+(one term per attained cost; the paper never needs the $2^n\times2^n$
+picture). Each layer costs $O(nm^2)$.
 
 **What was left open** (this is the paper's hook):
 
@@ -166,9 +180,9 @@ Two facts (Theorem 2), both one-line proofs:
 statevector layer + one $O(2^n)$ averaging pass** to measure. No $O(4^n)$
 distribution, no $2^n\times 2^n$ matrices. So leakage is a *practical
 instrument* — you can compute it, plot it, and use it to rank graph families.
-Experimentally the bound's slack is only $3$–$6\times$ at $p=20$ (never
-vacuous), and $\sum\lambda_\ell$ is a near-functional *predictor* of the actual
-error, not just an upper bound.
+Experimentally the bound's slack at $p=20$ is ${\approx}4\times$ in the median
+and never above $5.8\times$, and $\sum\lambda_\ell$ is a near-functional
+*predictor* of the actual error, not just an upper bound.
 
 ### 4b. What leakage actually is — Theorem 3 (variance identity)
 
@@ -242,6 +256,40 @@ $\lambda_\ell$ depends only on $(\gamma_\ell,\beta_\ell)\approx f(\ell/p)$, so
 $\sum_\ell\lambda_\ell \approx p\cdot\overline{f}$ — total leakage grows
 **linearly in depth $p$.** Predicted ratio $30/20 = 1.5$; measured $1.505$.
 
+### 4e. Opening the $V_2$ black box — the two codegree lemmas (E015, now in §4)
+
+The Corollary leaves $V_2$ as an opaque variance. Two exact, machine-verified
+lemmas (to $10^{-10}$ on 280 instances) reduce it to pure graph structure:
+
+- **Variance reduction.** Write $\delta_i(y) = c(y\oplus e_i) - c(y)$ for the
+  single-flip cost changes and $T(y) = \sum_i \delta_i(y)^2$. Then
+  $s_2 = (n-8)c^2 + 4mc + T$, and the first two terms are functions of the
+  cost alone, so they vanish inside a within-class variance:
+  **$V_2$ is just the within-class variance of $T$** — only *squared
+  single-flip cost changes* matter. (Proof: expand $(c+\delta_i)^2$, apply the
+  neighbor-sum Lemma to $\sum_i\delta_i = 2m-4c$.)
+- **Codegree form.** In spin variables $\sigma_j=(-1)^{y_j}$, one line of
+  algebra gives $\delta_i = \sigma_i\sum_{j\sim i}\sigma_j$, hence
+  $T = \sum_{j,k} A_{jk}\sigma_j\sigma_k$ where $A_{jk}$ counts **common
+  neighbors** of vertices $j,k$ (the codegree). Over uniform bitstrings this
+  gives *exactly* $\mathbb{E}[T]=2m$ and
+  $\mathrm{Var}(T) = 2\sum_{j\ne k}A_{jk}^2$ — a closed form in $O(n^2+m)$,
+  no $2^n$ enumeration. For $G(n,p)$ it evaluates to $\to 8p^2m^2$.
+
+**The conditioning story (the mechanism behind the density law).** $V_2$ is
+the *cost-conditioned* version of $\mathrm{Var}(T)$. Unconditionally,
+$\sqrt{\mathrm{Var}(T)}/m$ grows with density $p$. But conditioning on the
+cost removes a fraction that is **triangle-driven** (only codegree pairs that
+are also edges, i.e. triangles, feel the conditioning) and that fraction also
+grows with density. The two nearly cancel, leaving the measured flat law
+$\sqrt{V_2}\propto m$. Empirically the removed piece
+$\mathrm{Var}(T)-V_2$ tracks $\tau^2/m$ ($\tau$ = triangle count) at Pearson
+$0.994$. What remains open is only the exact prefactor of that conditioning
+correction, $\mathrm{Var}(\mathbb{E}[T\mid c])$ — pin it per ensemble and the
+density law becomes a theorem. Slogan for the paper: *"density drives
+compression error" sharpens to "squared codegrees, conditioned on cost, drive
+it."*
+
 ### 4d. The §4.3 "ladder" — why homogeneity happens at all
 
 §4.3 assembles the above into a narrative answer to "why do equal-cost
@@ -255,9 +303,10 @@ bitstrings end up with equal amplitudes?":
    makes the first moment an exact function of cost — **leading-order protection
    on any graph** (it's 2-locality, not randomness).
 5. Randomness buys only the *next* rung: $V_2$ self-averages over the
-   exponentially large cost classes for random-like instances. **This is the one
-   rung that is measured, not proved** — and it's exactly the open "$V_2$
-   problem" flagged in the discussion.
+   exponentially large cost classes for random-like instances. **This is the
+   one rung that is measured, not proved** — though §4e's lemmas have now
+   shrunk the open piece to a single quantity (the triangle conditioning
+   correction).
 6. Finally it's partly self-fulfilling: QAOA's good schedules shrink $\gamma$
    with density, so the angles worth running are precisely the low-leakage ones.
 
@@ -287,13 +336,26 @@ cost-class subspace just drifts off the tiny moving subspace the trajectory
 actually lives in. (This is the most interesting open door — see §7.)
 
 **Q: Does low compression error actually mean good parameters?**
-→ **At $p=1$, yes, and the ranking holds:** regret $0.03$–$0.06$ at $p=1$,
-positive value-added on every family, mild growth with $n$. Ranking families by
-leakage reproduces their ranking by regret (Spearman $\rho=0.96$ at $n{=}12$,
-$0.86$ at $n{=}14$). **Honest limit:** at deeper $p$ and larger $n$ the regret
-differences between families shrink to a few $0.01$ and the ranking signal fades
-with them. (This is the paper's central claim and also its most fragile one —
-see the critique.)
+→ **At $p=1$, yes, and the ranking holds:** regret $0.028$–$0.055$ at $p=1$
+(roughly doubling at $p=3$ ramps to $0.06$–$0.11$), positive value-added on
+every family, mild growth with $n$ ($+0.003$–$0.017$ from $n=14$ to $18$).
+Ranking families by leakage *at the proxy's own chosen angles* reproduces
+their ranking by regret (Spearman $\rho=0.96$ at $n{=}12$, $0.86$ at
+$n{=}14$). **Honest limit:** the ranking is a $p=1$ statement over seven rank
+points; along proxy-chosen $p=3$ ramps it collapses to $\rho\approx0$
+because those schedules equalize leakage across families.
+
+**Q: At depth, is regret a fidelity problem at all? (E014 — new)**
+→ **No — it is an argmax-transfer problem, and fidelity decouples.**
+Recomputing true-landscape geometry over 140 instances at both depths:
+regret correlates with the proxy's **argmax displacement** from the true
+optimum at both depths ($\rho=0.76$ at $p=1$, $0.63$ at $p=3$), but with the
+state-fidelity deficit only at $p=1$ ($\rho=0.39\to-0.02$ at $p=3$).
+Landscape flat-peak robustness predicts nothing ($\rho=-0.18/+0.10$). So the
+leakage calculus bounds the *state* error while parameter quality lives in
+*parameter space* — which is exactly why a lower-fidelity model with a
+better-placed argmax (the analytical $N$ off-ER) beats the exact
+compression. This is the result that lets the paper narrate depth honestly.
 
 **Q (model error): how bad is using the analytical $N$ off-ER?**
 → **Its argmax is excellent, its values are garbage.** The analytical formula
@@ -334,7 +396,9 @@ robustness and avoid dense graphs.
 - **Proved (exact, machine-verified):** Theorem 1 (proxy = compression),
   Theorem 2 (telescoping bound + norm identity), Theorem 3 (variance identity),
   the Lemma (neighbor-cost sum), the Corollary's cancellation (first-order leak
-  is identically zero). These hold for *any* graph; no randomness needed.
+  is identically zero), and the two $V_2$ lemmas (variance reduction; codegree
+  form, including the exact $G(n,p)$ expectation). These hold for *any* graph;
+  no randomness needed.
 - **Measured, not proved:** that $V_2$ self-averages so that leakage tracks
   density across random-graph families; the family rankings; all regret numbers;
   the sampled-$N$ recipe's quality. These are empirical over the tested range
@@ -349,18 +413,27 @@ robustness and avoid dense graphs.
 
 ---
 
-## 7. The two open doors (for "what's next")
+## 7. The open doors — one now measured shut, one narrowed
 
-1. **Instance-adapted low-rank frames.** §5 shows the trajectory lives in a
-   $2$–$4$-dim *moving* subspace, but the proxy uses a *fixed* $(m{+}1)$-dim
-   cost-class frame and pays for the mismatch. Could a cheap short-depth state
-   give a better frame and beat the homogeneous compression at equal cost? The
-   chicken-and-egg ("you need states to build the frame") is the obstacle.
-2. **An analytic $V_2$ per family.** Turning the measured density law
-   ($\lambda/(\beta\gamma^2 m)\approx$ const) into a *theorem* by computing the
-   expected within-class variance of $s_2$ for each random-graph ensemble. The
-   discussion calls this "open and tractable." (I'm attempting a first pass
-   tonight — see the research log.)
+1. **Instance-adapted low-rank frames — the cheap version fails (E016, now in
+   the Discussion).** The trajectory really is ~4-dimensional (an oracle
+   rank-4 PCA frame captures ~0.99 of a depth-20 trajectory), so a good
+   instance-adapted frame would easily beat the $(m{+}1)$-dim cost-class
+   frame. But a rank-4 frame built from the first five layers is nearly
+   **orthogonal** to the trajectory's true late-time subspace (largest
+   principal angle $71°$–$88°$, growing with ramp size) and captures *less*
+   than the zero-cost cost-class frame. The low-rank subspace **rotates**
+   across depth, so it cannot be discovered from a cheap prefix. Any frame
+   that beats the compression must model that rotation explicitly. This is a
+   measured obstacle, reported as future-work guidance, not a method.
+2. **The last piece of the $V_2$ density law.** §4e's lemmas reduce the open
+   problem to one quantity: the exact conditioning correction
+   $\mathrm{Var}(\mathbb{E}[T\mid c])$ per random-graph ensemble (empirically
+   $\propto \tau^2/m$ at Pearson $0.994$, constant $\approx 60$ on dense
+   families vs. the crude analytic $36$). Pin it and the density law is a
+   theorem.
+3. **A polynomial-time estimator of $N$** (or of leakage) would extend the
+   recipe beyond the classically simulable regime; nothing rules it out.
 
 ---
 
@@ -385,8 +458,96 @@ robustness and avoid dense graphs.
 | regret | "regret" | (best AR on the grid) − (AR at the proxy's chosen angles) |
 | value-added | "value-added" | (proxy AR) − (random balanced-partition AR ≈ 0.75) |
 | argmax transfer | "does the peak land right?" | the only thing parameter setting actually consumes |
+| $\delta_i(y)$ | "single-flip change" | $c(y\oplus e_i)-c(y)$; spin form $\sigma_i\sum_{j\sim i}\sigma_j$ |
+| $T(y)$ | "flip-energy sum" | $\sum_i \delta_i^2$; $V_2$ = its within-class variance |
+| $A_{jk}$ | "codegree" | # common neighbors of $j,k$; $\mathrm{Var}(T)=2\sum_{j\ne k}A_{jk}^2$ |
+| $\tau$ | "triangles" | drives the conditioning correction $\mathrm{Var}(T)-V_2 \propto \tau^2/m$ |
 
 ---
+
+## 9. The paper's skeleton (for rewriting it from scratch)
+
+The draft (`qce2027_paper.tex`, ~12 pages single-column) is organized so that
+each section owns one move. If you rewrite, this is the load-bearing order:
+
+1. **Introduction.** The hook is the two open questions (what is the proxy /
+   when does it work), quoted against Sud et al.'s own "no longer unitary,
+   analogues of amplitudes" language. Contributions list: exactness, error
+   calculus, small-angle structure (with the $V_2$ lemmas), experimental
+   anatomy, practical findings. A glossary table carries the paper-specific
+   terminology.
+2. **Background and related work.** One short QAOA subsection; one proxy
+   subsection (the recursion, coefficients $N$); related work does the
+   novelty positioning: exact symmetry reductions (Shaydulin, Tsvelikhovskiy)
+   as the exact special case, lumpability/aggregated Markov chains and model
+   order reduction (Buchholz, Antoulas) as the classical mathematics never
+   before connected to the proxy, pseudo-Boltzmann $p=1$ states (Diez-Valle)
+   and mean-field AOA (Misra-Spieldenner) as the other surrogate families,
+   parameter transfer (Brandao, Galda, Sureshbabu, utility-scale 2026) as the
+   competing strategy, and Kruger-Mauerer as the closest landscape-surrogate
+   neighbor (they approximate the landscape; we ask which error norms certify
+   argmax transfer).
+3. **Section 3: exactness.** Setup ($S_v$, $M_v$, class states, $P$), the
+   empirical $N$, Theorem 1 (one proxy step = layer + projection; proof is a
+   two-line induction: group the mixer sum by distance and cost, class-average
+   turns $n$ into $N$), the transfer-matrix form
+   $T = D^{-1/2}(PUP)|_{\mathcal{H}_{hom}}D^{1/2}$, three delimiting remarks
+   (same-instance $N$ only; unattained costs inert; do not renormalize), and
+   the norm certificate (Prop. 1: norm inflation proves model error).
+4. **Section 4: the error calculus.** Theorem 2 (telescoping + Pythagoras),
+   the "leakage is an instrument, $O(2^n)$" paragraph, Theorem 3 (variance
+   identity + the wrong-norm warning it implies), then MaxCut small-angle
+   structure: neighbor-sum Lemma, cubic Corollary, the two $V_2$ lemmas with
+   proofs, the conditioning remark, and the "why homogeneity happens" ladder.
+5. **Section 5: experimental anatomy.** Setup (7 families, $n=12$–$20$,
+   grids, regret/value-added/ceiling definitions, SE discipline). 5.2:
+   leakage maps, density law, bound tightness, depth scaling, trajectory PCA.
+   5.3: regret table, mild-$n$ growth, the $p=1$ leakage-regret ranking
+   (honestly scoped), 5.4: model error (analytical robustness + dense-ER
+   artifact, filter negatives, fitted-shape paradox table, E014
+   argmax-vs-fidelity, sampled-$N$ recipe, timing table).
+6. **Discussion.** What the compression view buys; limits; E016 (the rotating
+   subspace kills cheap instance-adapted frames); the remaining $V_2$ open
+   piece.
+7. **Code and data availability.** Everything traces to
+   `research/experiments/E001–E016`; claim-to-experiment mapping is in LaTeX
+   comments (`% E00x` next to each claim).
+
+Style rules the draft follows: every quantitative sentence carries a `% E00x`
+comment; negative results are reported as findings, not buried; each
+theorem's scope (any graph vs. random-like) is stated where it is used.
+
+## 10. Key numbers, with provenance (post-audit, 2026-07-22)
+
+| Claim | Number | Experiment |
+|---|---|---|
+| Thm 1 exactness verified | $2.5\times10^{-16}$ | E001 |
+| Bound slack at $p=20$ | median $\approx4\times$, max $5.8\times$, 840 runs | E003 |
+| Depth accumulation ratio ($p{=}30/20$) | $1.505$ vs. predicted $1.5$ | E011 |
+| Small-angle exponents ($\beta$, $\gamma$) | $0.98$, $1.92$ | E007 |
+| Density law | $\lambda/(\beta\gamma^2 m)$ const $\pm40\%$ | E007 |
+| $p=30$ small-ramp overlaps, $n=16$–$20$ | $0.81/0.76/0.71$ | E011 |
+| Sublinear-in-$m$ deep leakage | $+11$–$33\%$ vs. $m$ $+25$–$57\%$ | E011 |
+| Trajectory effective dimension | $2$–$4$ (99% energy; ~13 at large ramps) | E009 |
+| Exact-compression regret, $p=1$ | $0.028$–$0.038$ ($n\le14$), $0.032$–$0.055$ ($n=16$–$18$) | E002, E010 |
+| Regret at $p=3$ ramps | $0.063$–$0.107$ | E002, E010 |
+| Regret drift $n=14\to18$ | $+0.003$–$0.017$ | E010 |
+| Leakage-regret family ranking, $p=1$ | Spearman $0.96$ ($n{=}12$), $0.86$ ($n{=}14$); $\approx0$ at $p=3$ | E004 |
+| Analytical model off-ER regret | $0.01$–$0.02$ | E004 |
+| Dense-ER artifact | $\langle C\rangle=93$ on 38 edges, norm $\times7.5$ | E004 |
+| Filter backfire | regret $0.01\to0.07$–$0.31$ | E005, E006 |
+| Triangle fit paradox | regret $0.054\to0.211$, worse on 136/140 | E012 |
+| Gaussian fit inert | median MSE $10\times$ better, argmax moves 0/140 | E012 |
+| Norms vs. regret | MSE $\rho\approx-0.1$; amplitude $-0.2$; landscape $+0.1$; argmax displacement $\approx0.7$ | E012 |
+| Raw analytical slice sums | mean $\sim10^9$, up to $2\times10^{10}$ (vs. $2^n$) | E012 |
+| Argmax vs. fidelity at depth | displacement $\rho=0.76/0.63$; fidelity $0.39/-0.02$; robustness $-0.18/+0.10$ | E014 |
+| $V_2$ lemmas verified | $10^{-10}$, 280 instances; cubic law $<0.3\%$ | E015 |
+| Conditioning correction | $\propto\tau^2/m$, Pearson $0.994$ | E015 |
+| Prefix-frame failure | principal angle $71°$–$88°$; oracle captures $0.99$ | E016 |
+| Sampled-$N$ ($S=10$) match | within $0.011$ ($p1$) / $0.016$ ($p3$) AR; regret lower in 26/28 cells | E010 |
+| Sampled leakage ($S=5$) | median $3.2\%$ relative error | E008 |
+| Timing wall | exact $N$: $21.8$ s at $n=20$; sampled: $0.44$ s; brute-force ceiling: $0.48$ s | E013 |
+| Pipeline crossover | $n\approx22$–$24$ (extrapolated) | E013 |
 
 ## If you remember five things
 

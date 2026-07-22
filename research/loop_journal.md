@@ -56,3 +56,18 @@ Next: length trim toward 10 pages, then explainer rewrite pass.
   effectively met under the venue format; parked as a Spencer decision.
 
 Next: explainer completeness pass (goal 2), then journal_readiness.md.
+
+## Iteration 4 (2026-07-22 19:00)
+
+- Explainer updated to full rewrite-from-scratch completeness: added the proxy
+  recursion and expectation formulas (section 1), new section 4e (the V2
+  codegree lemmas and the triangle-conditioning mechanism, plain language),
+  the E014 argmax-vs-fidelity Q&A, rewrote section 7 (E016 closes the cheap
+  frame door; V2 open piece narrowed; polynomial-N estimator listed), new
+  section 9 (the paper's section-by-section skeleton with the related-work
+  positioning map) and section 10 (key-numbers table with experiment
+  provenance, post-audit values), cheat-sheet rows for delta_i, T, A_jk, tau,
+  and post-audit number corrections throughout (slack median 4x/max 5.8x,
+  regret 0.028-0.055).
+
+Next: journal_readiness.md (goal 3), via adversarial referee agents.
