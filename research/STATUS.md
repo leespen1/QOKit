@@ -69,7 +69,10 @@ arXiv late August; submit April 2027. Full plan: see `research/decisions.md` and
 ## Where we are
 
 **Phases 1–4 effectively complete.** The paper
-(`papers/OverleafPaper`, branch `ClaudeResearch`, head at the QCE length cut) compiles clean at 9 pp with the theory (V₂ lemmas included), the full anatomy of
+(`papers/OverleafPaper`, branch `ClaudeResearch`, head `24a1e1b`) compiles
+clean at **15 pp — over the 10 pp target; trimming is the open task** (it was
+9 pp at the QCE length cut, before the E014/E015/E016 fold-in and the proofs).
+It carries the theory (V₂ lemmas included), the full anatomy of
 experiments 001–031, eight figures (ranking, argmax-transfer,
 direction-vs-size, weighted binning, α-crossover with pre-registered
 points), a glossary, a Conclusion, and 36 verified references from two
@@ -489,7 +492,8 @@ don't wait"). Resolutions, auditable in the journal:
    about these; placeholders remain in the tex).
 2. **Venue/format** — the current draft is already
    `\documentclass[conference]{IEEEtran}`; staying with QCE 2027 conference
-   format, 8 pp of a ~8–12 pp budget. *(Decided.)*
+   format. **Target length: 10 pp** (within QCE's ~8–12 pp budget) — this is
+   the number to hold every draft against. *(Decided.)*
 3. **Headline framing** — mechanism + argmax-transfer lead; the family
    ranking is corroboration with its scope shown (Fig. ranking panel b).
    Implemented 2026-07-22: rewritten abstract, E017-hardened statistics, the
@@ -499,7 +503,8 @@ don't wait"). Resolutions, auditable in the journal:
    figures/lemmas: E014→§5.4 + figure; E015 lemmas→§4; E016→§7; paper repo
    commit `e09a5dc`). With Spencer's approval to edit the paper freely, the
    old convention of leaving §4/§5.4/§7 untouched is superseded: Claude edits
-   directly and Spencer reviews via git diff. Target length ~10 pp.
+   directly and Spencer reviews via git diff. Length held to the 10 pp target
+   (decision 2).
    *(Decided; implemented.)*
 5. **`theory_compression.tex`** — retired: header now marks it superseded
    by the paper's §III–IV; kept for proof-detail history, not maintained.
