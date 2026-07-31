@@ -434,3 +434,26 @@ questions to Spencer. Plan: ~/.claude/plans/i-want-you-to-zippy-seal.md.*
   enter the paper.
 - STATUS "Where we are" rewritten: two manuscripts named (QCE 9 pp — 10 pp
   target met; QINP 20 pp journal flagship), reconciliation recorded.
+
+## Iteration 6 (2026-07-31 ~21:35)
+
+- Referee panel returned: **MINOR REVISION equivalent at QINP tier; the
+  science is submission-ready, the package is not.** Direct answer to
+  Spencer's suitability question: YES for a low-to-mid journal, QINP a good
+  fit, no further research required; E041-E043 is the strongest optional
+  upgrade (with a consistency obligation: the paper's "normalize at depth"
+  recipe is dominated by sampled+normalized per E041, whose quarantine
+  condition is now met by E042). journal_readiness.md rewritten (commit
+  7074f588). Top gaps: (1) declarations+Zenodo (Spencer-owned), (2) the
+  E041-E043 fold-in decision, (3) vector figures, (4) addendum machine
+  check + n=16 sentence, (5) front matter.
+- Gap 4 closed: verify_addendum.jl machine-checks the unnormalized
+  addendum at 714 points (norm identity, decomposition, full bound, 1e-10;
+  worst utilization 0.85). E036 README updated; paper provenance tag now
+  cites the check. Both repos pushed.
+- Gap 3 delegated: vector-figure agent running on the QINP build.
+- Explainer rebuild agent still running.
+
+Next: when the explainer lands, decide the E041-E043 fold-in (gap 2) —
+one scoped paragraph in section 6.1 + a Discussion pointer, keeping the
+remote line's "best proxy variant at p<=3" scoping.
