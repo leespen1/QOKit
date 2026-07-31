@@ -65,3 +65,5 @@ text!(ax2, 24, 0.135; text="dashed: p=3 ramps\nsolid: p=1", color=:gray40,
 
 save(joinpath(DIR, "binned_weighted.png"), fig; px_per_unit=3)
 println("wrote binned_weighted.png")
+save(joinpath(DIR, "binned_weighted.pdf"), fig)
+println("wrote binned_weighted.pdf")

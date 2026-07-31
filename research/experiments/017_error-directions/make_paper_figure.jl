@@ -56,3 +56,5 @@ text!(ax, 0.011, mean(exactn) + 0.004; text="exact-N baseline",
 axislegend(ax; position=:lt, framevisible=false, rowgap=0)
 save(joinpath(DIR, "fitted_shape_directions.png"), fig; px_per_unit=3)
 println("wrote $(joinpath(DIR, "fitted_shape_directions.png"))")
+save(joinpath(DIR, "fitted_shape_directions.pdf"), fig)
+println("wrote $(joinpath(DIR, "fitted_shape_directions.pdf"))")
