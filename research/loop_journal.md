@@ -541,3 +541,15 @@ overnight cadence after that.
   run.jl + smoke; the full run is still executing (trajectory computation
   is the heavy part). Polling until results.csv lands, then README +
   digest. Overnight cadence.
+
+## Iteration 14 (2026-08-01 ~01:40)
+
+- E045 landed and digested: the margin-subtracted certificate is rigorous
+  and never worse (140/140) but closes little (median 10.2->9.5 / 11.3->
+  10.6); margin ~0.03 vs eps sum ~0.46; error cosines (-0.43/-0.05) show
+  limited headroom for two-point refinements. Practitioner-uniform
+  no-oracle variant validated as corollary. Honest negative, equal
+  billing: README + one paper sentence (% E045, pushed). The selection-
+  effect modeling gap stays open and is now sharply delimited.
+- Overnight: next big item is tomorrow's full-paper coherence audit; the
+  explainer needs an E045 row at the same time.
