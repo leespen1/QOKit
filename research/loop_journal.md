@@ -553,3 +553,15 @@ overnight cadence after that.
   effect modeling gap stays open and is now sharply delimited.
 - Overnight: next big item is tomorrow's full-paper coherence audit; the
   explainer needs an E045 row at the same time.
+
+## Iteration 15 (2026-08-01, morning)
+
+- Spencer directive: spend remaining subscription tokens on the work.
+  Approved: estimator arc + verification gauntlet, workflows OK.
+- Launching: E046 design/prototype agent (doubly-sampled poly-time N
+  estimator: MCMC class members x sampled neighbor profiles; the E042/E043
+  noise findings suggest crude estimation may WIN, not just suffice);
+  and a reproduction-sweep workflow over all experiment dirs (rerun
+  locally feasible ones from committed scripts, diff results; analysis-
+  only verification for HPC-scale ones). Referee gauntlet queued after
+  the sweep so its fixes land first.
