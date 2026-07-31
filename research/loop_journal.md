@@ -323,5 +323,11 @@ questions to Spencer. Plan: ~/.claude/plans/i-want-you-to-zippy-seal.md.*
   instances at the window boundary. README written (Answer: PENDING), full
   run relaunched in background (~15 min). Stray E012/E014/E016 smoke CSVs
   committed (QOKit commit 0bedf77d); tree clean.
-- Next in this iteration: IEEEtran two-column build to settle the 10 pp
-  question (STATUS decision 2), then the overdue full-paper audit.
+- Length question SETTLED: a scratch IEEEtran conference-class build of the
+  unmodified paper compiles clean at 9 pp two-column. The 10 pp target is met
+  with no cuts; 15 pp single-column is a formatting artifact. STATUS updated
+  (decision 2 and the headline paragraph).
+- In flight at iteration close: E025 full run (background julia, ~15 min);
+  two audit agents (numbers-vs-records and math re-derivation), prioritizing
+  the post-July-22 additions (E017-E024 content, certificate, conditioning
+  bound, weighted remark).
