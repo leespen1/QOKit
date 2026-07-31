@@ -509,3 +509,13 @@ sharpening using the E038 anatomy).
 - Ten flagged references (incl. a suspect lotshaw2023 venue) now being
   verified against arXiv/publisher records by a web-verification agent.
 - E044 (n=16 composed-recipe replication) still running.
+
+## Iteration 11 (2026-07-31 ~23:25)
+
+- Bibliography fully verified: all 11 flagged entries checked against
+  publisher/arXiv records (paper commit 76282fe, pushed). One fix
+  (montanezbarrera2025 published title); lotshaw2023 suspicion unfounded
+  (PRA 108, 042411 is correct). Every reference in the manuscript is now
+  record-verified. All non-Spencer submission items are done.
+- E044 still in prep (serial exact-N at n=16 is the bottleneck); expected
+  to land within the hour.
