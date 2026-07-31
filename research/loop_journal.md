@@ -457,3 +457,19 @@ questions to Spencer. Plan: ~/.claude/plans/i-want-you-to-zippy-seal.md.*
 Next: when the explainer lands, decide the E041-E043 fold-in (gap 2) —
 one scoped paragraph in section 6.1 + a Discussion pointer, keeping the
 remote line's "best proxy variant at p<=3" scoping.
+
+## Iteration 7 (2026-07-31 ~21:55)
+
+- Explainer rebuild landed (commit 0e8fa6b6 + flag fix; pushed): tracks the
+  QINP manuscript end to end (July arcs incl. the harsh-depth E019 result,
+  binned weighted proxy, E032 retraction; ported loop-1 science; section 8
+  = E041-E043 frontier marked "not yet in the paper"; ~50-row key-numbers
+  table with provenance; 10,348 words).
+- Stale-records cleanup: seven READMEs aligned with CSV-backed audit
+  numbers (034 transfer 0.006; 014 rhos 0.74/0.65; 011 +11-33%/25-57%;
+  012 slice-sum mean-vs-max; 035 capture min 0.9046; 038 curse 3.8-4.7x;
+  004 squared norm).
+- Noted for the next paper edit: QINP says capture "91-100%"; CSV min is
+  0.9046, so it should read 90-100% — fold into the E041-E043 edit.
+- Figure agent still running in the paper repo (holding off on paper edits
+  until it lands to avoid collisions).
