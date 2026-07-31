@@ -29,3 +29,5 @@ agent batches when limits allow).
 | 004_gate-leakage-vs-regret | REPRODUCED_FULL | rerun byte-identical (the GATE experiment; ranking rhos regenerate exactly) |
 | 005_norm-filtered-paper-proxy | REPRODUCED_FULL | rerun byte-identical |
 | 006_physicality-filter | REPRODUCED_FULL | rerun byte-identical |
+| 007_leakage-anatomy | REPRODUCED_FULL | rerun byte-identical |
+| 008_sampled-leakage-predictor | REPRODUCED_FULL | rerun byte-identical |
