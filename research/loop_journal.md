@@ -498,3 +498,14 @@ sharpening using the E038 anatomy).
   declarations block with TBD-Spencer placeholders).
 - E044 launched (n=16 replication of the composed-recipe headline, plus
   the S=3 cell): smoke passed, full run in background (~40 min).
+
+## Iteration 10 (2026-07-31 ~23:00)
+
+- Front-matter pass landed and pushed (paper commit e429241): abstract
+  215->197 words (honest framing intact), Springer keywords + MSC block,
+  draft date removed, declarations section with TBD-Spencer placeholders,
+  montanezbarrera2025 title fixed; 21 pp, clean build, zero undefined refs.
+  All 35 citations resolve; every bibitem cited.
+- Ten flagged references (incl. a suspect lotshaw2023 venue) now being
+  verified against arXiv/publisher records by a web-verification agent.
+- E044 (n=16 composed-recipe replication) still running.
