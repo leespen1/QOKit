@@ -191,3 +191,17 @@ to minor revision with only Spencer-owned placeholders blocking. All eight
 ranked gaps from that review are closed except the HPC crossover demo
 (item 4 there, nice-to-have item 2 here). The 2026-07-31 reconciliation
 ported all of that into the QINP manuscript reviewed above.
+
+## Gap status update (2026-07-31, loop 2 iteration 8)
+
+- Gap 2 (E041-E043 consistency): CLOSED. The composition paragraph is in
+  qinp_paper.tex section 6.1, scoped as best-proxy-variant-at-p<=3; the
+  exact-vs-sampled normalization convention split is stated explicitly.
+- Gap 3 (vector figures): CLOSED. All six QINP figures regenerated as
+  vector PDFs from their committed generators (paper commit c2857c3).
+- Gap 4 (addendum machine check + n=16 sentence): CLOSED. E036
+  verify_addendum.jl asserts at 714 points; the n=16 convention split is
+  stated in the manuscript's argmax paragraph.
+- Remaining: gap 1 (declarations + frozen archive; Spencer-owned) and
+  gap 5 (front-matter pass: abstract compression, keywords, watermark,
+  bibliography re-verification).
