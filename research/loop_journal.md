@@ -345,3 +345,55 @@ questions to Spencer. Plan: ~/.claude/plans/i-want-you-to-zippy-seal.md.*
   replicate-averaged N + S-sweep {3,10,30,100,300}, n=12, same seeds.
   Smoke passed; full run in background.
 - Audit agents (numbers, math) still running.
+
+## Iteration 3 (2026-07-31 ~20:20)
+
+- Dual audit returned and applied: ~79 claim groups checked against records,
+  68 confirmed, 11 mismatches fixed (one substantive: norm vs squared-norm
+  7.5x; the rest precision/labeling: SE range 0.003-0.008, winner's curse
+  3.8-4.7x, margin ~40%, 557/560 denominators, fitparadox caption
+  composition, n=16 correlation convention disclosed, transfer claim scoped
+  to proxy-only methods). Math audit: NO broken theorems, all identities
+  machine-verified; fixed an undefined epsilon, a missing 1/c_opt unit in
+  the certificate addendum, added the O(beta^2 gamma) cancellation sentence
+  to Cor. 6, singular-G qualifier and bound-not-ratio asymptotic in Prop 10.
+  Local paper commit ea8f56c (compiles clean, 15 pp single-column).
+  Deferred: T/S/v/p/G symbol collisions (dedicated notation pass later).
+- E026+E027 digested and committed: the sampled-N gain is NOISE acting
+  through the normalized objective (E026: averaged-N regresses to exact,
+  S=3 best, raw indifferent); at p=1 generic iid noise suffices, at p=3
+  only the sampler's structured (marginal-preserving) noise helps (E027).
+  Strong practical + conceptual finding, held out of the paper until the
+  reconciliation below lands.
+- **DISCOVERY — the paper repo has two diverged lines.** Remote
+  ClaudeResearch is 37 ahead: the July editorial line (E017-E032 in ITS
+  numbering = 017_error-directions..032_transfer-scale-audit; QCE 9 pp cut
+  d161076; QINP 17 pp journal manuscript de6bbaf/2953996; Spencer-attributed
+  decisions: Sud reconciliation, weighted-arc reframe, E032 audit). Local is
+  30 ahead: loop-1's line (June-13 base, never pulled; E014-E024 fold-in in
+  loop-1 numbering = 017_statistics-hardening..024_n16-stability;
+  certificate, conditioning bound; today's audit fixes). Experiment numbers
+  017-027 are DOUBLED in research/experiments/ with distinct slugs; E-refs
+  ambiguous from 017 up. Push to the paper repo is blocked (no force-push).
+
+**Reconciliation plan (next iteration's main task):**
+1. In QOKit: renumber the loop-1-derived series 017_statistics-hardening ->
+   033, 018_ceiling-validation -> 034, 019_conditioning-correction -> 035,
+   020_regret-certificate -> 036, 021_weighted-maxcut -> 037,
+   022_signed-regret-decomposition -> 038, 023_bias-corrected-objective ->
+   039, 024_n16-stability -> 040, 025_sampled-plus-normalized -> 041,
+   026_sampled-N-mechanism -> 042, 027_synthetic-noise-control -> 043
+   (git mv; July series keeps its numbers since the REMOTE paper cites
+   them). Update refs in loop_journal, paper_explainer, STATUS,
+   journal_readiness, and the loop-1 experiment READMEs/scripts.
+2. In the paper repo: treat remote (QINP head 2953996) as the canonical
+   editorial line. Port loop-1's + today's science (E014-E016 fold-in,
+   statistics hardening, certificate + signed anatomy, conditioning bound,
+   weighted remark, n=16 stability, audit fixes) INTO it as new commits
+   with the renumbered E-refs, using the local line as source material.
+   Merge strategy: merge -s ours of the local branch afterward to join
+   histories without discarding either (local commits stay reachable).
+3. Correct STATUS: my 2026-07-31 "15 pp / 9 pp two-column" headline
+   described the stale local line; remote already has a 9 pp QCE cut AND a
+   17 pp QINP manuscript. The 10 pp target discussion must name the actual
+   files.
