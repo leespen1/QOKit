@@ -565,3 +565,16 @@ overnight cadence after that.
   locally feasible ones from committed scripts, diff results; analysis-
   only verification for HPC-scale ones). Referee gauntlet queued after
   the sweep so its fixes land first.
+
+## Iteration 16 (2026-08-01 ~05:40)
+
+- LESSON: the 45-agent reproduction workflow + E046 agent hit the session
+  limit within a minute; all 46 agents died with zero output (~235k tokens
+  wasted). Spencer flagged it. Strategy revised: NO wide fan-outs;
+  sequential small agents; inline main-loop work preferred (far cheaper).
+  Limit resets 12:10am JST per the error.
+- Inline sweep started: E001 REPRODUCED_FULL (identities regenerate,
+  settling audit U3), E015 REPRODUCED_FULL (byte-identical results.csv).
+  Tracking in research/reproduction_sweep_2026-08-01.md.
+- E046 estimator agent died pre-output; will relaunch as a single agent
+  when limits allow (probe first with a tiny agent).
