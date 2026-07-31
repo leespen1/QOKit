@@ -331,3 +331,17 @@ questions to Spencer. Plan: ~/.claude/plans/i-want-you-to-zippy-seal.md.*
   two audit agents (numbers-vs-records and math re-derivation), prioritizing
   the post-July-22 additions (E017-E024 content, certificate, conditioning
   bound, weighted remark).
+
+## Iteration 2 (2026-07-31 19:35)
+
+- E025 complete (280 rows): the recipe composes and MORE — sampled N (S=10)
+  + normalized is the best of all four {exact,sampled}x{raw,norm} cells at
+  BOTH depths, beating exact+normalized (p=1 mean regret 0.021 vs 0.047,
+  sign p=8e-29; p=3 0.024 vs 0.044, p=2e-15), uniformly across all 7
+  families. Exact-N cells reproduce E020/E024 (p=3 0.080->0.044; p=1 exact
+  prefers raw). README digested; claim held OUT of the paper pending
+  mechanism.
+- E026 launched (mechanism: noise vs estimator bias): R=10 replicates +
+  replicate-averaged N + S-sweep {3,10,30,100,300}, n=12, same seeds.
+  Smoke passed; full run in background.
+- Audit agents (numbers, math) still running.
