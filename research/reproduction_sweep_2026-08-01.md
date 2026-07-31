@@ -31,3 +31,5 @@ agent batches when limits allow).
 | 006_physicality-filter | REPRODUCED_FULL | rerun byte-identical |
 | 007_leakage-anatomy | REPRODUCED_FULL | rerun byte-identical |
 | 008_sampled-leakage-predictor | REPRODUCED_FULL | rerun byte-identical |
+| 009_trajectory-pca | REPRODUCED_FULL | rerun byte-identical |
+| 012_fitted-shape-paradox | REPRODUCED_FULL | rerun byte-identical |
