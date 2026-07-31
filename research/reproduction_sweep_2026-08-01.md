@@ -26,3 +26,4 @@ agent batches when limits allow).
 | 039_bias-corrected-objective | ANALYSIS_VERIFIED | rho range and 0/126 recomputed (audit) |
 | 040_n16-stability | ANALYSIS_VERIFIED | 0.84/0.76 vs 0.25/0.47 convention split recomputed (audit) |
 | 002_baselines-and-headroom | REPRODUCED_FULL | rerun results.csv byte-identical (E1.1 sweep, 420 instances) |
+| 004_gate-leakage-vs-regret | REPRODUCED_FULL | rerun byte-identical (the GATE experiment; ranking rhos regenerate exactly) |
