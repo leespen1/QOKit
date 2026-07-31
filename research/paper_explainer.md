@@ -294,7 +294,7 @@ crude linear estimate undershot. Slogan for the paper: *"density drives
 compression error" sharpens to "squared codegrees, conditioned on cost, drive
 it."*
 
-### 4f. The quadratic conditioning bound (Proposition, E019)
+### 4f. The quadratic conditioning bound (Proposition, E035)
 
 This is the piece that turns the density law from an observation into a
 formula. Everything runs through the **edge sum** $S = m - 2c$, a linear
@@ -347,7 +347,7 @@ most 10%.
 ### 4g. Weighted MaxCut: the theory travels, the object doesn't
 
 All of §4c–4f extends verbatim to integer-weighted MaxCut under mechanical
-substitutions (Remark "Weighted MaxCut" in the paper, E021):
+substitutions (Remark "Weighted MaxCut" in the paper, E037):
 
 - **Neighbor-sum Lemma:** $m \to W$ (total weight).
 - **Second moments:** replace $m$ by $\sum_e w_e^2$ and pick up a
@@ -364,7 +364,7 @@ cost class to a bitstring-complement pair, so the compression itself becomes
 vacuous. Cost degeneracy is a requirement of the *object*, not of the
 theory.
 
-### 4h. From state error to parameter error: the two-point regret certificate (E020)
+### 4h. From state error to parameter error: the two-point regret certificate (E036)
 
 Everything so far bounds the **state** error, but parameter setting consumes
 an **argmax**. The paper bridges the two with a certificate evaluated at
@@ -413,7 +413,7 @@ with $a = \langle C\rangle_\psi$.
 **How to read it.** The certificate holds on all 280 instance-depth pairs
 tested (machine-checked) but is honestly loose: median tightness is
 $10$–$11\times$ over the actual regret, informative only where accumulated
-leakage is a few percent. The slack has an exact anatomy (E022): with the
+leakage is a few percent. The slack has an exact anatomy (E038): with the
 signed error field $e = F - \hat F$, regret decomposes exactly as
 $[e(\theta^*) - e(\hat\theta)]$ minus the proxy's own margin
 $[\hat F(\hat\theta) - \hat F(\theta^*)]$, and measurement shows three
@@ -426,10 +426,10 @@ $\hat F$ selects points of maximal overprediction); and the margin absorbs
 a third of what remains. Regret is small because of this selection
 structure, which no pointwise norm, and no triangle inequality, can see.
 Two follow-ups sharpen the picture: the residual overprediction is NOT
-predictable from the norm loss (E023, negative: a pooled linear norm-loss
+predictable from the norm loss (E039, negative: a pooled linear norm-loss
 correction worsens regret on every instance it moves, the third
 confirmation that calibrating values harms argmaxes), and the whole
-geometry replicates at $n=16$ (E024: displacement $\rho$ 0.84/0.76,
+geometry replicates at $n=16$ (E040: displacement $\rho$ 0.84/0.76,
 normalization rule and anatomy intact). Sharpening the certificate means
 modeling the selection effect, the natural next theory question.
 
@@ -528,7 +528,7 @@ only **argmax displacement** does ($\rho\approx0.7$). Lesson: parameter setting
 is an *argmax-transfer* problem, not a *state-approximation* problem. (This is
 Theorem 3's wrong-norm point, confirmed from the empirical side.)
 
-**Q: how does the proxy compare to plain parameter transfer? (E018 — new)**
+**Q: how does the proxy compare to plain parameter transfer? (E034 — new)**
 → **Transfer wins on these ensembles.** The grid ceilings themselves are
 validated (continuous refinement gains at most 0.0007 at $p=1$ and ~0.002 on
 the $p=3$ ramp grid; dropping the linear-ramp restriction gains another
@@ -541,7 +541,7 @@ parameter setting pays only where concentration fails (structured,
 heterogeneous instances) or where nothing can be simulated (then only the
 analytical $N$ exists anyway).
 
-**Q: why normalize the proxy objective at depth? (E020 — new)**
+**Q: why normalize the proxy objective at depth? (E036 — new)**
 → **Because the unnormalized objective carries a leakage bias.** Along the
 depth grid the compressed norm varies substantially from schedule to
 schedule, so the unnormalized objective **conflates "high predicted value"
@@ -558,7 +558,7 @@ so the rule is: **normalize at depth, keep unnormalized at $p=1$.**
 
 1. **If the ensemble concentrates and a solved source instance exists** (the
    random families tested here, at simulable sizes): **transfer** its
-   angles. Transfer beat every per-instance method tested (E018).
+   angles. Transfer beat every per-instance method tested (E034).
 2. **Otherwise, where statevector passes are affordable:** the recipe is
    **sampled $N$ ($S\approx10$ bitstrings per cost class) + the empirical
    cost distribution, with the normalized objective at depth.** It matches
@@ -604,7 +604,7 @@ so the rule is: **normalize at depth, keep unnormalized at $p=1$.**
   - The leakage→regret ranking is a **7-point Spearman** that is only resolvable
     at $p=1$/small $n$; it fades at scale. Don't oversell it.
   - Experiments are **unweighted MaxCut**, $n\le20$; the theory itself is
-    weighted-ready (E021), but continuous weights dissolve the compression
+    weighted-ready (E037), but continuous weights dissolve the compression
     (cost classes collapse to complement pairs).
   - Trajectory PCA is a *diagnostic*, not a method (it needs the states the proxy
     exists to avoid computing).
@@ -625,7 +625,7 @@ so the rule is: **normalize at depth, keep unnormalized at $p=1$.**
    across depth, so it cannot be discovered from a cheap prefix. Any frame
    that beats the compression must model that rotation explicitly. This is a
    measured obstacle, reported as future-work guidance, not a method.
-2. **The $V_2$ density law — now pinned (E019, new Proposition in §4).**
+2. **The $V_2$ density law — now pinned (E035, new Proposition in §4).**
    The missing piece was found: projecting $T$ onto $\{S, S^2\}$ of the edge
    sum $S=m-2c$ gives a rigorous, polynomial-time bound
    $V_2 \le \mathrm{Var}(T) - v^\top G^{-1} v$ built from four exact
@@ -639,7 +639,7 @@ so the rule is: **normalize at depth, keep unnormalized at $p=1$.**
    rigorous self-averaging statement.
 3. **A polynomial-time estimator of $N$** (or of leakage) would extend the
    recipe beyond the classically simulable regime; nothing rules it out.
-4. **The theory-to-regret bridge exists but is loose (E020, new §4
+4. **The theory-to-regret bridge exists but is loose (E036, new §4
    Proposition).** A two-point certificate
    (regret $\le \varepsilon(\theta^*)+\varepsilon(\hat\theta)$, each
    $\varepsilon$ controlled by leakage and cost variances) is proved and
@@ -744,7 +744,7 @@ nearly halves depth regret at no cost).
    pooled $p=3$ regret $0.080\to0.044$)). 5.2:
    leakage maps, density law, bound tightness, depth scaling, trajectory PCA.
    5.3: regret table, mild-$n$ growth, the $p=1$ leakage-regret ranking
-   (honestly scoped), ending with the transfer-baseline paragraph (E018).
+   (honestly scoped), ending with the transfer-baseline paragraph (E034).
    5.4: model error (analytical robustness + dense-ER
    artifact, filter negatives, fitted-shape paradox table, E014
    argmax-vs-fidelity, the normalization-rule paragraph, sampled-$N$ recipe,
@@ -755,7 +755,7 @@ nearly halves depth regret at no cost).
    open piece is now only the small residual plus a rigorous self-averaging
    statement.
 7. **Code and data availability.** Everything traces to
-   `research/experiments/E001–E021`; claim-to-experiment mapping is in LaTeX
+   `research/experiments/E001–E037`; claim-to-experiment mapping is in LaTeX
    comments (`% E00x` next to each claim).
 
 Style rules the draft follows: every quantitative sentence carries a `% E00x`
@@ -785,20 +785,20 @@ theorem's scope (any graph vs. random-like) is stated where it is used.
 | Gaussian fit inert | median MSE $10\times$ better, argmax moves 0/140 | E012 |
 | Norms vs. regret | MSE $\rho\approx-0.1$; amplitude $-0.2$; landscape $+0.1$; argmax displacement $\approx0.7$ | E012 |
 | Raw analytical slice sums | mean $\sim10^9$, up to $2\times10^{10}$ (vs. $2^n$) | E012 |
-| Argmax vs. fidelity at depth | displacement pooled $\rho=0.74$ (CI $0.64$–$0.82$) at $p=1$, $0.65$ (CI $0.54$–$0.74$) at $p=3$, robust $0.56$–$0.74$ under all controls; fidelity pooled $0.39\to0.07$ within cells ($p{=}1$), $-0.02$ pooled hiding within-cell $0.46$ ($p{=}3$); robustness $\lvert\rho\rvert\le0.24$ | E014, E017 |
+| Argmax vs. fidelity at depth | displacement pooled $\rho=0.74$ (CI $0.64$–$0.82$) at $p=1$, $0.65$ (CI $0.54$–$0.74$) at $p=3$, robust $0.56$–$0.74$ under all controls; fidelity pooled $0.39\to0.07$ within cells ($p{=}1$), $-0.02$ pooled hiding within-cell $0.46$ ($p{=}3$); robustness $\lvert\rho\rvert\le0.24$ | E014, E033 |
 | $V_2$ lemmas verified | $10^{-10}$, 280 instances; cubic law $<0.3\%$ | E015 |
 | Conditioning correction | $\propto\tau^2/m$, Pearson $0.994$ | E015 |
 | Prefix-frame failure | principal angle $71°$–$88°$; oracle captures $0.99$ | E016 |
-| Quadratic conditioning bound | captures 90–100% (mean 97%) of $\mathrm{Var}(\mathbb{E}[T\mid c])$; ER limit $0.375$ at $p=1/2$ | E019 |
-| Ceiling validation | $p=1$ gap $\le0.0007$; ramp gap $\approx0.002$; ramp restriction $\approx0.007$ | E018 |
-| Transfer baseline | beats proxy 134/140 ($p1$), 140/140 ($p3$); regret $\approx0.014/0.008$ | E018 |
-| Statistics hardening | argmax $\rho$ 0.56–0.74 under all controls; fidelity family-confounded both ways | E017 |
-| Regret certificate | holds on 280/280; median tightness 10–11x | E020 |
-| Signed regret anatomy | overprediction everywhere (277/280); winner's curse 4–5x at proxy argmax; margin absorbs a third | E022 |
-| Norm-loss correction (negative) | bias not norm-visible; pooled correction worse on 0/126 better | E023 |
-| n=16 stability | displacement $\rho$ 0.84/0.76; normalization and anatomy replicate | E024 |
-| Depth normalization rule | $p=3$ regret 0.080→0.044 (134/140 better); $p=1$: 0.031 vs 0.047 | E020 |
-| Weighted MaxCut extension | all identities hold; capture 93–100%; cubic law to 0.4%; continuous weights collapse classes to complement pairs | E021 |
+| Quadratic conditioning bound | captures 90–100% (mean 97%) of $\mathrm{Var}(\mathbb{E}[T\mid c])$; ER limit $0.375$ at $p=1/2$ | E035 |
+| Ceiling validation | $p=1$ gap $\le0.0007$; ramp gap $\approx0.002$; ramp restriction $\approx0.007$ | E034 |
+| Transfer baseline | beats proxy 134/140 ($p1$), 140/140 ($p3$); regret $\approx0.014/0.008$ | E034 |
+| Statistics hardening | argmax $\rho$ 0.56–0.74 under all controls; fidelity family-confounded both ways | E033 |
+| Regret certificate | holds on 280/280; median tightness 10–11x | E036 |
+| Signed regret anatomy | overprediction everywhere (277/280); winner's curse 4–5x at proxy argmax; margin absorbs a third | E038 |
+| Norm-loss correction (negative) | bias not norm-visible; pooled correction worse on 0/126 better | E039 |
+| n=16 stability | displacement $\rho$ 0.84/0.76; normalization and anatomy replicate | E040 |
+| Depth normalization rule | $p=3$ regret 0.080→0.044 (134/140 better); $p=1$: 0.031 vs 0.047 | E036 |
+| Weighted MaxCut extension | all identities hold; capture 93–100%; cubic law to 0.4%; continuous weights collapse classes to complement pairs | E037 |
 | Sampled-$N$ ($S=10$) match | within $0.011$ ($p1$) / $0.016$ ($p3$) AR; regret lower in 26/28 cells | E010 |
 | Sampled leakage ($S=5$) | median $3.2\%$ relative error | E008 |
 | Timing wall | exact $N$: $21.8$ s at $n=20$; sampled: $0.44$ s; brute-force ceiling: $0.48$ s | E013 |

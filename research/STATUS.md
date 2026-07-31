@@ -9,7 +9,7 @@
 > removed; abstract/contrib-5/§5.4/Conclusion/Limits corrected. Core theory
 > (Thms 1–3, error calculus, V₂, unweighted transfer-beats-proxy, E020 binning
 > machinery, Max-3-XOR) unaffected.
-*Venue chosen: QCE 2027 (IEEE Quantum Week), contributed. Last updated: 2026-07-22
+*Venue chosen: QCE 2027 (IEEE Quantum Week), contributed. Last updated: 2026-07-31
 (24-hour improvement loop). This is the one page Spencer needs to read.
 Everything here links to a reproducible experiment or a committed document.
 Plain-language walkthrough of all results: [explainer.md](explainer.md).
@@ -39,6 +39,21 @@ were merged today. Consequences:
 - `explainer.md` (results walkthrough, July line) and `paper_explainer.md`
   (paper companion, June line) both exist; they serve different purposes but
   overlap — consolidation is queued as a Spencer decision.
+
+## ⚠ E-number collision resolved (2026-07-31)
+
+The June→July-22 loop-1 line and the July HPC line each grew an independent
+experiment series numbered 017+. Both series' directories are kept; the
+loop-1-derived series is **renumbered 033–043** (017_statistics-hardening→033,
+018_ceiling-validation→034, 019_conditioning-correction→035,
+020_regret-certificate→036, 021_weighted-maxcut→037,
+022_signed-regret-decomposition→038, 023_bias-corrected-objective→039,
+024_n16-stability→040, 025_sampled-plus-normalized→041,
+026_sampled-N-mechanism→042, 027_synthetic-noise-control→043). Numbers
+017–032 now refer exclusively to the July series
+(017_error-directions … 032_transfer-scale-audit), which the remote paper
+line cites. Loop-1-derived docs (loop_journal, paper_explainer,
+journal_readiness, this page's 07-22 digests) have been updated.
 
 ## Overnight digest (2026-06-13, from the merged line)
 
@@ -193,7 +208,7 @@ paper repo's ClaudeResearch branch when ready to edit there.
   [experiments/017_error-directions](experiments/017_error-directions/README.md)
 
 - **The regret metric is validated, and parameter transfer beats the proxy on
-  the tested ensembles (exp 018, 2026-07-22).** Grid ceilings are tight (p=1
+  the tested ensembles (exp 034, 2026-07-22).** Grid ceilings are tight (p=1
   gap ≤0.0007 AR; p=3 ramp-grid gap ~0.002; the linear-ramp restriction itself
   costs ~0.007 mean, up to 0.05 sparse). New external baseline: transferring
   the mean true argmax of ten brute-forced ER(0.5) n=12 instances beats the
@@ -202,17 +217,17 @@ paper repo's ClaudeResearch branch when ready to edit there.
   ensembles, per-instance parameter setting adds little over transfer; the
   proxy's niche is where concentration fails or nothing can be simulated. Now
   stated in the paper's abstract, §5.1, §5.3.
-  → [experiments/018_ceiling-validation](experiments/018_ceiling-validation/README.md)
+  → [experiments/034_ceiling-validation](experiments/034_ceiling-validation/README.md)
 - **The headline correlations survive uncertainty quantification, with one
-  honest correction (exp 017, 2026-07-22).** Argmax displacement predicts
+  honest correction (exp 033, 2026-07-22).** Argmax displacement predicts
   regret under every control (pooled/cluster/within-cell/demeaned, rho
   0.56-0.74 both depths). The fidelity-regret correlations were family-
   confounded in both directions (p=1 pooled 0.39 → 0.07 within cells; p=3
   pooled -0.02 hides within-cell 0.46); paper restated. Ranking rhos now carry
   bootstrap CIs; 1.505 carries per-instance spread 1.54±0.26; 26/28 carries
-  p=1.5e-6. → [experiments/017_statistics-hardening](experiments/017_statistics-hardening/README.md)
+  p=1.5e-6. → [experiments/033_statistics-hardening](experiments/033_statistics-hardening/README.md)
 
-- **The density law is now derived, not just measured (exp 019, 2026-07-22).**
+- **The density law is now derived, not just measured (exp 035, 2026-07-22).**
   Four new exact moment identities (machine-verified 1e-9 on 140 instances);
   the key one is Cov(T, S²) = Var(T) with S = m−2c, a quadratic channel the
   crude 36τ²/m estimate missed (alive even in triangle-free graphs). The L²
@@ -220,10 +235,10 @@ paper repo's ClaudeResearch branch when ready to edit there.
   V₂ ≤ Var(T) − vᵀG⁻¹v that captures 91–100% (mean 97%) of the exact
   conditioning correction; ER asymptotic V₂/Var(T) → 1−p(1+4p−2p²)/(1+6p²−4p³)
   (0.375 at p=½ vs 0.352 measured). Now a Proposition with proof in §4.
-  → [experiments/019_conditioning-correction](experiments/019_conditioning-correction/README.md)
+  → [experiments/035_conditioning-correction](experiments/035_conditioning-correction/README.md)
 
 - **The leakage calculus now bounds regret, and normalization halves depth
-  regret (exp 020, 2026-07-22).** Two-point certificate proved and machine-
+  regret (exp 036, 2026-07-22).** Two-point certificate proved and machine-
   verified on 280 instance-depth pairs: regret ≤ ε(θ*)+ε(θ̂) with ε
   controlled by leakage and cost variances. Honestly loose (median 10-11×);
   the looseness is the quantitative argmax-transfer thesis. Bonus zero-cost
@@ -231,9 +246,9 @@ paper repo's ClaudeResearch branch when ready to edit there.
   halves p=3 regret (0.080→0.044, better on 134/140) while p=1 mildly
   prefers unnormalized (0.031 vs 0.047). Both in the paper (§4 Proposition,
   §5.4 rule).
-  → [experiments/020_regret-certificate](experiments/020_regret-certificate/README.md)
+  → [experiments/036_regret-certificate](experiments/036_regret-certificate/README.md)
 
-- **The §4 theory extends verbatim to integer-weighted MaxCut (exp 021,
+- **The §4 theory extends verbatim to integer-weighted MaxCut (exp 037,
   2026-07-22).** All identities re-verified (1e-9) under weighted codegrees
   and cycle weight products on 140 weighted instances; quadratic bound
   capture again 93-100%; cubic law to 0.4%. Continuous weights collapse
@@ -241,9 +256,9 @@ paper repo's ClaudeResearch branch when ready to edit there.
   vacuous: cost degeneracy is a requirement of the object, not the theory.
   Now a remark in §4; Limits rescoped (experiments unweighted, theory
   weighted-ready).
-  → [experiments/021_weighted-maxcut](experiments/021_weighted-maxcut/README.md)
+  → [experiments/037_weighted-maxcut](experiments/037_weighted-maxcut/README.md)
 
-- **The certificate's slack has an exact anatomy (exp 022, 2026-07-22).**
+- **The certificate's slack has an exact anatomy (exp 038, 2026-07-22).**
   regret = Δe − margin exactly (asserted 280/280). Measured: the normalized
   proxy overpredicts essentially everywhere (e = F−F̂ < 0 at 277/280 argmax
   points), a winner's curse makes |e| 4-5× larger at the proxy's own argmax
@@ -251,23 +266,23 @@ paper repo's ClaudeResearch branch when ready to edit there.
   0.6), and the proxy's internal margin absorbs a third of the rest. Sharp
   regret theory must model selection, not pointwise error, which is exactly
   why no pointwise norm predicts regret. Refined paragraph in §4.
-  → [experiments/022_signed-regret-decomposition](experiments/022_signed-regret-decomposition/README.md)
+  → [experiments/038_signed-regret-decomposition](experiments/038_signed-regret-decomposition/README.md)
 
-- **A norm-loss bias correction is a dead end (exp 023, 2026-07-22,
-  NEGATIVE).** The E022 overprediction is only weakly correlated with the
+- **A norm-loss bias correction is a dead end (exp 039, 2026-07-22,
+  NEGATIVE).** The E038 overprediction is only weakly correlated with the
   free observable 1−‖φ‖² (per-instance ρ −0.26 to 0.60) and a pooled linear
   correction worsens regret on every instance it moves (0/126 better at
   both depths). Third independent confirmation that calibrating proxy
   VALUES harms the ARGMAX; the winner's-curse component is a selection
   effect invisible to pointwise corrections. One sentence in §5.4.
-  → [experiments/023_bias-corrected-objective](experiments/023_bias-corrected-objective/README.md)
+  → [experiments/039_bias-corrected-objective](experiments/039_bias-corrected-objective/README.md)
 
-- **The parameter-space findings persist at n=16 (exp 024, 2026-07-23).**
+- **The parameter-space findings persist at n=16 (exp 040, 2026-07-23).**
   35 instances: displacement-regret ρ 0.84/0.76; normalization rule
   replicates (p=3: 0.090→0.060, better 32/35; p=1 keeps the unnormalized
   edge); signed anatomy replicates (overprediction 69/70, winner's curse
   4-9×, margin ~0.04). Stability sentences added to §5.4.
-  → [experiments/024_n16-stability](experiments/024_n16-stability/README.md)
+  → [experiments/040_n16-stability](experiments/040_n16-stability/README.md)
 
 ## Working hypotheses (NOT established — from the deleted research log or intuition)
 
@@ -498,7 +513,7 @@ don't wait"). Resolutions, auditable in the journal:
    two-column test build is 9 pp. *(Decided.)*
 3. **Headline framing** — mechanism + argmax-transfer lead; the family
    ranking is corroboration with its scope shown (Fig. ranking panel b).
-   Implemented 2026-07-22: rewritten abstract, E017-hardened statistics, the
+   Implemented 2026-07-22: rewritten abstract, E033-hardened statistics, the
    certificate, and the "So when does it work?" Discussion opener; the ranking
    carries CIs and the pre-committed criterion. *(Decided; implemented.)*
 4. **E014/E015/E016 fold-in** — done (all three are in the paper with

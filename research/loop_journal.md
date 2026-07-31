@@ -4,7 +4,7 @@
 Spencer's directives: (1) hunt and fix paper errors; (2) make
 `paper_explainer.md` complete enough to rewrite the paper from; (3) maintain
 an adversarial journal-readiness verdict in `journal_readiness.md`;
-(4) pursue promising directions with real experiments (E017+). Spencer
+(4) pursue promising directions with real experiments (E033+). Spencer
 approved free editing of the paper, including folding in E014/E015/E016.
 Target paper length: roughly 10 pages (was 14 before fold-in).*
 
@@ -79,8 +79,8 @@ Next: journal_readiness.md (goal 3), via adversarial referee agents.
   TQE/QST tier; no referee expected conclusions to reverse. Verdict and
   ranked gap list written to research/journal_readiness.md.
 - Top gaps: (1) family-demeaned re-analysis + bootstrap CIs for all pooled
-  Spearman rhos (E017, planned next); (2) grid-ceiling validation vs.
-  continuous optimization + a literature fixed-angle baseline (E018);
+  Spearman rhos (E033, planned next); (2) grid-ceiling validation vs.
+  continuous optimization + a literature fixed-angle baseline (E034);
   (3) any theory bound linking leakage to regret (hard, highest impact);
   (4) demonstrated (not extrapolated) crossover at n=24-28 (needs HPC GPU,
   parked); (5) exact Var(E[T|c]) for the density law.
@@ -89,12 +89,12 @@ Next: journal_readiness.md (goal 3), via adversarial referee agents.
   extreme-ramp points exceed the trivial bound), the abstract's norm claim,
   and the 9-vs-6 model count.
 
-Next: E017 (bootstrap CIs + within-family correlations, analysis-only,
+Next: E033 (bootstrap CIs + within-family correlations, analysis-only,
 local CPU) to close the biggest statistics gap.
 
 ## Iteration 6 (2026-07-22 19:30)
 
-- E017 (statistics hardening) run and committed: bootstrap CIs, cluster
+- E033 (statistics hardening) run and committed: bootstrap CIs, cluster
   bootstrap, within-cell and demeaned Spearman for E012/E014; CI-carrying
   7-point ranking rhos (E004); per-instance depth ratio 1.54 +- 0.26 (E011
   vs E003, 70 matched runs); 26/28 sign test p = 1.5e-6 (E010).
@@ -103,15 +103,15 @@ local CPU) to close the biggest statistics gap.
   within-cell 0.07; p=3 pooled -0.02 hides within-cell 0.46). Paper's E014
   paragraph and figure caption rewritten honestly; argmax-displacement claim
   survives every control and is now the paper's most robust statistic.
-- Paper commit 8418bd9; experiment range now E001-E017; 13 pp.
+- Paper commit 8418bd9; experiment range now E001-E033; 13 pp.
 - journal_readiness gaps 1 and 6 marked done.
 
-Next: E018 (grid-ceiling validation vs. continuous optimization + a
+Next: E034 (grid-ceiling validation vs. continuous optimization + a
 published fixed-angle baseline), local CPU at n=12-14.
 
 ## Iteration 7 (2026-07-22 19:45)
 
-- E018 (ceiling validation + transfer baseline) run on 140 instances:
+- E034 (ceiling validation + transfer baseline) run on 140 instances:
   ceilings are tight (p=1 gap <= 0.0007; p=3 ramp gap ~0.002; the linear-
   ramp restriction itself costs ~0.007 mean, up to 0.05 sparse). The new
   parameter-transfer baseline (mean true argmax of ten brute-forced
@@ -126,7 +126,7 @@ published fixed-angle baseline), local CPU at n=12-14.
   N-fitting exists; the documented origin is the collaboration's own public
   G-RIPS 2024 report, now cited (with Khairy 2020 / Shaffer 2023 for the
   general surrogate-fit pattern). Table 3 framing rewritten.
-- Paper commit fb036e1; experiment range E001-E018; 13 pp; compiles clean.
+- Paper commit fb036e1; experiment range E001-E034; 13 pp; compiles clean.
 - journal_readiness gaps 2 and 7 marked done. Remaining open: theory-regret
   bound (gap 3), HPC crossover demo (gap 4, parked), Var(E[T|c]) (gap 5),
   vector figures (gap 8).
@@ -137,7 +137,7 @@ figures).
 
 ## Iteration 8 (2026-07-22 ~20:00)
 
-- E019: closed the density-law open problem in substance (readiness gap 5).
+- E035: closed the density-law open problem in substance (readiness gap 5).
   Derived and machine-verified four exact moment identities; the key one is
   Cov(T, S^2) = Var(T) (a quadratic channel the crude 36 tau^2/m estimate
   missed, alive even in triangle-free graphs). The resulting L2-projection
@@ -149,13 +149,13 @@ figures).
   section 4; Discussion open problem narrowed; abstract upgraded to
   "derive to within a few percent". Commit 24a1c7f; 13 pp; compiles clean.
 
-Next: digest E019 into STATUS/explainer, then remaining gaps: theory-regret
+Next: digest E035 into STATUS/explainer, then remaining gaps: theory-regret
 bound (gap 3, hard) or vector figures (gap 8, mechanical).
 
 ## Iteration 9 (2026-07-22 ~20:15)
 
-- Digested E019 into STATUS.md and the explainer (new density-law entry,
-  key-numbers rows for E017/E018/E019).
+- Digested E035 into STATUS.md and the explainer (new density-law entry,
+  key-numbers rows for E033/E034/E035).
 - Figure-production pass (readiness gap 8) done via subagent: all six paper
   figures re-emitted as vector PDFs at print font sizes; "gate criterion"
   annotation removed from the ranking figure; "Normal" renamed "Gaussian" in
@@ -171,7 +171,7 @@ referee verdict near the end of the 24 h window.
 
 ## Iteration 10 (2026-07-22 ~20:45)
 
-- E020: closed the last open science gap this loop can reach (gap 3). Proved
+- E036: closed the last open science gap this loop can reach (gap 3). Proved
   a two-point regret certificate connecting the leakage calculus to regret
   (regret <= eps(theta*) + eps(theta-hat), eps controlled by leakage and
   cost variances), machine-verified on 280 instance-depth pairs, honest
@@ -184,7 +184,7 @@ referee verdict near the end of the 24 h window.
   section 5.4; abstract updated. Paper commit 514b221; 14 pp.
 - All eight journal_readiness gaps now closed or parked (gap 4 needs HPC).
 
-Next: digest E020 into STATUS/explainer; then re-run the referee panel for
+Next: digest E036 into STATUS/explainer; then re-run the referee panel for
 a refreshed verdict, and a final consistency pass (page count crept to 14;
 one more trim).
 
@@ -207,7 +207,7 @@ Next: sweep the explainer for consistency with today's paper changes
 
 ## Iteration 12 (2026-07-22 ~21:45)
 
-- E021: proved-by-verification that the whole section-4 theory extends
+- E037: proved-by-verification that the whole section-4 theory extends
   verbatim to integer-weighted MaxCut (weighted codegrees, triangle and
   4-cycle weight products): all identities to 1e-9 on 140 weighted
   instances, quadratic bound capture 93-100% (mean 0.975), cubic law to
@@ -234,23 +234,23 @@ rewrite, decision rule, certificate), then final wrap-up.
   stated ceiling convention; capture/residual ranges harmonized.
 - Explainer fully synced with today's paper (QOKit commit 723dc139):
   new sections for the conditioning bound, weighted extension, and regret
-  certificate with proof ideas; corrected E014/E017 numbers; skeleton and
+  certificate with proof ideas; corrected E014/E033 numbers; skeleton and
   decision-rule/"So when does it work?" content; abstract-shape note.
 
 Next: overnight cadence. Remaining productive options: attempt sharpening
-the certificate (correlated-error analysis, E022); a final full-paper
+the certificate (correlated-error analysis, E038); a final full-paper
 re-audit near the end of the window; keep STATUS decisions current.
 
 ## Iteration 14 (2026-07-22 ~23:30)
 
-- E022: exact signed decomposition regret = Delta-e - margin (identity
+- E038: exact signed decomposition regret = Delta-e - margin (identity
   asserted 280/280). The certificate's 10x slack has three named parts:
   uniform overprediction by the normalized proxy (e<0 at 277/280 argmax
   points, so signed errors partially cancel, median factor 0.6), a winner's
   curse concentrating error at the proxy's own argmax (4-5x the error at
   the true optimum), and the proxy's internal margin absorbing a third of
   the residual tilt. Paper's certificate paragraph now states this
-  (commit 430027f); experiment range E001-E022.
+  (commit 430027f); experiment range E001-E038.
 - Sharp insight for future theory: regret bounds must model the selection
   effect, not pointwise error. This is the mechanistic reason no pointwise
   norm predicts regret (E012/E014).
@@ -263,12 +263,12 @@ full-paper audit + wrap-up summary for Spencer.
 - Housekeeping: proposed_paper_additions.md marked superseded;
   theory_compression.tex flagged out-of-sync (Spencer decision 5);
   STATUS decision 3 (headline framing) marked resolved-in-effect.
-- E023 (negative): the E022 overprediction is not predictable from norm
+- E039 (negative): the E038 overprediction is not predictable from norm
   loss (per-instance rho -0.26 to 0.60) and a pooled linear correction
   worsens regret on every moved instance (0/126 better, both depths).
   Third confirmation of "never calibrate values to fix argmaxes"; the
   winner's-curse remainder is a selection effect. One sentence added to
-  the paper's normalization paragraph (commit dab97cd); range E001-E023.
+  the paper's normalization paragraph (commit dab97cd); range E001-E039.
 - Page count 15 after all additions; the venue-format argument (two-column
   IEEE ~10-11 pp) still applies; further single-column trimming would cut
   results, parked as Spencer's call.
@@ -279,11 +279,11 @@ theory (hard), HPC crossover demo (parked).
 
 ## Iteration 16 (2026-07-23 ~01:30)
 
-- E024 (n=16 stability, 35 instances): all three parameter-space findings
+- E040 (n=16 stability, 35 instances): all three parameter-space findings
   replicate one size up (displacement-regret rho 0.84/0.76; normalization
   rule 0.090->0.060 at p=3, better 32/35, p=1 keeps unnormalized edge;
   signed anatomy 69/70 overprediction, winner's curse 4-9x). Two stability
-  sentences added to the paper (commit 24a1e1b); range E001-E024.
+  sentences added to the paper (commit 24a1e1b); range E001-E040.
 
 Next: overnight idle stretch; final comprehensive re-audit and Spencer
 wrap-up digest in the last hours of the window.
@@ -301,8 +301,8 @@ wrap-up digest in the last hours of the window.
 
 - Explainer coherence pass: the ladder subsection relabeled (it follows the
   certificate section, matching the paper's order); the certificate's "how
-  to read it" now carries the E022 signed anatomy, the E023 negative, and
-  the E024 n=16 stability in prose (they were table-only).
+  to read it" now carries the E038 signed anatomy, the E039 negative, and
+  the E040 n=16 stability in prose (they were table-only).
 - Overnight: idle heartbeats; final audit + Spencer digest in the last
   hours of the window.
 
@@ -313,12 +313,12 @@ extended the originally-requested 24 h to a full weekend mid-launch). Same
 four directives as loop 1: (1) hunt and fix paper errors; (2) explainer
 complete enough to rewrite the paper from; (3) honest journal-readiness
 verdict, now judged explicitly against a low-to-mid journal tier;
-(4) pursue promising directions with real experiments (E025+). No trivial
+(4) pursue promising directions with real experiments (E041+). No trivial
 questions to Spencer. Plan: ~/.claude/plans/i-want-you-to-zippy-seal.md.*
 
 ## Iteration 1 (2026-07-31 19:12)
 
-- Housekeeping: adopted the orphaned E025 (recipe composition: sampled N x
+- Housekeeping: adopted the orphaned E041 (recipe composition: sampled N x
   normalized objective) left by loop 1 — its full run died at 123/140
   instances at the window boundary. README written (Answer: PENDING), full
   run relaunched in background (~15 min). Stray E012/E014/E016 smoke CSVs
@@ -327,21 +327,21 @@ questions to Spencer. Plan: ~/.claude/plans/i-want-you-to-zippy-seal.md.*
   unmodified paper compiles clean at 9 pp two-column. The 10 pp target is met
   with no cuts; 15 pp single-column is a formatting artifact. STATUS updated
   (decision 2 and the headline paragraph).
-- In flight at iteration close: E025 full run (background julia, ~15 min);
+- In flight at iteration close: E041 full run (background julia, ~15 min);
   two audit agents (numbers-vs-records and math re-derivation), prioritizing
-  the post-July-22 additions (E017-E024 content, certificate, conditioning
+  the post-July-22 additions (E033-E040 content, certificate, conditioning
   bound, weighted remark).
 
 ## Iteration 2 (2026-07-31 19:35)
 
-- E025 complete (280 rows): the recipe composes and MORE — sampled N (S=10)
+- E041 complete (280 rows): the recipe composes and MORE — sampled N (S=10)
   + normalized is the best of all four {exact,sampled}x{raw,norm} cells at
   BOTH depths, beating exact+normalized (p=1 mean regret 0.021 vs 0.047,
   sign p=8e-29; p=3 0.024 vs 0.044, p=2e-15), uniformly across all 7
-  families. Exact-N cells reproduce E020/E024 (p=3 0.080->0.044; p=1 exact
+  families. Exact-N cells reproduce E036/E040 (p=3 0.080->0.044; p=1 exact
   prefers raw). README digested; claim held OUT of the paper pending
   mechanism.
-- E026 launched (mechanism: noise vs estimator bias): R=10 replicates +
+- E042 launched (mechanism: noise vs estimator bias): R=10 replicates +
   replicate-averaged N + S-sweep {3,10,30,100,300}, n=12, same seeds.
   Smoke passed; full run in background.
 - Audit agents (numbers, math) still running.
@@ -359,10 +359,10 @@ questions to Spencer. Plan: ~/.claude/plans/i-want-you-to-zippy-seal.md.*
   to Cor. 6, singular-G qualifier and bound-not-ratio asymptotic in Prop 10.
   Local paper commit ea8f56c (compiles clean, 15 pp single-column).
   Deferred: T/S/v/p/G symbol collisions (dedicated notation pass later).
-- E026+E027 digested and committed: the sampled-N gain is NOISE acting
-  through the normalized objective (E026: averaged-N regresses to exact,
+- E042+E043 digested and committed: the sampled-N gain is NOISE acting
+  through the normalized objective (E042: averaged-N regresses to exact,
   S=3 best, raw indifferent); at p=1 generic iid noise suffices, at p=3
-  only the sampler's structured (marginal-preserving) noise helps (E027).
+  only the sampler's structured (marginal-preserving) noise helps (E043).
   Strong practical + conceptual finding, held out of the paper until the
   reconciliation below lands.
 - **DISCOVERY — the paper repo has two diverged lines.** Remote
