@@ -305,3 +305,23 @@ wrap-up digest in the last hours of the window.
   the E024 n=16 stability in prose (they were table-only).
 - Overnight: idle heartbeats; final audit + Spencer digest in the last
   hours of the window.
+
+# Loop 2 (72-hour weekend run)
+
+*Loop started 2026-07-31 19:12 JST; hard stop 2026-08-03 ~19:12 JST (Spencer
+extended the originally-requested 24 h to a full weekend mid-launch). Same
+four directives as loop 1: (1) hunt and fix paper errors; (2) explainer
+complete enough to rewrite the paper from; (3) honest journal-readiness
+verdict, now judged explicitly against a low-to-mid journal tier;
+(4) pursue promising directions with real experiments (E025+). No trivial
+questions to Spencer. Plan: ~/.claude/plans/i-want-you-to-zippy-seal.md.*
+
+## Iteration 1 (2026-07-31 19:12)
+
+- Housekeeping: adopted the orphaned E025 (recipe composition: sampled N x
+  normalized objective) left by loop 1 — its full run died at 123/140
+  instances at the window boundary. README written (Answer: PENDING), full
+  run relaunched in background (~15 min). Stray E012/E014/E016 smoke CSVs
+  committed (QOKit commit 0bedf77d); tree clean.
+- Next in this iteration: IEEEtran two-column build to settle the 10 pp
+  question (STATUS decision 2), then the overdue full-paper audit.
