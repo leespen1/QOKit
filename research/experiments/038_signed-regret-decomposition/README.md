@@ -9,7 +9,8 @@ two points nearly cancel") deserved a measurement.
 (e = F - F-hat < 0 at 277/280 measured argmax points), so the two signed
 errors share a sign and partially cancel (median cancellation factor ~0.6,
 correlation 0.86 at p=1). (2) A winner's curse inflates the error at the
-proxy's own argmax: |e(theta-hat)| is 4-5x |e(theta*)| (0.10 vs 0.02-0.03),
+proxy's own argmax: |e(theta-hat)| is 3.8-4.7x |e(theta*)| by ratio of means (medians 3.75/4.19;
+0.10 vs 0.02-0.03),
 because maximizing F-hat selects points of maximal overprediction. (3) The
 proxy's own margin F-hat(theta-hat) - F-hat(theta*) absorbs ~0.03 of the
 remaining ~0.077, leaving regret ~0.045. The certificate's Cauchy-Schwarz

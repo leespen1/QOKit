@@ -67,7 +67,7 @@ Family means (n=14 shown; n=12 similar, full table in `results.csv`):
    non-ER graphs" is contradicted on every non-ER family tested.
 3. **The ER(0.5) anomaly is an unphysical-artifact story, not a model-quality
    story.** On dense ER(0.5) the analytical-N proxy's grid argmax lands where
-   the proxy state's norm has inflated ~7.5× and the predicted ⟨C⟩ = 93
+   the proxy state's squared norm has inflated ~7.5× and the predicted ⟨C⟩ = 93
    exceeds the number of edges (38). Theorem 1 makes the exact compression
    contractive — the proxy norm can only decay — so **norm inflation is a
    free certificate of model error**. Filtering grid points to ‖φ‖² ≤ 1.05

@@ -91,7 +91,8 @@ instances):
 | argmax displacement ‖(Δγ, Δβ)‖ | **+0.69 ± 0.18** | **+0.74 ± 0.18** |
 
 The amplitude norm is hostage to scale conventions the argmax ignores: the raw
-PaperProxy N has slice sums ranging up to ~9e8 (vs the exact 2^n), giving an
+PaperProxy N has slice sums whose per-instance maxima average ~9.2e8 (absolute max 2.3e10;
+vs the exact 2^n), giving an
 amplitude error of ~1e5 — five orders of magnitude above every other model —
 yet the *lowest* non-emp regret (0.041). Conversely the fitted Triangle has
 modest amplitude error and the worst regret. Regret is determined by where the

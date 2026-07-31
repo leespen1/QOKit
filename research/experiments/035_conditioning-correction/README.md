@@ -8,7 +8,7 @@ conditioning correction Var(E[T|c]) = Var(T) - V2. The crude linear estimate
 
 **Answer: Yes, to within a few percent. Projecting T onto span{S, S^2} of
 the edge-spin sum S = m - 2c gives a rigorous, polynomial-time lower bound
-on Var(E[T|c]) that captures 91-100% (mean 97%) of the exact correction on
+on Var(E[T|c]) that captures 90-100% (mean 97%; min 0.9046) of the exact correction on
 all 140 instances across the seven families. Zero bound violations. The
 missing channel was quadratic: Cov(T, S^2) = Var(T) exactly, present even
 in triangle-free graphs.**

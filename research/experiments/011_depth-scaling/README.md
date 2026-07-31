@@ -6,7 +6,7 @@ ramps, and how does the growth rate scale with n and graph family?
 
 **Answer: Accumulated leakage grows *linearly* in depth for fixed-endpoint
 ramps — Σλ(p=30)/Σλ(p=20) = 1.505 at small ramps vs the 1.5 predicted by
-Theorem 3's per-layer profile argument — and only mildly with n (+13–30% from
+Theorem 3's per-layer profile argument — and only mildly with n (+11–33% from
 n=16→20 despite m growing ~58%), so proxy fidelity at depth is predictable:
 overlap at p=30 stays 0.71–0.81 for small ramps even at n=20.**
 
@@ -36,8 +36,8 @@ overlap, and compressed norm of the exact compressed trajectory
    Saturation at larger ramps is expected: once the compressed norm has
    decayed, later layers have less amplitude left to leak.
 2. **Mild n-dependence at fixed schedule:** family-pooled Σλ at layer 20
-   (moderate ramp) grows from n=16 → 20 by only 13–30% per family while
-   m grows ~30–58% — accumulated leakage scales *sublinearly* in m along
+   (moderate ramp) grows from n=16 → 20 by only 11–33% per family while
+   m grows ~25–57% — accumulated leakage scales *sublinearly* in m along
    deep trajectories (in contrast to the single-layer ∝ m law), again
    consistent with norm-loss saturation.
 3. **Fidelity at depth stays usable in the working regime:** mean overlap at

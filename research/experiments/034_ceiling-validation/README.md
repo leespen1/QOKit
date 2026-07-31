@@ -30,7 +30,8 @@ seeds as E002/E004/E014)
    - p=1: transfer AR beats the proxy-set AR on 134/140 instances
      (mean advantage 0.018); pooled transfer regret ~0.014 vs proxy 0.032.
    - p=3: transfer beats the proxy on 140/140 (mean advantage 0.074);
-     pooled transfer regret ~0.008 vs proxy 0.083.
+     pooled transfer regret ~0.006 (CSV recomputation, 2026-07-31; an earlier
+     digest said ~0.008) vs proxy 0.083.
    Parameter concentration on these random ensembles is strong enough that
    one solved small instance sets better parameters than instance-specific
    proxy compression, especially at depth (the ramp grid's coarse 8-point

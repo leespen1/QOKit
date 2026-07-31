@@ -9,10 +9,10 @@ model (the analytical N) can pick better parameters than the exact compression?
 
 **Answer: Parameter-setting regret is an argmax-transfer (parameter-space)
 quantity, decoupled from state fidelity at depth. Pooled over 140 instances,
-regret correlates with argmax displacement at both depths (Spearman ρ = 0.76 at
-p=1, 0.63 at p=3) but with the fidelity deficit only at p=1 (ρ = 0.39 → −0.02 at
+regret correlates with argmax displacement at both depths (Spearman ρ = 0.7373 at
+p=1, 0.6530 at p=3; CSV-recomputed 2026-07-31) but with the fidelity deficit only at p=1 (ρ = 0.39 → −0.02 at
 p=3 — fidelity stops predicting regret entirely). The "landscape robustness
-governs depth regret" hypothesis is refuted (ρ ≈ −0.18/+0.10, weak and
+governs depth regret" hypothesis is refuted (ρ ≈ −0.21/+0.10, weak and
 sign-inconsistent). So the leakage calculus bounds the STATE error, but
 parameter-setting quality is a separate, parameter-space matter — exactly why a
 low-fidelity model with a well-placed argmax (the analytical N off-ER) beats the
@@ -53,8 +53,8 @@ Pooled Spearman ρ(regret, ·) over 140 instances per depth:
 | predictor | p=1 | p=3 |
 |---|---|---|
 | fidelity deficit (1−overlap) | **0.39** | **−0.02**  ← decoupled |
-| argmax displacement | **0.76** | **0.63** |
-| landscape robustness (flat-peak %) | −0.18 | +0.10  (refuted) |
+| argmax displacement | **0.74** | **0.65** |
+| landscape robustness (flat-peak %) | −0.21 | +0.10  (refuted) |
 
 `argmax_vs_fidelity.png`: (a) regret vs fidelity deficit — a slope at p=1 that
 flattens to a high cloud at p=3; (b) regret vs argmax displacement — a positive
