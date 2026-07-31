@@ -5,7 +5,11 @@
 interacting with argmax selection, or by a systematic property of the S=10
 estimator?
 
-**Answer**: **PENDING** (full run in progress).
+**Answer**: **Noise is the active ingredient, and it acts only through the
+normalized objective: the replicate-averaged N loses the gain (regret back to
+exact-N level), the S-sweep is monotone with SMALLER S better (S=3 mean
+regret 0.012/0.016 at p=1/3 vs exact-norm 0.042/0.040, converging to exact by
+S=300), and noise does nothing for the raw objective at any S.**
 
 ## Method
 
@@ -25,7 +29,26 @@ Both depths (p=1 grid, p=3 linear-ramp grid), both objectives recorded.
 
 ## Result
 
-PENDING.
+Mean regret over 70 instances (normalized objective):
+
+| variant             | p=1    | p=3    |
+|---------------------|--------|--------|
+| exact N             | 0.0416 | 0.0397 |
+| S=10 (700 draws)    | 0.0212 | 0.0236 |
+| replicate-averaged N| 0.0360 | 0.0372 |
+| S=3                 | 0.0120 | 0.0160 |
+| S=30                | 0.0305 | 0.0309 |
+| S=100               | 0.0359 | 0.0387 |
+| S=300               | 0.0421 | 0.0397 |
+
+Raw-objective regret is flat across all variants (~0.030 at p=1, ~0.075 at
+p=3): noise helps *only* under normalization. Per-instance replicate SD of
+regret is ~0.011 (median), so single draws vary, but the mean effect is
+unambiguous (700 independent draws). Interpretation: subsampling noise
+disrupts the selection effect (E022's winner's curse) that the normalized
+proxy's systematic errors feed; less data gives better parameters. Whether
+generic entrywise noise reproduces this, or the specific structure of real
+member-profile heterogeneity is needed, is E027.
 
 ## Caveats
 
