@@ -478,7 +478,8 @@ acquires one extra term,
 $|a|(1-\lVert\phi\rVert^2)/c_{\mathrm{opt}} =
 |a|\sum_\ell\lambda_\ell^2/c_{\mathrm{opt}}$ with
 $a = \langle C\rangle_\psi$. (The paper marks this as an algebraic
-addendum, audit-verified 2026-07-31, not part of E036's machine check.)
+addendum; since 2026-07-31 it is also machine-checked, by E036's
+verify_addendum.jl at 714 points to 1e-10.)
 
 **How to read it.** The certificate holds on all 280 instance-depth pairs
 tested (machine-checked) but is honestly loose: median tightness is
