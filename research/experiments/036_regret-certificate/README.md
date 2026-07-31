@@ -71,3 +71,12 @@ Practical rule now in the paper: normalize the proxy objective at depth.
 
 Reproduce: `JULIA_NUM_THREADS=auto julia --project research/experiments/036_regret-certificate/run.jl`
 (~10 min); smoke: `E20_SMOKE=1 ...`.
+
+## Addendum machine check (2026-07-31)
+
+The unnormalized-objective extra term |a|(1-‖φ‖²)/c_opt (paper remark) was
+audit-verified algebraically on 2026-07-31 and is now also machine-checked:
+`verify_addendum.jl` asserts the Theorem-3 norm identity, the decomposition
+identity, and the full unnormalized bound at 714 (instance, schedule) points
+(7 families x n in {10,12} x 3 instances; p=1 grid and p=3 ramps), all to
+1e-10 (bound strict; worst utilization 0.85).
