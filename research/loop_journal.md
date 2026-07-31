@@ -397,3 +397,18 @@ questions to Spencer. Plan: ~/.claude/plans/i-want-you-to-zippy-seal.md.*
    described the stale local line; remote already has a 9 pp QCE cut AND a
    17 pp QINP manuscript. The 10 pp target discussion must name the actual
    files.
+
+## Iteration 4 (2026-07-31 ~20:50)
+
+- Renumber executed: loop-1 series git-mv'd to 033-043; references updated
+  in loop_journal (pre-iteration-3 bulk + hand-fixed mixed passages),
+  paper_explainer, journal_readiness, STATUS (loop-1 digest blocks only;
+  July blocks untouched), and the renumbered dirs' own files. A glob
+  mistake briefly touched July dirs 031/032 — caught and reverted before
+  commit. STATUS gains an "E-number collision resolved" section with the
+  full map. QOKit pushed.
+- Port agent launched in the paper repo: branch reconcile-loop1 from
+  origin/ClaudeResearch (QINP manuscript = editorial flagship), porting
+  loop-1's certificate/conditioning/normalization/statistics/E014-E016
+  science with renumbered refs, honoring the remote line's owner-approved
+  framings (weighted reframe, Sud tone). No pushes; I review before merge.
