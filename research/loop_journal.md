@@ -412,3 +412,25 @@ questions to Spencer. Plan: ~/.claude/plans/i-want-you-to-zippy-seal.md.*
   loop-1's certificate/conditioning/normalization/statistics/E014-E016
   science with renumbered refs, honoring the remote line's owner-approved
   framings (weighted reframe, Sud tone). No pushes; I review before merge.
+
+## Iteration 5 (2026-07-31 ~21:05)
+
+- Paper reconciliation COMPLETE and pushed (2953996..1e72f46, fast-forward;
+  no force-push; loop-1 commits joined via ours-merge, reachable forever).
+  Four port commits put loop-1's science into qinp_paper.tex (17->20 pp,
+  clean builds): dual-audit fixes to shared claims; conditioning bound as
+  the primary V2 statement (remote's quartic-split compressed to a pointer;
+  capture set to the README-backed 91-100%/97%); certificate + signed
+  anatomy + normalization rule (with a bridging sentence reconciling
+  "normalize at depth" with the remote's "normalization is an instrument"
+  finding); statistics hardening + ceiling validation + transfer
+  replication merged into the remote's own framing. Weighted remark placed
+  in theory, rescoped to MOTIVATE the binned-proxy arc; a genuine remote
+  imprecision fixed (unweighted identity DOES survive integer weights).
+- Key scoping kept from the remote line (harsher than loop-1's story):
+  at p=10-20 every proxy variant collapses (0.07-0.37) while ramp transfer
+  holds <=0.03; "sampled N" is best-proxy-at-p<=3, not a universal recipe.
+  E041-E043's noise findings must be read within that scope when they
+  enter the paper.
+- STATUS "Where we are" rewritten: two manuscripts named (QCE 9 pp — 10 pp
+  target met; QINP 20 pp journal flagship), reconciliation recorded.

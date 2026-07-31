@@ -83,12 +83,15 @@ arXiv late August; submit April 2027. Full plan: see `research/decisions.md` and
 
 ## Where we are
 
-**Phases 1–4 effectively complete.** The paper
-(`papers/OverleafPaper`, branch `ClaudeResearch`) compiles clean at 15 pp in
-the single-column screen-reading layout, and at **9 pp in IEEEtran two-column
-venue format (verified 2026-07-31)** — so the 10 pp target is met with no
-cuts; the single-column count is a formatting artifact, not excess content.
-It carries the theory (V₂ lemmas included), the full anatomy of
+**Phases 1–4 effectively complete; the two paper lines were reconciled
+2026-07-31** (head `1e72f46`): the July editorial line is canonical, with
+loop-1's science ported in (renumbered E033–E043) and the loop-1 history
+joined losslessly. Two manuscripts now live in `papers/OverleafPaper`:
+**`qce2027_paper.tex`** (IEEEtran two-column QCE cut, **9 pp — the 10 pp
+target is met**) and **`qinp_paper.tex`** (single-column Springer QINP
+journal manuscript, 20 pp after the port; the journal flagship). Both
+compile clean. The line carries the theory (V₂ lemmas, conditioning bound,
+regret certificate), the full anatomy of
 experiments 001–031, eight figures (ranking, argmax-transfer,
 direction-vs-size, weighted binning, α-crossover with pre-registered
 points), a glossary, a Conclusion, and 36 verified references from two
