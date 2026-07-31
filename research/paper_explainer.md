@@ -926,13 +926,12 @@ beyond simulability, and, most durably, the error calculus itself.
 
 ---
 
-## 8. NOT yet in the paper: the noise-regularization frontier (E041--E043)
+## 8. The noise-regularization arc (E041--E043; folded into the paper 2026-07-31)
 
-*This subsection is deliberately fenced off: these results are committed
-experiments on the ClaudeResearch branch but are NOT in qinp_paper.tex.
-E041's own README says not to put the claim in the paper until the
-mechanism question was resolved; E042/E043 have since resolved it, but the
-paper has not yet been updated. Treat as frontier.*
+*Status: E041's README quarantined this claim until the mechanism was
+resolved; E042/E043 resolved it, and the arc entered qinp_paper.tex on
+2026-07-31 as one scoped paragraph at the end of Sec. 6.1 (best proxy
+variant at $p\le3$; within a family, transfer still wins).*
 
 - **E041 (sampled + normalized composes, and overshoots).** The two
   separately-validated ingredients combine better than either alone:
@@ -1166,9 +1165,9 @@ MaxCut-specific vs random-like) is stated where it is used.
 | Guarded surrogate polish | ramp polish +0.05--0.12; full-$2p$ overfits (Pareto $\to0.829$); guard never hurts | E030, E031 |
 | Max-3-XOR replication | $p=1$ regret 0.031--0.040; sampled $\ge$ exact 7/8 cells; leakage $0.045\to0.092$ with density; large-angle 0.84--0.95 | E027 |
 | Timing wall | exact $N$ 21.8 s at $n=20$; sampled 0.44 s; sweep 0.38 s; GPU ceiling 0.48 s; statevector 0.3 ms | E013 |
-| NOT in paper: sampled+norm composes | $p1$ 0.021 vs exact-norm 0.047 (123/7); $p3$ 0.024 vs 0.044 (112/23) | E041 |
-| NOT in paper: noise is the ingredient | replicate-averaged loses gain; $S=3$ best (0.012/0.016); converges to exact by $S=300$ | E042 |
-| NOT in paper: structured noise required at depth | iid noise wins at $p1$ ($\sigma=0.1$: 0.011) but only hurts at $p3$ (0.036--0.126) | E043 |
+| sampled+norm composes (Sec. 6.1) | $p1$ 0.021 vs exact-norm 0.047 (123/7); $p3$ 0.024 vs 0.044 (112/23) | E041 |
+| noise is the ingredient (Sec. 6.1) | replicate-averaged loses gain; $S=3$ best (0.012/0.016); converges to exact by $S=300$ | E042 |
+| structured noise required at depth (Sec. 6.1) | iid noise wins at $p1$ ($\sigma=0.1$: 0.011) but only hurts at $p3$ (0.036--0.126) | E043 |
 
 ## If you remember five things
 
