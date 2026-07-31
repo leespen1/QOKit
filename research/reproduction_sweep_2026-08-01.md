@@ -16,3 +16,12 @@ agent batches when limits allow).
 | 043_synthetic-noise-control | REPRODUCED_FULL | generated fresh during this loop |
 | 044_composed-recipe-n16 | REPRODUCED_FULL | generated fresh during this loop |
 | 045_selection-aware-certificate | REPRODUCED_FULL | generated fresh during this loop; validity asserts held on every row |
+| 016_cheap-prefix-frame | REPRODUCED_FULL | rerun results.csv byte-identical (210 jobs) |
+| 033_statistics-hardening | ANALYSIS_VERIFIED | headline rhos/CIs recomputed from committed CSVs by the 2026-07-31 numbers audit |
+| 034_ceiling-validation | ANALYSIS_VERIFIED | ceiling gaps + transfer regret recomputed from CSVs (audit; README refreshed to 0.006) |
+| 035_conditioning-correction | ANALYSIS_VERIFIED | capture stats recomputed (min 0.9046, mean 0.97) |
+| 036_regret-certificate | ANALYSIS_VERIFIED + addendum machine check rerun this loop (714 points) |
+| 037_weighted-maxcut | ANALYSIS_VERIFIED | capture 92.9-99.6% recomputed from CSVs (audit) |
+| 038_signed-regret-decomposition | ANALYSIS_VERIFIED | 557/560, 3.8-4.7x, margin ~40% recomputed from CSVs (audit) |
+| 039_bias-corrected-objective | ANALYSIS_VERIFIED | rho range and 0/126 recomputed (audit) |
+| 040_n16-stability | ANALYSIS_VERIFIED | 0.84/0.76 vs 0.25/0.47 convention split recomputed (audit) |

@@ -578,3 +578,10 @@ overnight cadence after that.
   Tracking in research/reproduction_sweep_2026-08-01.md.
 - E046 estimator agent died pre-output; will relaunch as a single agent
   when limits allow (probe first with a tiny agent).
+
+## Iteration 17 (2026-08-01 ~06:50)
+
+- Limits back (probe ok). E046 estimator relaunched as a single agent.
+- Sweep: E016 byte-identical (210 jobs). E033-E040 marked ANALYSIS_VERIFIED
+  on the strength of the 2026-07-31 audit's CSV recomputations (036 also
+  had its addendum check rerun this loop). Ledger at 19/45.
