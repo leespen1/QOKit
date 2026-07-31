@@ -519,3 +519,18 @@ sharpening using the E038 anatomy).
   record-verified. All non-Spencer submission items are done.
 - E044 still in prep (serial exact-N at n=16 is the bottleneck); expected
   to land within the hour.
+
+## Iteration 12 (2026-07-31 ~23:50)
+
+- E044 landed: the composed recipe replicates at n=16, 34/35 at both
+  depths (p=1e-9), margin WIDENS with n (0.018/0.024 vs exact-normalized
+  0.061/0.060); S=3 strongest (0.0067 at p=1). Exact-norm cell reproduces
+  E040. Digested into README, one clause in qinp Sec. 6.1 (% E044,
+  pushed), and the explainer key-numbers table.
+- The E041-E044 arc is now a complete, size-stable, mechanism-explained
+  result fully inside the paper.
+
+Next: E045 (selection-aware certificate sharpening via the E038 signed
+anatomy: can regret <= max(0, Delta-e) - margin with Delta-e estimated
+from the norm-visible part give a tighter certified bound?), and an
+overnight cadence after that.

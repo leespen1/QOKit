@@ -1168,6 +1168,7 @@ MaxCut-specific vs random-like) is stated where it is used.
 | sampled+norm composes (Sec. 6.1) | $p1$ 0.021 vs exact-norm 0.047 (123/7); $p3$ 0.024 vs 0.044 (112/23) | E041 |
 | noise is the ingredient (Sec. 6.1) | replicate-averaged loses gain; $S=3$ best (0.012/0.016); converges to exact by $S=300$ | E042 |
 | structured noise required at depth (Sec. 6.1) | iid noise wins at $p1$ ($\sigma=0.1$: 0.011) but only hurts at $p3$ (0.036--0.126) | E043 |
+| composed recipe replicates at n=16 (Sec. 6.1) | 34/35 both depths; 0.018/0.024 vs exact-norm 0.061/0.060; $S=3$: 0.0067 | E044 |
 
 ## If you remember five things
 
