@@ -490,3 +490,11 @@ Next: gap 5 front-matter pass (abstract compression, keywords, watermark,
 bibliography re-verification), then fresh science (E044 candidates: S and
 n scaling of the noise-regularization effect; selection-aware certificate
 sharpening using the E038 anatomy).
+
+## Iteration 9 (2026-07-31 ~22:40)
+
+- Front-matter agent launched on qinp_paper.tex (abstract compression,
+  keywords, watermark sweep, bibliography re-verification, Springer
+  declarations block with TBD-Spencer placeholders).
+- E044 launched (n=16 replication of the composed-recipe headline, plus
+  the S=3 cell): smoke passed, full run in background (~40 min).
