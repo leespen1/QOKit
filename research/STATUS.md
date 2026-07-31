@@ -69,9 +69,10 @@ arXiv late August; submit April 2027. Full plan: see `research/decisions.md` and
 ## Where we are
 
 **Phases 1–4 effectively complete.** The paper
-(`papers/OverleafPaper`, branch `ClaudeResearch`, head `24a1e1b`) compiles
-clean at **15 pp — over the 10 pp target; trimming is the open task** (it was
-9 pp at the QCE length cut, before the E014/E015/E016 fold-in and the proofs).
+(`papers/OverleafPaper`, branch `ClaudeResearch`) compiles clean at 15 pp in
+the single-column screen-reading layout, and at **9 pp in IEEEtran two-column
+venue format (verified 2026-07-31)** — so the 10 pp target is met with no
+cuts; the single-column count is a formatting artifact, not excess content.
 It carries the theory (V₂ lemmas included), the full anatomy of
 experiments 001–031, eight figures (ranking, argmax-transfer,
 direction-vs-size, weighted binning, α-crossover with pre-registered
@@ -493,7 +494,8 @@ don't wait"). Resolutions, auditable in the journal:
 2. **Venue/format** — the current draft is already
    `\documentclass[conference]{IEEEtran}`; staying with QCE 2027 conference
    format. **Target length: 10 pp** (within QCE's ~8–12 pp budget) — this is
-   the number to hold every draft against. *(Decided.)*
+   the number to hold every draft against. Met: the 2026-07-31 IEEEtran
+   two-column test build is 9 pp. *(Decided.)*
 3. **Headline framing** — mechanism + argmax-transfer lead; the family
    ranking is corroboration with its scope shown (Fig. ranking panel b).
    Implemented 2026-07-22: rewritten abstract, E017-hardened statistics, the
