@@ -473,3 +473,20 @@ remote line's "best proxy variant at p<=3" scoping.
   0.9046, so it should read 90-100% — fold into the E041-E043 edit.
 - Figure agent still running in the paper repo (holding off on paper edits
   until it lands to avoid collisions).
+
+## Iteration 8 (2026-07-31 ~22:15)
+
+- Readiness gap 2 closed: E041-E043 folded into qinp_paper.tex as one
+  scoped paragraph ending Sec. 6.1 (composition beats every combination at
+  both depths; mechanism = in-set noise disrupting the winner's curse;
+  scoped best-proxy-at-p<=3, transfer still wins in-family). Capture floor
+  corrected to 90% while in there. Gap 3 closed by the figure agent (all
+  six QINP figures vector, commit c2857c3). Gap 4 closed last iteration.
+  journal_readiness updated: only gap 1 (Spencer: declarations + Zenodo)
+  and gap 5 (front matter) remain.
+- Explainer section 8 and key-numbers rows updated to reflect the fold-in.
+
+Next: gap 5 front-matter pass (abstract compression, keywords, watermark,
+bibliography re-verification), then fresh science (E044 candidates: S and
+n scaling of the noise-regularization effect; selection-aware certificate
+sharpening using the E038 anatomy).
