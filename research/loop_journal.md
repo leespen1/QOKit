@@ -534,3 +534,10 @@ Next: E045 (selection-aware certificate sharpening via the E038 signed
 anatomy: can regret <= max(0, Delta-e) - margin with Delta-e estimated
 from the norm-visible part give a tighter certified bound?), and an
 overnight cadence after that.
+
+## Iteration 13 (2026-08-01 ~00:30)
+
+- E045 agent derived the margin-subtracted certificate and committed
+  run.jl + smoke; the full run is still executing (trajectory computation
+  is the heavy part). Polling until results.csv lands, then README +
+  digest. Overnight cadence.
