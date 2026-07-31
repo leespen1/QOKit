@@ -585,3 +585,14 @@ overnight cadence after that.
 - Sweep: E016 byte-identical (210 jobs). E033-E040 marked ANALYSIS_VERIFIED
   on the strength of the 2026-07-31 audit's CSV recomputations (036 also
   had its addendum check rerun this loop). Ledger at 19/45.
+
+## Iteration 18 (2026-08-01 ~08:15)
+
+- E046 preview (run still in its n=20 scaling phase): the poly-time
+  estimator VALIDATES — p=1 norm regret 0.011 (best of all variants;
+  samp10 0.019, exact 0.047); p=3 0.030 vs samp10 0.025, exact 0.045.
+  Within the pre-set ~0.01 AR criterion: the paper's open question is
+  closing positively. Awaiting the agent's README/timing before any
+  paper edit.
+- Sweep: E004 (gate) byte-identical earlier this morning; E005+E006
+  reruns still executing.
