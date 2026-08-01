@@ -33,3 +33,4 @@ agent batches when limits allow).
 | 008_sampled-leakage-predictor | REPRODUCED_FULL | rerun byte-identical |
 | 009_trajectory-pca | REPRODUCED_FULL | rerun byte-identical |
 | 012_fitted-shape-paradox | REPRODUCED_FULL | rerun byte-identical |
+| 017_error-directions | REPRODUCED_FULL | rerun byte-identical (first July-series full rerun) |
