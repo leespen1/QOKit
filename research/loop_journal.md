@@ -695,3 +695,20 @@ overnight cadence after that.
 - All science and verification threads for the window are now closed.
   Remaining: long-idle cadence, then the Spencer wrap-up digest in the
   final hours (2026-08-03 afternoon JST).
+
+## Iteration 26 (2026-08-01 ~18:20)
+
+- QCE conference cut synced with the flagship (paper commit c4b8cb0,
+  pushed): applicable audit fixes applied (7 present, 4 absent-from-cut
+  verified), one compact E041-E048 paragraph added at conference altitude,
+  four stale "estimator is open / exponential essential" statements
+  purged, Limits + repro footnote updated. **Exactly 10 pp** — Spencer's
+  target met with the new results included.
+- Memories saved: paper-repo structure (two manuscripts + numbering
+  split) and agent-budget discipline (no wide fan-outs; the 45-agent
+  lesson).
+- ALL planned work for the window is complete: both manuscripts current
+  and consistent, explainer current through E048, readiness at minor
+  revision with only Spencer-owned gaps, sweep 45/45, E041-E048 arc
+  settled on three sizes. Loop enters idle cadence; wrap-up digest in the
+  final hours.
