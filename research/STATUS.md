@@ -287,6 +287,46 @@ paper repo's ClaudeResearch branch when ready to edit there.
   4-9×, margin ~0.04). Stability sentences added to §5.4.
   → [experiments/040_n16-stability](experiments/040_n16-stability/README.md)
 
+- **Less data gives better parameters: the noise-regularization arc (exps
+  041-044, 2026-07-31).** The recipe's two ingredients compose and beat
+  BOTH parents: sampled N (S=10) + normalized objective is the best of all
+  four {exact,sampled}x{raw,norm} cells at both depths (p=1 mean regret
+  0.021 vs exact-norm 0.047, sign p=8e-29; p=3 0.024 vs 0.044), uniform
+  over 7 families, replicating at n=16 (34/35 both depths). Mechanism
+  nailed: the gain is the sampling NOISE acting through the normalized
+  objective (replicate-averaging restores exact-N regret; S=3 best), and
+  at depth it must be the sampler's structured, marginal-preserving noise
+  (iid noise wins at p=1, only hurts at p=3). In the paper, Sec. 6.1.
+  → [experiments/041](experiments/041_sampled-plus-normalized/README.md),
+  [042](experiments/042_sampled-N-mechanism/README.md),
+  [043](experiments/043_synthetic-noise-control/README.md),
+  [044](experiments/044_composed-recipe-n16/README.md)
+
+- **The poly-time N estimator exists: the open question closes YES (exp
+  046, 2026-08-01).** Wang-Landau density of states + flat-histogram MCMC
+  class members + K=200 random d-subsets per profile row + estimated
+  counts + normalized objective reproduces the recipe's regret in pooled
+  mean within 0.01 AR at n<=14 (p=1: best variant tested, 0.011, better
+  49/70 vs the enumeration sampler; p=3 trails by ~0.005), misses zero
+  attained classes, and crosses below enumeration wall-clock at n=20.
+  Prototype-grade scoping in the paper (two places, Sec. 6.1 +
+  contributions). The recipe's n<~30 ceiling becomes an extrapolation
+  question. → [experiments/046](experiments/046_polytime-N-estimator/README.md)
+
+- **The margin-subtracted certificate is free but closes little (exp 045,
+  2026-08-01, NEGATIVE).** Rigorous, never worse, holds 140/140; median
+  tightness improves only 10.2->9.5 / 11.3->10.6 because the margin
+  (~0.03) is an order below the eps sum (~0.46). The slack lives in the
+  pointwise Cauchy-Schwarz step: selection-aware regret theory remains
+  the open problem, now sharply delimited. One sentence in the paper.
+  → [experiments/045](experiments/045_selection-aware-certificate/README.md)
+
+- **The evidence base regenerates (reproduction sweep, 2026-08-01).**
+  All 45 experiment dirs verified: 17 full local reruns byte-identical
+  (incl. the 840-run E003), the rest recompute from committed CSVs; zero
+  reproduction failures; three conservative README imprecisions fixed.
+  → [reproduction_sweep_2026-08-01.md](reproduction_sweep_2026-08-01.md)
+
 ## Working hypotheses (NOT established — from the deleted research log or intuition)
 
 - H1: The proxy's usefulness is governed by leakage out of the cost-class subspace,
