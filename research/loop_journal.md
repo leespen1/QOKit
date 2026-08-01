@@ -719,3 +719,10 @@ overnight cadence after that.
   and delivered now (research/loop2_wrapup.md) rather than sitting idle.
   Loop stays on light heartbeats through the window to catch any new
   Spencer directives; hard stop unchanged (2026-08-03 ~19:12 JST).
+
+## Loop 2 end (2026-08-01 17:30)
+
+- Loop stopped early by its own judgment: all goals complete, digest
+  delivered, Spencer notified; idle heartbeats through 08-03 would be
+  pure overhead (and Spencer can message the session at any time).
+  Restartable with /loop.
