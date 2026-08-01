@@ -36,3 +36,5 @@ agent batches when limits allow).
 | 017_error-directions | REPRODUCED_FULL | rerun byte-identical (first July-series full rerun) |
 | 010_scaleup-ranking | ANALYSIS_VERIFIED | full rerun exceeded the 1 h local budget (timeout); headline numbers (sign test 26/28 p=1.5e-6, rho fade) recomputed from committed CSVs by the audit |
 | 011_depth-scaling | ANALYSIS_VERIFIED | same timeout; +11-33%/25-57% growth recomputed from CSVs (audit), README refreshed accordingly |
+| 003_leakage-vs-overlap | REPRODUCED_FULL | rerun byte-identical (840 p=20 runs; the heaviest local rerun, ~1.5 h) |
+| 013_timing-benchmark | ANALYSIS_VERIFIED | timing is machine-dependent by nature; all 24 committed table cells verified against results.csv by the audit |
