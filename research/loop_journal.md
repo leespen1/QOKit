@@ -670,3 +670,14 @@ overnight cadence after that.
   depth". Pushed both repos.
 - Science threads now closed for the window. Remaining: explainer E047
   touch, final one-document coherence read, wrap-up digest.
+
+## Iteration 24 (2026-08-01 ~15:30)
+
+- Coherence read landed (paper commit bc32dfc, pushed): the paper reads as
+  one document; stale E046-range/tags fixed, the n<=14-vs-n=16 validation
+  contradiction reconciled (FLAG for Spencer: the text now says validated
+  to n=16, matching its own numbers; E047's README frames n=16 as "one
+  size beyond validation" — pick a framing), Background headings starred,
+  cites tied. Numbers agree everywhere spot-checked.
+- E048 launched (background julia, ~2-3 h): the n=18 point for the
+  estimator's depth-split trends, closing E047's two-points caveat.
