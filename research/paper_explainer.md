@@ -1187,6 +1187,7 @@ MaxCut-specific vs random-like) is stated where it is used.
 | composed recipe replicates at n=16 (Sec. 6.1) | 34/35 both depths; 0.018/0.024 vs exact-norm 0.061/0.060; $S=3$: 0.0067 | E044 |
 | margin-subtracted certificate: free, closes little | median tightness 10.2->9.5 ($p1$), 11.3->10.6 ($p3$); margin ~0.03 vs eps sum ~0.46 | E045 |
 | poly-time N estimator validates (Sec. 6.1) | $p1$ mean 0.011 (best variant); $p3$ 0.030 vs samp10 0.025; wall-clock crossover at n=20 | E046 |
+| estimator hardening: depth-split verdict | $p1$ improves with n (0.0084 at n=16, K=50 best); $p3$ deficit widens (+0.022 at n=16); n=24 in ~1.3 s | E047 |
 
 ## If you remember five things
 

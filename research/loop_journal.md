@@ -655,3 +655,18 @@ overnight cadence after that.
   hyperparameter robustness at n=12, n=16 validation (does poly's p=1
   advantage keep growing with n?), and timing at n in {16,20,24}
   including Wang-Landau step counts.
+
+## Iteration 23 (2026-08-01 ~14:40)
+
+- E047 landed and digested inline (agent stood down cleanly after the
+  wasteful wake-cycle was cut off). Verdict split by depth: at p=1 the
+  estimator is robust and IMPROVES with n (n=16: 0.0084, better 29/35;
+  K=50 best at n=12 with 0.0061 — noise mechanism again); at p=3 the
+  deficit to the enumeration sampler is not repaired by any (S,K) and
+  WIDENS at n=16 (+0.022, better only 7/35). n=24 estimation ~1.3 s,
+  ~2.6M WL steps, zero missed classes at all sizes. Paper scoping
+  corrected in both E046 sites: "lifting the ceiling at low depth",
+  explicit depth-deficit numbers, "prefer the enumeration sampler at
+  depth". Pushed both repos.
+- Science threads now closed for the window. Remaining: explainer E047
+  touch, final one-document coherence read, wrap-up digest.
