@@ -34,3 +34,5 @@ agent batches when limits allow).
 | 009_trajectory-pca | REPRODUCED_FULL | rerun byte-identical |
 | 012_fitted-shape-paradox | REPRODUCED_FULL | rerun byte-identical |
 | 017_error-directions | REPRODUCED_FULL | rerun byte-identical (first July-series full rerun) |
+| 010_scaleup-ranking | ANALYSIS_VERIFIED | full rerun exceeded the 1 h local budget (timeout); headline numbers (sign test 26/28 p=1.5e-6, rho fade) recomputed from committed CSVs by the audit |
+| 011_depth-scaling | ANALYSIS_VERIFIED | same timeout; +11-33%/25-57% growth recomputed from CSVs (audit), README refreshed accordingly |
