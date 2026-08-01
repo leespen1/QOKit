@@ -613,3 +613,20 @@ overnight cadence after that.
   extrapolation question. Raw objective collapses under estimated counts:
   the normalized objective is an essential partner (consistent with the
   whole E041-E044 mechanism story).
+
+## Iteration 20 (2026-08-01 ~11:15)
+
+- Four-referee gauntlet returned: 2 BLOCKERs (both my own mid-sentence
+  %-comment bugs swallowing words in the rendered PDF), 7 MAJOR, 15 MINOR;
+  11 fixes applied and pushed by the agent (incl. purging three leftover
+  "only the analytical N survives" sentences that contradicted E046,
+  softening "fully polynomial" to per-sweep-polynomial with a WL
+  heuristic-convergence caveat + citation, aligning E011 numbers to the
+  record, E-range pointers to E001-E046). One genuine number discrepancy
+  found and fixed (E011 +13-30% -> +11-33%). Verdict unchanged: MINOR
+  REVISION at QINP tier.
+- Deferred items resolved by coordinator: "margin widens" softened to
+  "at least the same margin" with the formal-test caveat; 49/70 sign
+  count disclosed; abstract left as-is (stakes the calculus; the
+  contributions list carries the new results). Remaining open: Spencer's
+  declarations + Zenodo archive only.
