@@ -681,3 +681,17 @@ overnight cadence after that.
   cites tied. Numbers agree everywhere spot-checked.
 - E048 launched (background julia, ~2-3 h): the n=18 point for the
   estimator's depth-split trends, closing E047's two-points caveat.
+
+## Iteration 25 (2026-08-01 ~17:00)
+
+- E048 landed and digested: at n=18 the estimator's p=1 advantage is a
+  statistical tie (+0.001, 11w/10l) — "grows with n" was premature and is
+  now corrected in the paper to "beats at n<=16, ties at n=18"; the depth
+  deficit is confirmed on three sizes (0.005/0.02/0.026) and quoted as
+  such. Validation frontier updated to n=18. Bonus: the composed recipe
+  extends to n=18 (beats exact-normalized 20/21 at p=1, 17/19 decided at
+  p=3), added to the paper's stability sentence. Zero missed classes
+  again. Both repos pushed; 21 pp clean.
+- All science and verification threads for the window are now closed.
+  Remaining: long-idle cadence, then the Spencer wrap-up digest in the
+  final hours (2026-08-03 afternoon JST).

@@ -1188,6 +1188,7 @@ MaxCut-specific vs random-like) is stated where it is used.
 | margin-subtracted certificate: free, closes little | median tightness 10.2->9.5 ($p1$), 11.3->10.6 ($p3$); margin ~0.03 vs eps sum ~0.46 | E045 |
 | poly-time N estimator validates (Sec. 6.1) | $p1$ mean 0.011 (best variant); $p3$ 0.030 vs samp10 0.025; wall-clock crossover at n=20 | E046 |
 | estimator hardening: depth-split verdict | $p1$ improves with n (0.0084 at n=16, K=50 best); $p3$ deficit widens (+0.022 at n=16); n=24 in ~1.3 s | E047 |
+| n=18 settles the trends | $p1$ tie (0.0154 vs 0.0143); $p3$ deficit +0.026 (2/21); composed recipe beats exact 20/21 and 17/19 | E048 |
 
 ## If you remember five things
 
