@@ -630,3 +630,18 @@ overnight cadence after that.
   count disclosed; abstract left as-is (stakes the calculus; the
   contributions list carries the new results). Remaining open: Spencer's
   declarations + Zenodo archive only.
+
+## Iteration 21 (2026-08-01 ~12:30)
+
+- **Reproduction sweep COMPLETE: 45/45, zero reproduction failures.**
+  17 full local reruns all byte-identical (including E003's 840 p=20 runs
+  and the E041-E046 series); the rest analysis-verified (every README
+  headline recomputes from committed CSVs — the July 018-032 agent needed
+  no HPC data at all). Three README-side imprecisions fixed, all
+  conservative or tolerance-level, none in the paper. Summary paragraph
+  in research/reproduction_sweep_2026-08-01.md. The evidence base
+  regenerates.
+- Verification-gauntlet arm of the token plan is now done (audits ->
+  referee gauntlet -> reproduction sweep). Science arm done through E046.
+  Remaining before the window closes: STATUS refresh, final coherence
+  read of the paper as one document, wrap-up digest.
