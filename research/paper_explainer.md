@@ -933,6 +933,22 @@ resolved; E042/E043 resolved it, and the arc entered qinp_paper.tex on
 2026-07-31 as one scoped paragraph at the end of Sec. 6.1 (best proxy
 variant at $p\le3$; within a family, transfer still wins).*
 
+Two follow-ups landed 2026-08-01. E045 (negative, in the paper as one
+sentence): subtracting the proxy-computable margin from the regret
+certificate is rigorous and free but closes little of the 10x slack; the
+slack lives in the pointwise Cauchy-Schwarz step, so sharp regret theory
+still needs to model selection. E046 (positive, in the paper in two
+places): the open question "does N admit a polynomial-time estimator?"
+closes YES. Wang-Landau density of states + flat-histogram MCMC class
+members + K=200 random d-subsets per profile row + estimated counts +
+the normalized objective reproduces the recipe's regret within 0.01 AR
+at validation sizes (n<=14), is the BEST variant at p=1 (mean 0.011),
+trails the enumeration sampler by ~0.005 at p=3, and its wall-clock
+crosses below enumeration at n=20. The estimator's noise behaves like
+the sampler's own (the E042/E043 mechanism), and the raw objective
+collapses under estimated counts, so normalization is essential. Scoped
+prototype-grade in the paper: unvalidated beyond n=14 against truth.
+
 - **E041 (sampled + normalized composes, and overshoots).** The two
   separately-validated ingredients combine better than either alone:
   sampled $N$ ($S=10$) + normalized objective is the best of all four
@@ -1169,6 +1185,8 @@ MaxCut-specific vs random-like) is stated where it is used.
 | noise is the ingredient (Sec. 6.1) | replicate-averaged loses gain; $S=3$ best (0.012/0.016); converges to exact by $S=300$ | E042 |
 | structured noise required at depth (Sec. 6.1) | iid noise wins at $p1$ ($\sigma=0.1$: 0.011) but only hurts at $p3$ (0.036--0.126) | E043 |
 | composed recipe replicates at n=16 (Sec. 6.1) | 34/35 both depths; 0.018/0.024 vs exact-norm 0.061/0.060; $S=3$: 0.0067 | E044 |
+| margin-subtracted certificate: free, closes little | median tightness 10.2->9.5 ($p1$), 11.3->10.6 ($p3$); margin ~0.03 vs eps sum ~0.46 | E045 |
+| poly-time N estimator validates (Sec. 6.1) | $p1$ mean 0.011 (best variant); $p3$ 0.030 vs samp10 0.025; wall-clock crossover at n=20 | E046 |
 
 ## If you remember five things
 
