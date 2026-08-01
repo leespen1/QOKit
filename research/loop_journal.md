@@ -596,3 +596,20 @@ overnight cadence after that.
   paper edit.
 - Sweep: E004 (gate) byte-identical earlier this morning; E005+E006
   reruns still executing.
+
+## Iteration 19 (2026-08-01 ~10:15)
+
+- **E046 COMPLETE: the paper's open question closes positively.** A fully
+  polynomial pipeline (Wang-Landau density of states -> flat-histogram
+  MCMC class members -> K=200 random d-subsets per profile row ->
+  estimated counts + normalized objective) matches the exponential
+  enumeration sampler within 0.01 AR at n<=14 (p=1: BEST variant, mean
+  0.011, better 49/70 vs samp10; p=3: 0.030 vs 0.025, within band),
+  misses zero attained classes, and crosses below enumeration wall-clock
+  at n=20 (0.96s vs 1.70s, 3 instances). QOKit commits 43de9c98/4755e46d.
+  Paper updated in two places (contributions item, practical subsection)
+  with prototype-grade scoping; 21 pp, clean build, pushed.
+- The recipe's domain converts from a hard n<~30 ceiling to an
+  extrapolation question. Raw objective collapses under estimated counts:
+  the normalized objective is an essential partner (consistent with the
+  whole E041-E044 mechanism story).
