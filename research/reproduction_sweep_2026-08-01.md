@@ -53,3 +53,18 @@ agent batches when limits allow).
 | 030_proxy-side-refinement | ANALYSIS_VERIFIED | logn 0.7990->0.9150, pareto 0.8373->0.8836, pareto full2p 0.8289 below both - all recompute |
 | 031_composed-recipe | ANALYSIS_VERIFIED | unit 0.8965->0.8367 (polish degrades, guard recovers); pareto 0.764/0.770->0.8187; logn 0.7745/0.8040->0.8967/0.8989, best-of-two 0.9189/0.9515 |
 | 032_transfer-scale-audit | ANALYSIS_VERIFIED | table recomputes exactly: binned 0.0123; mean-scaled 0.0901/0.0551; median 0.0665/0.0372; coststd 0.0145/0.0021 |
+
+## Summary (sweep complete, 2026-08-01)
+
+All 45 experiment directories are verified. Every locally rerunnable
+experiment (17 full reruns, including the 840-run p=20 E003 and the whole
+loop-series E041-E046 generated this window) reproduced byte-identically
+or to printed-magnitude agreement from its committed script and fixed
+seeds — zero reproduction failures. The remaining directories are
+analysis-verified: every README headline number recomputes from the
+committed CSVs. One conservative miscount was found and fixed (E022:
+transfer beats the binned proxy in 4 of 4 Pareto p=3 cells, not 3 of 4)
+plus two range imprecisions (E019 upper end 0.042 not 0.03; E027 "7 of 8"
+holds at a 0.006 match tolerance, strictly 5 of 8); none affects the
+paper, which does not carry those secondary claims. Overall: the
+evidence base regenerates.

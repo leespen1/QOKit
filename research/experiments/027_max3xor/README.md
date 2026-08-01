@@ -7,8 +7,9 @@ compression, sampled-N ≈ exact-N, and transfer dominance on unweighted
 instances?
 
 **Answer. Everything replicates.** Exact-compression p=1 regret
-0.031–0.040 (MaxCut magnitude); sampled-N matches or beats exact in 7 of
-8 cells (8n, n=16, p=3: 0.044 vs 0.086 — the regularization effect's
+0.031–0.040 (MaxCut magnitude); sampled-N matches (within 0.006) or beats
+exact in 7 of 8 cells, strictly beats in 5 (clearest: 8n, n=16, p=3:
+0.044 vs 0.086 — the regularization effect's
 fourth independent occurrence); transfer and even the pooled universal
 schedule are near-perfect on unweighted 3-XOR (regret ≈ 0.000 in most
 cells — concentration stronger than MaxCut's); small-angle leakage

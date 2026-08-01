@@ -16,14 +16,16 @@ lottery (0.02–0.14). Exponential weights remain transfer's territory.**
 Array 11751040, all 8 tasks COMPLETED (~1–3 min each). Cell means in
 analysis below. Reading:
 
-- **Exp(1):** transfer still wins everywhere (regret 0.002–0.015 vs binned
+- **Exp(1):** transfer still wins everywhere (regret 0.0001–0.0145 vs binned
   0.028–0.117) — mild i.i.d. heterogeneity behaves like E021's U[0,1].
 - **Pareto(1.5), p=1:** binned proxy 0.012–0.022; every transfer source
   0.031–0.099; universal 0.032–0.111. Mean-weight rescaling fails because
   the mean is tail-dominated — one or two giant edges reshape the
   landscape in a way no cross-instance schedule can track, while the
   quantile bins absorb them per instance.
-- **Pareto(1.5), p=3:** best-of-3 transfer still edges the binned proxy in
+- **Pareto(1.5), p=3:** best-of-3 transfer edges the binned proxy in all 4 cells (an earlier
+digest said 3 of 4; CSV recount 2026-08-01 gives 4 of 4, i.e. more in
+transfer's favor) —
   3 of 4 cells, but with enormous source variance (same-family sources
   range 0.021 → 0.140); the binned proxy sits stably at 0.046–0.067.
   Risk-adjusted, the per-instance method is the defensible choice.

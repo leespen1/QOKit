@@ -12,7 +12,8 @@ All 10 tasks COMPLETED (array 11740470; n=26 tasks ~30 min each). Full
 table: [analysis.txt](analysis.txt).
 
 1. **Depth (p=10, 20; n=14–16):** E018's dense-ER strain closes in
-   *transfer's* favor. Single-source transfer regret is 0.001–0.03
+   *transfer's* favor. Single-source transfer regret is 0.001–0.042 (worst cell 0.0424,
+3-regular n=14 p=10; most cells under 0.03)
    (best-of-3 ≤ 0.007 in every cell) while every proxy variant collapses:
    exact compression 0.07–0.14, sampled-N 0.11–0.21, analytical 0.18–0.37.
    The zero-model-error compression itself misplaces the argmax by ~0.1 AR
