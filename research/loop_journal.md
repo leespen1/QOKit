@@ -645,3 +645,13 @@ overnight cadence after that.
   referee gauntlet -> reproduction sweep). Science arm done through E046.
   Remaining before the window closes: STATUS refresh, final coherence
   read of the paper as one document, wrap-up digest.
+
+## Iteration 22 (2026-08-01 ~13:10)
+
+- STATUS What-we-know refreshed with four new entries: the noise-
+  regularization arc (E041-E044), the estimator closure (E046), the E045
+  negative, and the reproduction sweep. Pushed.
+- E047 launched (single agent): estimator hardening — (S,K)
+  hyperparameter robustness at n=12, n=16 validation (does poly's p=1
+  advantage keep growing with n?), and timing at n in {16,20,24}
+  including Wang-Landau step counts.
