@@ -712,3 +712,10 @@ overnight cadence after that.
   revision with only Spencer-owned gaps, sweep 45/45, E041-E048 arc
   settled on three sizes. Loop enters idle cadence; wrap-up digest in the
   final hours.
+
+## Iteration 28 (2026-08-01 ~16:30) — wrap-up delivered early
+
+- All work complete ~48 h before the hard stop; wrap-up digest written
+  and delivered now (research/loop2_wrapup.md) rather than sitting idle.
+  Loop stays on light heartbeats through the window to catch any new
+  Spencer directives; hard stop unchanged (2026-08-03 ~19:12 JST).
